@@ -1,0 +1,45 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  print: CollectionEntry<'prints'>;
+  eager?: boolean;
+}
+
+const { print, eager = false } = Astro.props;
+const { data } = print;
+const from = Math.min(...data.options.map((o) => o.price));
+---
+
+<a href={`/prints/${print.id}`} class="group block">
+  {/* Prints are shown "matted" — a lifted surface around the image sets the
+      shop apart from the flush plates of the gallery archive. */}
+  <div class="hover-lift border hairline bg-surface p-4 sm:p-5">
+    <div class="overflow-hidden">
+      <Image
+        src={data.image}
+        alt={data.alt}
+        widths={[420, 640, 960, 1280]}
+        sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw"
+        class="aspect-[4/5] w-full object-cover"
+        loading={eager ? 'eager' : 'lazy'}
+        quality={75}
+      />
+    </div>
+  </div>
+  <div class="mt-3 flex items-baseline justify-between gap-3">
+    <h3
+      class="font-display text-lg leading-snug text-star transition-colors duration-200 group-hover:text-dust-bright"
+    >
+      {data.title}
+    </h3>
+    <span
+      class="hidden font-mono text-[0.6875rem] text-faint transition-colors duration-200 group-hover:text-dust sm:inline"
+      aria-hidden="true">↗</span
+    >
+  </div>
+  <p class="mt-1 font-mono text-[0.6875rem] uppercase [letter-spacing:0.08em] text-faint">
+    {data.edition} · from ${from} CAD
+  </p>
+</a>

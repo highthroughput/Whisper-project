@@ -1,0 +1,28 @@
+{
+  "name": "abdur-astro",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Astrophotography portfolio and print shop — deep-sky imaging from Central Alberta, Canada.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.4.1",
+    "@fontsource-variable/archivo": "^5.2.5",
+    "@fontsource/ibm-plex-mono": "^5.2.5",
+    "@fontsource/marcellus": "^5.2.5",
+    "@tailwindcss/vite": "^4.1.11",
+    "astro": "^7.2.9",
+    "sharp": "^0.34.4",
+    "tailwindcss": "^4.1.11"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "typescript": "^5.8.3"
+  }
+}

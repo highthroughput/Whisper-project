@@ -1,0 +1,130 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import portrait from '../assets/photos/PLACEHOLDER-portrait-telescope.jpg';
+
+const gear = [
+  {
+    group: 'Optics',
+    items: [
+      ['Celestron EdgeHD 8″', 'f/7 with reducer · galaxies & small targets'],
+      ['Sky-Watcher Esprit 100ED', 'f/5.5 triplet · widefield nebulae'],
+    ],
+  },
+  {
+    group: 'Camera',
+    items: [
+      ['ZWO ASI2600MM Pro', 'cooled mono · APS-C'],
+      ['ZWO ASI220MM Mini', 'off-axis guiding'],
+    ],
+  },
+  {
+    group: 'Mount',
+    items: [['Sky-Watcher EQ6-R Pro', 'belt-modded · permanent pier']],
+  },
+  {
+    group: 'Filters',
+    items: [
+      ['Chroma 3nm', 'Ha · OIII · SII narrowband'],
+      ['Antlia V-Pro', 'LRGB broadband set'],
+    ],
+  },
+  {
+    group: 'Control & processing',
+    items: [
+      ['N.I.N.A. + PHD2', 'acquisition & guiding automation'],
+      ['PixInsight', 'calibration through final grade'],
+    ],
+  },
+];
+---
+
+<Base
+  title="About"
+  description="Abdur is an astrophotographer in Central Alberta, Canada, photographing galaxies and nebulae from backyard and dark-sky sites — and teaching astrophotography through tutorials, talks, and star parties."
+  ogImage={portrait}
+  ogImageAlt="Portrait placeholder — Abdur with his telescope rig."
+>
+  <section class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
+    <div class="grid gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
+      <div class="lg:sticky lg:top-8 lg:self-start">
+        <div class="border hairline bg-surface p-4 sm:p-5">
+          <Image
+            src={portrait}
+            alt="Placeholder portrait: replace with a photograph of Abdur standing with his telescope rig under an Alberta sky."
+            widths={[420, 640, 960, 1280]}
+            sizes="(min-width: 1024px) 40vw, 92vw"
+            class="aspect-[4/5] w-full object-cover"
+            loading="eager"
+            quality={80}
+          />
+        </div>
+        <p class="mt-3 font-mono text-[0.6875rem] uppercase [letter-spacing:0.08em] text-faint">
+          The observer &amp; the rig · Central Alberta
+        </p>
+      </div>
+
+      <div>
+        <p class="eyebrow">The observer</p>
+        <h1 class="mt-3 font-display text-4xl sm:text-5xl">About Abdur</h1>
+
+        {/* PLACEHOLDER COPY — replace with Abdur's real bio (see README "Replace before launch"). */}
+        <div class="mt-8 max-w-prose space-y-5 leading-relaxed text-star/85">
+          <p>
+            Abdur is an astrophotographer working from Central Alberta, where the prairie
+            meets some of the darkest accessible skies in Canada. His subjects are deep-sky
+            objects — galaxies tens of millions of light-years out, and the nebulae where
+            stars are born and die — photographed over dozens of hours per target from a
+            backyard observatory and from Bortle 2 sites in the foothills.
+          </p>
+          <p>
+            The work sits at the intersection of patience and precision: months of planning
+            around moon phases and Alberta weather, nights of automated capture at −30 °C,
+            and long days rendering faint signal into photographs that hold up on a gallery
+            wall. Every image in the archive carries its full observation log, because in
+            this craft the data is part of the picture.
+          </p>
+          <p>
+            Off the pier, Abdur teaches — one-on-one astrophotography tutorials online across
+            Canada and in person around Central Alberta — consults on equipment and remote
+            observatory builds, speaks at astronomy events, and hosts private star parties
+            under the skies that made all of this possible.
+          </p>
+        </div>
+
+        <div class="mt-8 flex flex-wrap gap-4">
+          <a href="/services" class="btn">Work with Abdur</a>
+          <a href="/contact" class="btn btn-solid">Say hello</a>
+        </div>
+
+        {/* Gear list, set as a field inventory — same log grammar as the archive */}
+        <section class="reveal mt-16 border hairline bg-surface" aria-labelledby="gear-heading">
+          <header
+            class="flex items-baseline justify-between border-b hairline px-5 py-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)]"
+          >
+            <h2 id="gear-heading" class="text-faint">Field inventory</h2>
+            <span class="text-dust">Current rig</span>
+          </header>
+          <dl class="px-5 py-3 font-mono text-[0.8125rem]">
+            {
+              gear.map(({ group, items }, i) => (
+                <div class:list={['py-3', i > 0 && 'border-t hairline']}>
+                  <dt class="text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+                    {group}
+                  </dt>
+                  {items.map(([name, note]) => (
+                    <dd class="mt-2 flex items-baseline">
+                      <span class="text-star">{name}</span>
+                      <span class="log-leader" aria-hidden="true" />
+                      <span class="text-right text-faint">{note}</span>
+                    </dd>
+                  ))}
+                </div>
+              ))
+            }
+          </dl>
+        </section>
+      </div>
+    </div>
+  </section>
+</Base>
