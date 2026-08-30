@@ -1,5 +1,5 @@
-# abdurastro.ca — PLACEHOLDER domain: update the Sitemap line when the real domain is set.
+# abdurastro.com — keep the Sitemap line in sync with `site` in astro.config.mjs.
 User-agent: *
 Allow: /
 
-Sitemap: https://abdurastro.ca/sitemap-index.xml
+Sitemap: https://abdurastro.com/sitemap-index.xml

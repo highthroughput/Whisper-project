@@ -2,6 +2,7 @@
 import { Image, getImage } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import { cleanPathname } from '../../lib/urls';
 
 export async function getStaticPaths() {
   const prints = await getCollection('prints');
@@ -23,7 +24,7 @@ const sizes = [...new Set(data.options.map((o) => o.size))].map((size) => ({
   papers: data.options.filter((o) => o.size === size),
 }));
 
-const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const canonical = new URL(cleanPathname(Astro.url.pathname), Astro.site).href;
 const description = `${data.title} fine art print — archival giclée astrophotography from Alberta on matte or baryta cotton papers, ${data.options[0].size} to ${data.options[data.options.length - 1].size}, from $${from} CAD. Ships across Canada.`;
 
 const schemaImage = await getImage({ src: data.image, width: 1200, format: 'jpeg', quality: 80 });
