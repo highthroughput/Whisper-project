@@ -5,9 +5,9 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-  // PLACEHOLDER — replace with the real production domain before launch.
-  // Used for canonical URLs, the sitemap, Open Graph URLs, and JSON-LD.
-  site: 'https://abdurastro.ca',
+  // Production domain (registered via Cloudflare). Drives canonical URLs,
+  // the sitemap, Open Graph URLs, and JSON-LD — change only if the domain changes.
+  site: 'https://abdurastro.com',
   // `file` build format + no trailing slashes matches how Cloudflare Pages
   // canonicalizes clean URLs (/gallery -> gallery.html), so canonical tags,
   // the sitemap, and the served URLs all agree.

@@ -22,6 +22,7 @@ documented in [DESIGN.md](./DESIGN.md).
 Requires **Node 22.12+**.
 
 ```sh
+cd abdur-astro
 npm install
 npm run dev        # http://localhost:4321
 npm run build      # static build to dist/
@@ -189,37 +190,22 @@ Replace each token in the named file under `src/content/prints/` with a real
 
 ### 5. Email, socials, domain
 
-- [ ] `email` in `src/config.ts` (currently `hello@abdurastro.ca`)
+- [x] Domain: `site` in `astro.config.mjs` and the `Sitemap:` line in
+      `public/robots.txt` are set to `https://abdurastro.com` — change only if
+      the domain ever changes, then rebuild and spot-check a canonical tag
+- [ ] Email forwarding for `hello@abdurastro.com` set up in Cloudflare Email
+      Routing and tested (the address is already wired into the site and the
+      contact form's fallback message)
 - [ ] Three social URLs in `src/config.ts` (`PLACEHOLDER_YOUTUBE`,
       `PLACEHOLDER_INSTAGRAM`, `PLACEHOLDER_FACEBOOK`)
-- [ ] `site` in `astro.config.mjs` — the real production domain (drives
-      canonicals, sitemap, OG URLs, JSON-LD)
-- [ ] `Sitemap:` URL in `public/robots.txt` — same domain
-- [ ] Rebuild + redeploy after the domain change, then spot-check a canonical tag
-
-## Putting this on GitHub
-
-One-time, from inside this folder (needs [git](https://git-scm.com) and a GitHub
-account — create an empty repository first, e.g. `abdur-astro`, with no README):
-
-```sh
-git init -b main
-git add -A
-git commit -m "Abdur Astro website"
-git remote add origin https://github.com/<your-username>/abdur-astro.git
-git push -u origin main
-```
-
-No git installed? On the empty GitHub repository page choose **uploading an
-existing file** and drag the entire contents of this folder into the browser.
 
 ## Deploying to Cloudflare Pages
 
-The site sits at the repository root, so Cloudflare's Astro defaults almost
-work out of the box.
+The repository root is `Whisper-project/`; the site lives in the `abdur-astro/`
+subdirectory — set the **root directory** accordingly in step 4.
 
-1. **Push to GitHub** (see "Putting this on GitHub" above). The project deploys
-   from a GitHub branch (use `main` for production).
+1. **Push to GitHub.** The project deploys from a GitHub branch (use `main` for
+   production).
 2. **Create the Pages project.** Cloudflare dashboard → **Workers & Pages →
    Create → Pages → Connect to Git** → authorize GitHub and pick this repository.
 3. **Pick the production branch** (`main`).
@@ -227,33 +213,34 @@ work out of the box.
    - Framework preset: **Astro**
    - Build command: `npm run build`
    - Build output directory: `dist`
-   - Root directory: leave as the default (the repo root)
+   - **Root directory (advanced): `abdur-astro`**
    - Environment variable: `NODE_VERSION` = `22.12.0` (Astro 7 requires Node
      22.12+; Cloudflare's default may be older)
 5. **Save and Deploy.** First build takes a few minutes (image optimization);
    the site goes live at `<project>.pages.dev`. Every push to `main` redeploys;
    pushes to other branches create preview deployments.
 6. **Custom domain.** Pages project → **Custom domains → Set up a custom
-   domain** → enter the domain (e.g. `abdurastro.ca`).
+   domain** → enter the domain (e.g. `abdurastro.com`).
    - Domain on Cloudflare (recommended — transfer or point its nameservers at
      Cloudflare first): the CNAME is created automatically and TLS issues within
-     minutes. Add both `abdurastro.ca` and `www.abdurastro.ca`; Cloudflare
+     minutes. Add both `abdurastro.com` and `www.abdurastro.com`; Cloudflare
      redirects the alternate automatically.
    - Domain elsewhere: add the CNAME record Cloudflare shows you at your DNS host.
-7. **Update the code's domain** (`astro.config.mjs` `site` + `robots.txt`), push,
-   and let it redeploy — now canonicals, sitemap, and OG URLs carry the real domain.
-8. **Email forwarding** (so `hello@abdurastro.ca` works — requires the domain's
+7. **Code's domain is already set** to `https://abdurastro.com`
+   (`astro.config.mjs` `site` + `robots.txt`) — nothing to change unless the
+   domain itself changes.
+8. **Email forwarding** (so `hello@abdurastro.com` works — requires the domain's
    DNS on Cloudflare): dashboard → the domain (not the Pages project) → **Email →
    Email Routing → Get started**.
    - Add the **destination address** (the personal inbox that should receive
      mail) and click the verification link Cloudflare emails to it.
    - Enable routing — Cloudflare adds the required MX and SPF records itself.
-   - **Routing rules → Create address**: `hello@abdurastro.ca` → forward to the
+   - **Routing rules → Create address**: `hello@abdurastro.com` → forward to the
      verified destination. Send a test email.
    - Note: Email Routing forwards inbound mail only. To *send* as
-     `hello@abdurastro.ca`, add it as a send-as alias in your mail provider.
+     `hello@abdurastro.com`, add it as a send-as alias in your mail provider.
 9. **Submit the sitemap** (optional, day one): Google Search Console → add the
-   domain → submit `https://abdurastro.ca/sitemap-index.xml`.
+   domain → submit `https://abdurastro.com/sitemap-index.xml`.
 
 ## Placeholder image credits
 

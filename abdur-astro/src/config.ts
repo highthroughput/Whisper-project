@@ -6,8 +6,8 @@ export const SITE = {
   name: 'Abdur Astro',
   tagline: 'Deep-sky astrophotography from the dark skies of Central Alberta',
 
-  /** PLACEHOLDER — replace with the real contact address once email forwarding is set up. */
-  email: 'hello@abdurastro.ca',
+  /** Goes live once Cloudflare Email Routing forwards it (see README deploy steps). */
+  email: 'hello@abdurastro.com',
 
   region: 'Central Alberta, Canada',
   /** Approximate — a wink at the observation log, not a home address. */

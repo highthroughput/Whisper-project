@@ -1,0 +1,27 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Only relevant if this project deploys via Wrangler ("Workers Builds" —
+  // deploy command `npx wrangler deploy`) rather than a classic Pages
+  // project. It tells Wrangler this is a static-assets-only Worker: build
+  // first (`npm run build`), then deploy serves everything from dist/.
+  //
+  // Name must match the Worker this GitHub repo is connected to in the
+  // Cloudflare dashboard (Workers & Pages → whisper-project) — Wrangler
+  // deploys by name, not by which repo/branch triggered the build.
+  "name": "whisper-project",
+  "compatibility_date": "2026-08-30",
+  // Cloudflare Workers Builds runs `wrangler deploy` (production branch) or
+  // `wrangler versions upload` (every other branch, incl. PR previews) —
+  // neither one is guaranteed to run the dashboard's "Build command" first.
+  // `build.command` is Wrangler's own pre-deploy hook, so the site always
+  // gets built regardless of which of those two entry points ran it.
+  "build": {
+    "command": "npm run build"
+  },
+  "assets": {
+    "directory": "./dist",
+    // Serve our custom-styled 404.html for any unmatched route, matching
+    // how Cloudflare Pages handles 404s automatically.
+    "not_found_handling": "404-page"
+  }
+}

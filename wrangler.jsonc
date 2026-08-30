@@ -1,0 +1,20 @@
+{
+  // Cloudflare Workers Builds runs preview/non-production branch builds
+  // (`npx wrangler versions upload`) with the repository root as the
+  // working directory — confirmed from a build log showing "Root
+  // directory: /" and "Build command: None" even though the dashboard's
+  // production-branch settings point at abdur-astro/. Wrangler only looks
+  // for a config file in its current directory, so abdur-astro/wrangler.jsonc
+  // (used for local `wrangler dev`/`versions upload` from inside that
+  // folder) is invisible to those builds. This repo-root copy is what they
+  // actually find, so it has to build and locate the site on its own.
+  "name": "whisper-project",
+  "compatibility_date": "2026-08-30",
+  "build": {
+    "command": "cd abdur-astro && npm install && npm run build"
+  },
+  "assets": {
+    "directory": "./abdur-astro/dist",
+    "not_found_handling": "404-page"
+  }
+}

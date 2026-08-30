@@ -8,6 +8,7 @@ import '../styles/global.css';
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import { SITE } from '../config';
+import { cleanPathname } from '../lib/urls';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import defaultOgSource from '../assets/photos/PLACEHOLDER-orion-nebula.jpg';
@@ -39,7 +40,7 @@ const {
 } = Astro.props;
 
 const fullTitle = isHome ? title : `${title} — ${SITE.name}`;
-const canonical = new URL(Astro.url.pathname, Astro.site);
+const canonical = new URL(cleanPathname(Astro.url.pathname), Astro.site);
 
 const og = await getImage({
   src: ogImage ?? defaultOgSource,
