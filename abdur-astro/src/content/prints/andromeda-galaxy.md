@@ -17,7 +17,7 @@ order: 0
 ---
 
 At 2.6 million light-years, Andromeda is the most distant object visible to the naked
-eye — and the only large spiral galaxy we see from an outside vantage point rather
+eye, and the only large spiral galaxy we see from an outside vantage point rather
 than from within, the way we see our own Milky Way. This print holds the full sweep
 of the disk: star-forming regions, dust lanes, and individual resolved stars across
 a galaxy of roughly a trillion suns.

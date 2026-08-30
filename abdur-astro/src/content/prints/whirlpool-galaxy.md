@@ -3,7 +3,7 @@ title: 'Whirlpool Galaxy'
 photo: 'whirlpool-galaxy'
 image: '../../assets/photos/whirlpool-galaxy.jpg'
 alt: 'Fine art print of the Whirlpool Galaxy, a face-on spiral with rust-brown dust lanes and a bright companion galaxy, on a near-black field. Alberta astrophotography print.'
-tagline: 'A grand-design spiral and its companion, 31 million light-years out — 30.5 hours of Alberta sky.'
+tagline: 'A grand-design spiral and its companion, 31 million light-years out, 30.5 hours of Alberta sky.'
 edition: 'Open edition · signed'
 options:
   - { size: '12 × 18″', paper: 'Archival matte', price: 145, stripeLink: 'STRIPE_LINK_WHIRLPOOL_12X18' }
@@ -21,6 +21,6 @@ as a single elegant spiral; up close, the dust lanes resolve into knots of star-
 clouds, and the bridge to the companion galaxy appears. It hangs beautifully over a
 desk or in a hallway where people pass close to it.
 
-Printed from the full-resolution master — every H II region in the arms survives at
+Printed from the full-resolution master: every H II region in the arms survives at
 24 × 36″. The near-black background is held just above pure black, so the print keeps
 its depth without turning into a void on the wall.

@@ -21,7 +21,7 @@ if (form) {
     const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
     if (subject && select) {
       const label = select.options[select.selectedIndex]?.text ?? 'General inquiry';
-      subject.value = `${label} — Abdur Astro contact form`;
+      subject.value = `${label} · Abdur Astro contact form`;
     }
 
     if (button) button.disabled = true;
@@ -36,13 +36,13 @@ if (form) {
       const result = (await response.json()) as { success?: boolean; message?: string };
       if (response.ok && result.success) {
         form.reset();
-        if (status) status.textContent = 'Received — thank you. Expect a reply within two days.';
+        if (status) status.textContent = 'Received, thank you. Expect a reply within two days.';
       } else {
         throw new Error(result.message ?? 'Submission failed');
       }
     } catch {
       if (status) {
-        status.textContent = 'Could not send just now — please email info@abdurastro.com directly.';
+        status.textContent = 'Could not send just now. Please email info@abdurastro.com directly.';
       }
     } finally {
       if (button) button.disabled = false;

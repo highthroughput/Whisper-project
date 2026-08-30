@@ -14,7 +14,7 @@ import Footer from '../components/Footer.astro';
 import defaultOgSource from '../assets/photos/andromeda-galaxy.jpg';
 
 interface Props {
-  /** Page title — rendered as "<title> — Abdur Astro" (home page passes its own full title). */
+  /** Page title, rendered as "<title> · Abdur Astro" (home page passes its own full title). */
   title: string;
   /** Unique per-page meta description. */
   description: string;
@@ -25,7 +25,7 @@ interface Props {
   schema?: Record<string, unknown>[];
   /** Let the header float over a full-bleed hero (home page). */
   overlayHeader?: boolean;
-  /** Set on the home page so the title reads as the brand, not "Home — Abdur Astro". */
+  /** Set on the home page so the title reads as the brand, not "Home · Abdur Astro". */
   isHome?: boolean;
 }
 
@@ -39,7 +39,7 @@ const {
   isHome = false,
 } = Astro.props;
 
-const fullTitle = isHome ? title : `${title} — ${SITE.name}`;
+const fullTitle = isHome ? title : `${title} · ${SITE.name}`;
 const canonical = new URL(cleanPathname(Astro.url.pathname), Astro.site);
 
 const og = await getImage({
@@ -51,7 +51,7 @@ const og = await getImage({
   quality: 80,
 });
 const ogUrl = new URL(og.src, Astro.site);
-const ogAlt = ogImageAlt ?? `${SITE.name} — deep-sky astrophotography`;
+const ogAlt = ogImageAlt ?? `${SITE.name}, deep-sky astrophotography`;
 
 const localBusiness = {
   '@context': 'https://schema.org',
@@ -59,7 +59,7 @@ const localBusiness = {
   '@id': new URL('/#business', Astro.site).href,
   name: SITE.name,
   description:
-    'Deep-sky astrophotography from Central Alberta, Canada — fine art prints, one-on-one astrophotography tutorials, equipment consulting, public speaking, and private star parties.',
+    'Deep-sky astrophotography from Central Alberta, Canada: fine art prints, one-on-one astrophotography tutorials, equipment consulting, public speaking, and private star parties.',
   url: Astro.site?.href,
   email: SITE.email,
   image: ogUrl.href,

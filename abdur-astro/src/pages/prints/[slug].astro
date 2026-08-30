@@ -25,14 +25,14 @@ const sizes = [...new Set(data.options.map((o) => o.size))].map((size) => ({
 }));
 
 const canonical = new URL(cleanPathname(Astro.url.pathname), Astro.site).href;
-const description = `${data.title} fine art print — archival giclée astrophotography from Alberta on matte or baryta cotton papers, ${data.options[0].size} to ${data.options[data.options.length - 1].size}, from $${from} CAD. Ships across Canada.`;
+const description = `${data.title} fine art print: archival giclée astrophotography from Alberta on matte or baryta cotton papers, ${data.options[0].size} to ${data.options[data.options.length - 1].size}, from $${from} CAD. Ships across Canada.`;
 
 const schemaImage = await getImage({ src: data.image, width: 1200, format: 'jpeg', quality: 80 });
 
 const productSchema = {
   '@context': 'https://schema.org',
   '@type': 'Product',
-  name: `${data.title} — Fine Art Astrophotography Print`,
+  name: `${data.title} · Fine Art Astrophotography Print`,
   description: data.tagline,
   image: new URL(schemaImage.src, Astro.site).href,
   brand: { '@type': 'Brand', name: 'Abdur Astro' },

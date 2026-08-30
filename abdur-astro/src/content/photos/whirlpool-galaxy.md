@@ -19,5 +19,5 @@ featured: true
 ---
 
 Full processing notes and acquisition details for this piece are coming soon. (44.5
-hours total integration, per the source file — filter breakdown, dates, and mount to
+hours total integration, per the source file; filter breakdown, dates, and mount to
 follow.)

@@ -15,7 +15,7 @@ const entries = [
     n: '01',
     href: '/gallery',
     title: 'Gallery',
-    text: 'The archive — galaxies and nebulae gathered over hundreds of hours of Alberta darkness.',
+    text: 'The archive: galaxies and nebulae gathered over hundreds of hours of Alberta darkness.',
   },
   {
     n: '02',
@@ -35,8 +35,8 @@ const entries = [
 <Base
   isHome
   overlayHeader
-  title="Abdur Astro — Deep-Sky Astrophotography from Central Alberta"
-  description="Deep-sky astrophotography from the dark skies of Central Alberta — fine art galaxy and nebula prints, one-on-one astrophotography tutorials, equipment consulting, and private star parties across Alberta, Canada."
+  title="Abdur Astro · Deep-Sky Astrophotography from Central Alberta"
+  description="Deep-sky astrophotography from the dark skies of Central Alberta: fine art galaxy and nebula prints, one-on-one astrophotography tutorials, equipment consulting, and private star parties across Alberta, Canada."
   ogImage={heroImage}
   ogImageAlt={heroPhoto?.data.alt}
 >
@@ -73,7 +73,7 @@ const entries = [
       {
         heroPhoto && (
           <p class="mt-8 font-mono text-[0.6875rem] uppercase [letter-spacing:0.08em] text-star/60">
-            In frame — {heroPhoto.data.target} {heroPhoto.data.title} · {heroPhoto.data.captured}
+            In frame: {heroPhoto.data.target} {heroPhoto.data.title} · {heroPhoto.data.captured}
           </p>
         )
       }

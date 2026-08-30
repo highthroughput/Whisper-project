@@ -28,11 +28,11 @@ const print = prints.find((p) => p.data.photo === photo.id);
 const printFrom = print ? Math.min(...print.data.options.map((o) => o.price)) : null;
 
 const hours = formatHours(totalHours(data.filters));
-const description = `${data.title} (${data.target}) photographed from ${data.location.split('·')[0]?.trim() ?? 'Central Alberta'} — ${hours} hours of ${filterNames(data.filters).replaceAll(' · ', '/')} integration. Full acquisition log: telescope, camera, mount, filters and capture dates.`;
+const description = `${data.title} (${data.target}) photographed from ${data.location.split('·')[0]?.trim() ?? 'Central Alberta'}, ${hours} hours of ${filterNames(data.filters).replaceAll(' · ', '/')} integration. Full acquisition log: telescope, camera, mount, filters and capture dates.`;
 ---
 
 <Base
-  title={`${data.title} — ${data.target}`}
+  title={`${data.title} · ${data.target}`}
   description={description}
   ogImage={data.image}
   ogImageAlt={data.alt}

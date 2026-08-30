@@ -24,12 +24,12 @@ if (form) {
       const result = (await response.json()) as { success?: boolean; message?: string };
       if (response.ok && result.success) {
         form.reset();
-        if (status) status.textContent = "You're on the list — thank you.";
+        if (status) status.textContent = "You're on the list, thank you.";
       } else {
         throw new Error(result.message ?? 'Signup failed');
       }
     } catch {
-      if (status) status.textContent = 'Could not sign up just now — please try again shortly.';
+      if (status) status.textContent = 'Could not sign up just now. Please try again shortly.';
     } finally {
       if (button) button.disabled = false;
     }
