@@ -66,6 +66,16 @@ const services = [
                 </p>
                 <p class="mt-5 leading-relaxed text-star/85">{service.body}</p>
                 {
+                  service.id === 'tutorials' && (
+                    <div class="mt-6 max-w-md">
+                      <p class="mb-2 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+                        A taste of the process
+                      </p>
+                      <YouTubeEmbed id="6wrQ08Mc2ac" title="NEW Siril Data Processing Guide V2 (Abdur Astro)" />
+                    </div>
+                  )
+                }
+                {
                   service.id === 'consulting' && (
                     <div class="mt-6 max-w-md">
                       <p class="mb-2 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">

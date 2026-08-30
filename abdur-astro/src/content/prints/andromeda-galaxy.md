@@ -6,12 +6,12 @@ alt: 'Fine art print of the Andromeda Galaxy, a broad spiral of blue-white starl
 tagline: 'Our nearest large galactic neighbour, two and a half million light-years out, from a backyard in Cochrane, Alberta.'
 edition: 'Open edition · signed'
 options:
-  - { size: '8 × 12″', paper: 'Archival matte', price: 65, stripeLink: 'https://buy.stripe.com/dRmdRbewuaF76F39bu3Nm00' }
-  - { size: '8 × 12″', paper: 'Baryta fibre', price: 85, stripeLink: 'STRIPE_LINK_ANDROMEDA_8X12_BARYTA' }
-  - { size: '16 × 24″', paper: 'Archival matte', price: 165, stripeLink: 'https://buy.stripe.com/dRmdRbewuaF76F39bu3Nm00' }
-  - { size: '16 × 24″', paper: 'Baryta fibre', price: 205, stripeLink: 'STRIPE_LINK_ANDROMEDA_16X24_BARYTA' }
-  - { size: '24 × 36″', paper: 'Archival matte', price: 295, stripeLink: 'https://buy.stripe.com/dRmdRbewuaF76F39bu3Nm00' }
-  - { size: '24 × 36″', paper: 'Baryta fibre', price: 355, stripeLink: 'STRIPE_LINK_ANDROMEDA_24X36_BARYTA' }
+  - { size: '12 × 18″', paper: 'Archival matte', price: 145, stripeLink: 'STRIPE_LINK_ANDROMEDA_12X18' }
+  - { size: '12 × 18″', paper: 'Baryta fibre', price: 185, stripeLink: 'STRIPE_LINK_ANDROMEDA_12X18_BARYTA' }
+  - { size: '16 × 24″', paper: 'Archival matte', price: 210, stripeLink: 'STRIPE_LINK_ANDROMEDA_16X24' }
+  - { size: '16 × 24″', paper: 'Baryta fibre', price: 260, stripeLink: 'STRIPE_LINK_ANDROMEDA_16X24_BARYTA' }
+  - { size: '24 × 36″', paper: 'Archival matte', price: 340, stripeLink: 'STRIPE_LINK_ANDROMEDA_24X36' }
+  - { size: '24 × 36″', paper: 'Baryta fibre', price: 410, stripeLink: 'STRIPE_LINK_ANDROMEDA_24X36_BARYTA' }
 featured: true
 order: 0
 ---
