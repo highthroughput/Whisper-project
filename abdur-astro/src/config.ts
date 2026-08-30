@@ -7,7 +7,7 @@ export const SITE = {
   tagline: 'Deep-sky astrophotography from the dark skies of Central Alberta',
 
   /** Goes live once Cloudflare Email Routing forwards it (see README deploy steps). */
-  email: 'hello@abdurastro.com',
+  email: 'info@abdurastro.com',
 
   region: 'Central Alberta, Canada',
   /** Approximate — a wink at the observation log, not a home address. */

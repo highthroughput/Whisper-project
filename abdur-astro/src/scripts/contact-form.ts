@@ -42,7 +42,7 @@ if (form) {
       }
     } catch {
       if (status) {
-        status.textContent = 'Could not send just now — please email hello@abdurastro.com directly.';
+        status.textContent = 'Could not send just now — please email info@abdurastro.com directly.';
       }
     } finally {
       if (button) button.disabled = false;

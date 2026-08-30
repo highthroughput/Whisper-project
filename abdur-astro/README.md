@@ -183,7 +183,7 @@ Replace each token in the named file under `src/content/prints/` with a real
 - [x] Domain: `site` in `astro.config.mjs` and the `Sitemap:` line in
       `public/robots.txt` are set to `https://abdurastro.com` — change only if
       the domain ever changes, then rebuild and spot-check a canonical tag
-- [ ] Email forwarding for `hello@abdurastro.com` set up in Cloudflare Email
+- [ ] Email forwarding for `info@abdurastro.com` set up in Cloudflare Email
       Routing and tested (the address is already wired into the site and the
       contact form's fallback message)
 - [ ] Three social URLs in `src/config.ts` (`PLACEHOLDER_YOUTUBE`,
@@ -219,16 +219,16 @@ subdirectory — set the **root directory** accordingly in step 4.
 7. **Code's domain is already set** to `https://abdurastro.com`
    (`astro.config.mjs` `site` + `robots.txt`) — nothing to change unless the
    domain itself changes.
-8. **Email forwarding** (so `hello@abdurastro.com` works — requires the domain's
+8. **Email forwarding** (so `info@abdurastro.com` works — requires the domain's
    DNS on Cloudflare): dashboard → the domain (not the Pages project) → **Email →
    Email Routing → Get started**.
    - Add the **destination address** (the personal inbox that should receive
      mail) and click the verification link Cloudflare emails to it.
    - Enable routing — Cloudflare adds the required MX and SPF records itself.
-   - **Routing rules → Create address**: `hello@abdurastro.com` → forward to the
+   - **Routing rules → Create address**: `info@abdurastro.com` → forward to the
      verified destination. Send a test email.
    - Note: Email Routing forwards inbound mail only. To *send* as
-     `hello@abdurastro.com`, add it as a send-as alias in your mail provider.
+     `info@abdurastro.com`, add it as a send-as alias in your mail provider.
 9. **Submit the sitemap** (optional, day one): Google Search Console → add the
    domain → submit `https://abdurastro.com/sitemap-index.xml`.
 
