@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import portrait from '../assets/photos/PLACEHOLDER-portrait-telescope.jpg';
+import portrait from '../assets/photos/portrait.jpg';
 
 const gear = [
   {
@@ -43,7 +43,7 @@ const gear = [
   title="About"
   description="Abdur is an astrophotographer in Central Alberta, Canada, photographing galaxies and nebulae from backyard and dark-sky sites — and teaching astrophotography through tutorials, talks, and star parties."
   ogImage={portrait}
-  ogImageAlt="Portrait placeholder — Abdur with his telescope rig."
+  ogImageAlt="Portrait of Abdur, holding a photograph of a comet."
 >
   <section class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
     <div class="grid gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
@@ -51,7 +51,7 @@ const gear = [
         <div class="border hairline bg-surface p-4 sm:p-5">
           <Image
             src={portrait}
-            alt="Placeholder portrait: replace with a photograph of Abdur standing with his telescope rig under an Alberta sky."
+            alt="Abdur smiling and holding up a photograph of a comet streaking across a starry sky, seated in front of a night-sky mural."
             widths={[420, 640, 960, 1280]}
             sizes="(min-width: 1024px) 40vw, 92vw"
             class="aspect-[4/5] w-full object-cover"
