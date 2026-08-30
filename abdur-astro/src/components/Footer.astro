@@ -14,6 +14,58 @@ const year = new Date().getFullYear();
       <span>{SITE.coordinates} · Central Alberta · Bortle 2–4 skies</span>
     </div>
 
+    <div class="reveal mt-10 flex flex-col gap-5 border hairline bg-surface p-6 sm:flex-row sm:items-center sm:justify-between sm:p-7">
+      <div>
+        <h2 class="font-display text-xl">New image released. Next dark-sky weekend.</h2>
+        <p class="mt-1.5 max-w-md text-sm text-faint">
+          An occasional email when a new photograph or print drops, or a star party opens up
+          nearby. No spam, unsubscribe anytime.
+        </p>
+      </div>
+      <div class="shrink-0">
+        <form
+          id="newsletter-form"
+          action="https://api.web3forms.com/submit"
+          method="POST"
+          class="flex gap-2"
+        >
+          <input type="hidden" name="access_key" value={SITE.web3formsKey} />
+          <input type="hidden" name="subject" value="New newsletter signup — Abdur Astro" />
+          <input type="hidden" name="from_name" value="Abdur Astro newsletter signup" />
+          <input type="hidden" name="message" value="New newsletter signup from the site footer." />
+          {/* Web3Forms honeypot — hidden from people, filled by bots */}
+          <input
+            type="checkbox"
+            name="botcheck"
+            class="hidden"
+            style="display:none"
+            tabindex="-1"
+            aria-hidden="true"
+          />
+          <label for="newsletter-email" class="sr-only">Email address</label>
+          <input
+            id="newsletter-email"
+            name="email"
+            type="email"
+            required
+            autocomplete="email"
+            placeholder="you@example.com"
+            class="w-44 min-w-0 border hairline bg-sky px-3 py-2.5 text-sm text-star placeholder:text-faint/60 sm:w-56"
+          />
+          <button type="submit" class="btn btn-solid shrink-0 !px-4 !py-2.5 !text-[0.6875rem]">
+            Join
+          </button>
+        </form>
+        <p
+          id="newsletter-status"
+          class="mt-2 font-mono text-[0.6875rem] text-faint"
+          role="status"
+          aria-live="polite"
+        >
+        </p>
+      </div>
+    </div>
+
     <div class="mt-10 grid grid-cols-2 gap-10 sm:grid-cols-3">
       <nav aria-label="Footer — explore">
         <h2 class="eyebrow">Explore</h2>
@@ -52,4 +104,6 @@ const year = new Date().getFullYear();
       </p>
     </div>
   </div>
+
+  <script src="../scripts/newsletter-form.ts"></script>
 </footer>

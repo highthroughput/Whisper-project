@@ -2,7 +2,7 @@
 title: 'Veil Nebula'
 photo: 'veil-nebula'
 image: '../../assets/photos/veil-nebula.jpg'
-alt: 'Fine art print of the Western Veil Nebula, interlaced red and teal shock filaments of a supernova remnant across a dense star field.'
+alt: 'Fine art print of the Western Veil Nebula, interlaced red and teal shock filaments of a supernova remnant across a dense star field. Alberta astrophotography print.'
 tagline: 'Ten-thousand-year-old supernova wreckage in hydrogen red and oxygen teal — 23.5 hours from Bortle 2.'
 edition: 'Open edition · signed'
 options:

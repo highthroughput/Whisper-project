@@ -2,13 +2,16 @@
 title: 'Andromeda Galaxy'
 photo: 'andromeda-galaxy'
 image: '../../assets/photos/andromeda-galaxy.jpg'
-alt: 'Fine art print of the Andromeda Galaxy, a broad spiral of blue-white starlight and dark dust lanes filling the frame.'
+alt: 'Fine art print of the Andromeda Galaxy, a broad spiral of blue-white starlight and dark dust lanes filling the frame. Alberta astrophotography print.'
 tagline: 'Our nearest large galactic neighbour, two and a half million light-years out, from a backyard in Cochrane, Alberta.'
 edition: 'Open edition · signed'
 options:
   - { size: '8 × 12″', paper: 'Archival matte', price: 65, stripeLink: 'https://buy.stripe.com/dRmdRbewuaF76F39bu3Nm00' }
+  - { size: '8 × 12″', paper: 'Baryta fibre', price: 85, stripeLink: 'STRIPE_LINK_ANDROMEDA_8X12_BARYTA' }
   - { size: '16 × 24″', paper: 'Archival matte', price: 165, stripeLink: 'https://buy.stripe.com/dRmdRbewuaF76F39bu3Nm00' }
+  - { size: '16 × 24″', paper: 'Baryta fibre', price: 205, stripeLink: 'STRIPE_LINK_ANDROMEDA_16X24_BARYTA' }
   - { size: '24 × 36″', paper: 'Archival matte', price: 295, stripeLink: 'https://buy.stripe.com/dRmdRbewuaF76F39bu3Nm00' }
+  - { size: '24 × 36″', paper: 'Baryta fibre', price: 355, stripeLink: 'STRIPE_LINK_ANDROMEDA_24X36_BARYTA' }
 featured: true
 order: 0
 ---

@@ -1,0 +1,21 @@
+---
+interface Props {
+  /** YouTube video ID (the part after v= or youtu.be/). */
+  id: string;
+  /** Accessible title — what the video is, not just its filename. */
+  title: string;
+  class?: string;
+}
+const { id, title, class: className } = Astro.props;
+---
+
+<div class:list={['aspect-video overflow-hidden border hairline bg-surface', className]}>
+  <iframe
+    src={`https://www.youtube-nocookie.com/embed/${id}`}
+    title={title}
+    loading="lazy"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+    class="h-full w-full"
+  ></iframe>
+</div>

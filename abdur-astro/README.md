@@ -154,7 +154,7 @@ of them in place — but do not launch until each box is checked.
       and `src/pages/prints/[slug].astro`
 - [ ] Coordinates in `src/config.ts` (`coordinates`) if 52.3° N · 113.8° W isn't right
 
-### 3. Stripe Payment Links (30 tokens)
+### 3. Stripe Payment Links
 
 Replace each token in the named file under `src/content/prints/` with a real
 `https://buy.stripe.com/…` URL. Until then, Buy buttons point at the literal token.
@@ -162,11 +162,18 @@ Replace each token in the named file under `src/content/prints/` with a real
 | File | Tokens |
 | --- | --- |
 | `whirlpool-galaxy.md` | `STRIPE_LINK_WHIRLPOOL_12X18` · `STRIPE_LINK_WHIRLPOOL_12X18_BARYTA` · `STRIPE_LINK_WHIRLPOOL_16X24` · `STRIPE_LINK_WHIRLPOOL_16X24_BARYTA` · `STRIPE_LINK_WHIRLPOOL_24X36` · `STRIPE_LINK_WHIRLPOOL_24X36_BARYTA` |
-| `pillars-of-creation.md` | `STRIPE_LINK_PILLARS_12X18` · `STRIPE_LINK_PILLARS_12X18_BARYTA` · `STRIPE_LINK_PILLARS_16X24` · `STRIPE_LINK_PILLARS_16X24_BARYTA` · `STRIPE_LINK_PILLARS_24X36` · `STRIPE_LINK_PILLARS_24X36_BARYTA` |
 | `veil-nebula.md` | `STRIPE_LINK_VEIL_12X18` · `STRIPE_LINK_VEIL_12X18_BARYTA` · `STRIPE_LINK_VEIL_16X24` · `STRIPE_LINK_VEIL_16X24_BARYTA` · `STRIPE_LINK_VEIL_24X36` · `STRIPE_LINK_VEIL_24X36_BARYTA` |
+| `andromeda-galaxy.md` | `STRIPE_LINK_ANDROMEDA_8X12_BARYTA` · `STRIPE_LINK_ANDROMEDA_16X24_BARYTA` · `STRIPE_LINK_ANDROMEDA_24X36_BARYTA` |
 
 - [ ] Remaining tokens above replaced
 - [ ] Page prices match the amounts configured in Stripe
+- [ ] **Known issue:** Andromeda's 3 Archival matte sizes (8×12 / 16×24 / 24×36 — $65 /
+      $165 / $295) currently all point at the *same* real Stripe Payment Link, since only
+      one was provided. That link charges whatever single amount it was configured with
+      regardless of which size the buyer clicked — replace with 3 distinct Payment Links
+      (one per size) before relying on this for real orders. The 3 Baryta fibre prices
+      above are estimated (proportional to the existing Archival matte pricing) and
+      unconfirmed.
 
 ### 4. Contact form
 

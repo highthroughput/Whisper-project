@@ -2,6 +2,8 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PhotoCard from '../../components/PhotoCard.astro';
+import YouTubeEmbed from '../../components/YouTubeEmbed.astro';
+import { SITE } from '../../config';
 import { byDateDesc, formatHours, totalHours } from '../../lib/photos';
 
 const photos = (await getCollection('photos')).sort(byDateDesc);
@@ -10,7 +12,7 @@ const keyImage = photos[0]?.data.image;
 ---
 
 <Base
-  title="Gallery"
+  title="Astrophotography Gallery"
   description={`The deep-sky archive: ${photos.length} galaxies and nebulae photographed from Central Alberta across ${formatHours(archiveHours)} hours of integration. Acquisition data for every frame.`}
   ogImage={keyImage}
   ogImageAlt={photos[0]?.data.alt}
@@ -37,6 +39,37 @@ const keyImage = photos[0]?.data.image;
           </div>
         ))
       }
+    </div>
+  </section>
+
+  {/* From the channel — real footage of the gear and rig behind this archive */}
+  <section class="mx-auto mt-24 w-full max-w-7xl px-5 sm:px-8" aria-labelledby="channel-heading">
+    <div class="reveal flex items-baseline justify-between gap-4">
+      <div>
+        <p class="eyebrow">Behind the images</p>
+        <h2 id="channel-heading" class="mt-3 font-display text-3xl sm:text-4xl">
+          From the channel
+        </h2>
+      </div>
+      <a
+        href={SITE.social.youtube}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link-quiet font-mono text-xs uppercase [letter-spacing:var(--tracking-log)]"
+      >
+        Full channel →
+      </a>
+    </div>
+    <p class="reveal mt-4 max-w-2xl text-faint">
+      The gear and the rig behind this archive, on YouTube.
+    </p>
+    <div class="mt-8 grid gap-6 sm:grid-cols-2">
+      <YouTubeEmbed id="D-kKPQLUF1c" title="Mirror cleaning time... (Abdur Astro)" class="reveal" />
+      <YouTubeEmbed
+        id="wd0wO2DgRq8"
+        title="Testing SVBONY SV535 telescope (Abdur Astro)"
+        class="reveal"
+      />
     </div>
   </section>
 

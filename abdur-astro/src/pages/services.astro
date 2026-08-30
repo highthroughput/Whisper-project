@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import YouTubeEmbed from '../components/YouTubeEmbed.astro';
 import { byDateDesc } from '../lib/photos';
 
 const photos = (await getCollection('photos')).sort(byDateDesc);
@@ -39,7 +40,7 @@ const services = [
 ---
 
 <Base
-  title="Services"
+  title="Astrophotography Tutorials & Star Parties"
   description="Astronomy services from Central Alberta: one-on-one astrophotography tutorials online or in person, telescope and equipment consulting, public speaking for astronomy events, and private star parties across Central Alberta."
   ogImage={keyImage}
 >
@@ -64,6 +65,19 @@ const services = [
                   {service.mode}
                 </p>
                 <p class="mt-5 leading-relaxed text-star/85">{service.body}</p>
+                {
+                  service.id === 'consulting' && (
+                    <div class="mt-6 max-w-md">
+                      <p class="mb-2 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+                        Buying advice, on camera
+                      </p>
+                      <YouTubeEmbed
+                        id="ZXVIQyI4_iE"
+                        title={'5" APO vs 6" Achromatic Refractor — Which one should you buy? (Abdur Astro)'}
+                      />
+                    </div>
+                  )
+                }
               </div>
               <div class="lg:self-end">
                 <a
