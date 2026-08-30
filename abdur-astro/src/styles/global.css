@@ -1,0 +1,205 @@
+@import 'tailwindcss';
+
+/*
+  Abdur Astro palette — six named values derived from deep-sky imagery.
+  See DESIGN.md for the reasoning behind each.
+*/
+@theme {
+  --color-*: initial;
+  --color-sky: #0b0a09; /* Background sky — near-black, faintly warm      */
+  --color-surface: #14110f; /* Sky, lifted — cards, mats, the log's paper    */
+  --color-star: #eae3d6; /* Star white — primary text                     */
+  --color-faint: #9c9184; /* Faint magnitude — secondary text              */
+  --color-ha: #a63a28; /* Hydrogen-alpha — buy buttons, key actions     */
+  --color-ha-deep: #822d1f; /* Hα, pressed                                   */
+  --color-dust: #b4713d; /* Dust lane — links, eyebrows, log markings     */
+  --color-dust-bright: #cf8f55; /* Dust lane, hover                              */
+  --color-oiii: #7fa9a3; /* Oxygen-III — data accents inside the log only */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-transparent: transparent;
+
+  --font-display: 'Marcellus', 'Iowan Old Style', Georgia, serif;
+  --font-sans: 'Archivo Variable', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --tracking-cap: 0.22em; /* wordmark / display caps   */
+  --tracking-log: 0.14em; /* log field labels, eyebrows */
+}
+
+@layer base {
+  html {
+    background-color: var(--color-sky);
+    color-scheme: dark;
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    @apply bg-sky text-star font-sans antialiased;
+    font-feature-settings: 'ss01' off;
+  }
+
+  ::selection {
+    background-color: var(--color-ha);
+    color: var(--color-star);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-dust-bright);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+
+  /* Balance display headings without JS */
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+}
+
+@layer components {
+  /* Small monospace label — the site's connective tissue */
+  .eyebrow {
+    @apply font-mono text-dust text-[0.6875rem] uppercase;
+    letter-spacing: var(--tracking-log);
+  }
+
+  /* Hairline rule used everywhere */
+  .hairline {
+    border-color: color-mix(in srgb, var(--color-star) 14%, transparent);
+  }
+
+  /* Dotted leader between a log label and its value */
+  .log-leader {
+    flex: 1 1 2rem;
+    margin: 0 0.6em;
+    border-bottom: 1px dotted color-mix(in srgb, var(--color-star) 28%, transparent);
+    transform: translateY(-0.3em);
+    min-width: 1.5rem;
+  }
+
+  .btn {
+    @apply font-mono inline-flex items-center justify-center gap-2 text-[0.8125rem] uppercase;
+    letter-spacing: var(--tracking-log);
+    padding: 0.8rem 1.4rem;
+    border: 1px solid color-mix(in srgb, var(--color-star) 25%, transparent);
+    color: var(--color-star);
+    transition:
+      border-color 200ms ease,
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+
+  .btn:hover {
+    border-color: var(--color-dust-bright);
+    color: var(--color-dust-bright);
+  }
+
+  .btn-solid {
+    background-color: var(--color-ha);
+    border-color: var(--color-ha);
+    color: var(--color-star);
+  }
+
+  .btn-solid:hover {
+    background-color: var(--color-ha-deep);
+    border-color: var(--color-ha-deep);
+    color: var(--color-star);
+  }
+
+  .link-quiet {
+    color: var(--color-dust);
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+    transition: color 150ms ease;
+  }
+
+  .link-quiet:hover {
+    color: var(--color-dust-bright);
+    text-decoration-line: underline;
+  }
+
+  /* Gallery lightbox (native <dialog>) */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: color-mix(in srgb, var(--color-sky) 97%, transparent);
+    color: var(--color-star);
+  }
+
+  .lightbox::backdrop {
+    background: color-mix(in srgb, var(--color-sky) 90%, transparent);
+  }
+
+  .lb-control {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid color-mix(in srgb, var(--color-star) 22%, transparent);
+    background: color-mix(in srgb, var(--color-sky) 75%, transparent);
+    color: var(--color-star);
+    cursor: pointer;
+    transition:
+      border-color 150ms ease,
+      color 150ms ease;
+  }
+
+  .lb-control:hover {
+    border-color: var(--color-dust-bright);
+    color: var(--color-dust-bright);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    #lb-image {
+      transition: opacity 250ms ease;
+    }
+
+    #lb-image.lb-loading {
+      opacity: 0.15;
+    }
+  }
+}
+
+@layer utilities {
+  /* Soft reveal — only when JS is present and motion is allowed.
+     Without JS (or with reduced motion) content is simply visible. */
+  @media (prefers-reduced-motion: no-preference) {
+    html.js .reveal {
+      opacity: 0;
+      transform: translateY(14px);
+      transition:
+        opacity 700ms cubic-bezier(0.22, 0.61, 0.36, 1),
+        transform 700ms cubic-bezier(0.22, 0.61, 0.36, 1);
+      transition-delay: var(--reveal-delay, 0ms);
+    }
+
+    html.js .reveal.is-visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    html.js .hover-lift img {
+      transition: transform 600ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+
+    html.js .hover-lift:hover img {
+      transform: scale(1.02);
+    }
+  }
+}

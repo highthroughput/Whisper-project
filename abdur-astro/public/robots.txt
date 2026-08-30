@@ -1,0 +1,5 @@
+# abdurastro.ca — PLACEHOLDER domain: update the Sitemap line when the real domain is set.
+User-agent: *
+Allow: /
+
+Sitemap: https://abdurastro.ca/sitemap-index.xml

@@ -1,0 +1,129 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ObservationLog from '../../components/ObservationLog.astro';
+import { byDateDesc, filterNames, formatHours, totalHours } from '../../lib/photos';
+
+export async function getStaticPaths() {
+  const photos = (await getCollection('photos')).sort(byDateDesc);
+  return photos.map((photo, index) => ({
+    params: { slug: photo.id },
+    props: {
+      photo,
+      // Chronological archive number: oldest observation is № 01.
+      number: photos.length - index,
+      newer: photos[index - 1] ?? null,
+      older: photos[index + 1] ?? null,
+    },
+  }));
+}
+
+const { photo, number, newer, older } = Astro.props;
+const { data } = photo;
+const { Content } = await render(photo);
+
+const prints = await getCollection('prints');
+const print = prints.find((p) => p.data.photo === photo.id);
+const printFrom = print ? Math.min(...print.data.options.map((o) => o.price)) : null;
+
+const hours = formatHours(totalHours(data.filters));
+const description = `${data.title} (${data.target}) photographed from ${data.location.split('·')[0]?.trim() ?? 'Central Alberta'} — ${hours} hours of ${filterNames(data.filters).replaceAll(' · ', '/')} integration. Full acquisition log: telescope, camera, mount, filters and capture dates.`;
+---
+
+<Base
+  title={`${data.title} — ${data.target}`}
+  description={description}
+  ogImage={data.image}
+  ogImageAlt={data.alt}
+>
+  <article class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
+    <header>
+      <p class="eyebrow">
+        Observation № {String(number).padStart(2, '0')} · {data.constellation}
+      </p>
+      <div class="mt-3 flex flex-wrap items-baseline gap-x-6 gap-y-2">
+        <h1 class="font-display text-4xl sm:text-5xl">{data.title}</h1>
+        <p class="font-mono text-sm text-dust">{data.target}</p>
+      </div>
+    </header>
+
+    <div class="mt-10 bg-surface">
+      <Image
+        src={data.image}
+        alt={data.alt}
+        widths={[640, 1080, 1600, 2200]}
+        sizes="(min-width: 1280px) 1152px, 100vw"
+        quality={80}
+        loading="eager"
+        fetchpriority="high"
+        class="w-full object-contain"
+      />
+    </div>
+    <p class="mt-3 font-mono text-[0.6875rem] uppercase [letter-spacing:0.08em] text-faint">
+      {data.target} · {hours} h · {filterNames(data.filters)} · {data.captured}
+    </p>
+
+    <div class="mt-14 grid gap-12 lg:grid-cols-[1fr_minmax(22rem,26rem)] lg:gap-16">
+      <div>
+        <div
+          class="reveal max-w-prose text-star/85 leading-relaxed [&_p]:mb-5 [&_p:last-child]:mb-0"
+        >
+          <Content />
+        </div>
+
+        {
+          print && (
+            <aside class="reveal mt-12 border hairline p-6 sm:p-7" aria-label="Print availability">
+              <p class="eyebrow">In the print shop</p>
+              <p class="mt-3 text-star">
+                This observation is available as an archival giclée print, from ${printFrom} CAD.
+              </p>
+              <a href={`/prints/${print.id}`} class="btn mt-5">
+                View print options
+              </a>
+            </aside>
+          )
+        }
+      </div>
+
+      <ObservationLog photo={photo} number={number} class="reveal h-fit lg:sticky lg:top-8" />
+    </div>
+
+    <nav
+      class="mt-20 flex flex-col gap-4 border-t hairline pt-8 sm:flex-row sm:items-baseline sm:justify-between"
+      aria-label="Adjacent observations"
+    >
+      {
+        older ? (
+          <a href={`/gallery/${older.id}`} class="group">
+            <span class="eyebrow">← Earlier</span>
+            <span class="mt-1 block font-display text-xl text-star transition-colors group-hover:text-dust-bright">
+              {older.data.title}
+            </span>
+          </a>
+        ) : (
+          <span />
+        )
+      }
+      <a
+        href="/gallery"
+        class="link-quiet font-mono text-xs uppercase [letter-spacing:var(--tracking-log)]"
+      >
+        Full archive
+      </a>
+      {
+        newer ? (
+          <a href={`/gallery/${newer.id}`} class="group sm:text-right">
+            <span class="eyebrow">Later →</span>
+            <span class="mt-1 block font-display text-xl text-star transition-colors group-hover:text-dust-bright">
+              {newer.data.title}
+            </span>
+          </a>
+        ) : (
+          <span />
+        )
+      }
+    </nav>
+  </article>
+</Base>

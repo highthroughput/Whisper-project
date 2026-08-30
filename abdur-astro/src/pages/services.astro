@@ -1,0 +1,88 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { byDateDesc } from '../lib/photos';
+
+const photos = (await getCollection('photos')).sort(byDateDesc);
+const keyImage = photos.find((p) => p.id === 'veil-nebula')?.data.image;
+
+const services = [
+  {
+    id: 'tutorials',
+    topic: 'tutorials',
+    title: 'One-on-one tutorials',
+    mode: 'Online across Canada · in person around Central Alberta',
+    body: `Astrophotography has a brutal first year — mounts that won't align, stars that won't stay round, stacked images that come out grey. A few hours of direct help collapses months of trial and error. Sessions are built around your gear and your goals: polar alignment and guiding, camera and filter settings, automating a night with N.I.N.A., or processing your own data end-to-end in PixInsight. Online tutorials run over screen-share anywhere in Canada; in-person sessions happen at your setup, under your sky, in and around Central Alberta. You keep the session notes and every file we touch.`,
+  },
+  {
+    id: 'consulting',
+    topic: 'consulting',
+    title: 'Equipment consulting',
+    mode: 'Buying advice · remote observatories · astronomy for business',
+    body: `The fastest way to waste money in this hobby is to buy twice. Before you order anything, we'll match a telescope, mount, and camera to your targets, your budget, and the realities of your site — then I'll help you assemble and test it so first light actually happens. For observers going deeper, I design and configure remote and backyard setups that run unattended through an Alberta winter. And for lodges, resorts, and venues that want to add astronomy to what they offer their guests, I plan the equipment, the viewing program, and the staff training to make it real.`,
+  },
+  {
+    id: 'speaking',
+    topic: 'speaking',
+    title: 'Public speaking',
+    mode: 'Astronomy events · clubs · schools · festivals',
+    body: `A good astronomy talk sends people outside to look up. I speak for astronomy clubs, schools, science festivals, dark-sky events, and corporate audiences across Alberta and beyond — from "what is actually above Alberta tonight" for general audiences to working sessions on deep-sky imaging for practitioners, all illustrated with photographs from this archive and the stories of the nights behind them. Talks are AV-ready, sized to your time slot, and adaptable from a classroom to a festival main stage.`,
+  },
+  {
+    id: 'star-parties',
+    topic: 'starparty',
+    title: 'Private star parties',
+    mode: 'In and around Central Alberta',
+    body: `Some of the best skies in Canada are an easy drive from Red Deer, and a telescope changes what an evening outdoors can be. I bring the equipment and the sky-knowledge to your acreage, campground, lodge, or event — a guided tour of the night sky by eye and by telescope: the Moon's terminator, planets, star clusters, and the same nebulae that hang in this gallery. Star parties in Central Alberta work for family gatherings, camps, team retreats, and weddings; every booking includes a weather call the day before and a backup date, because Alberta.`,
+  },
+];
+---
+
+<Base
+  title="Services"
+  description="Astronomy services from Central Alberta: one-on-one astrophotography tutorials online or in person, telescope and equipment consulting, public speaking for astronomy events, and private star parties across Central Alberta."
+  ogImage={keyImage}
+>
+  <section class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
+    <p class="eyebrow">Beyond the archive</p>
+    <h1 class="mt-3 font-display text-4xl sm:text-5xl">Services</h1>
+    <p class="mt-6 max-w-2xl text-faint">
+      The photographs are one output of years spent learning this sky. The rest is teaching it,
+      speccing gear for it, and sharing it in person — astronomy tutorials Canada-wide, and
+      dark-sky experiences rooted in Central Alberta.
+    </p>
+
+    <ul class="mt-14">
+      {
+        services.map((service, i) => (
+          <li id={service.id} class="reveal border-b hairline first:border-t">
+            <article class="grid gap-x-10 gap-y-4 py-12 lg:grid-cols-[3.5rem_minmax(0,1fr)_auto]">
+              <span class="font-mono text-[0.6875rem] text-dust">0{i + 1}</span>
+              <div class="max-w-2xl">
+                <h2 class="font-display text-3xl">{service.title}</h2>
+                <p class="mt-2 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+                  {service.mode}
+                </p>
+                <p class="mt-5 leading-relaxed text-star/85">{service.body}</p>
+              </div>
+              <div class="lg:self-end">
+                <a
+                  href={`/contact?topic=${service.topic}`}
+                  class="btn"
+                  aria-label={`Inquire about ${service.title.toLowerCase()}`}
+                >
+                  Inquire →
+                </a>
+              </div>
+            </article>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="reveal mt-12 max-w-2xl text-sm text-faint">
+      Not sure which of these fits? <a href="/contact" class="link-quiet">Write anyway</a> — a
+      two-line description of what you're after is plenty to start.
+    </p>
+  </section>
+</Base>
