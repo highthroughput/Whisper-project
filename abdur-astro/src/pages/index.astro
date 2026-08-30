@@ -4,11 +4,11 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import PhotoCard from '../components/PhotoCard.astro';
 import { byDateDesc } from '../lib/photos';
-import heroImage from '../assets/photos/PLACEHOLDER-pillars-of-creation.jpg';
+import heroImage from '../assets/photos/andromeda-galaxy.jpg';
 
 const photos = (await getCollection('photos')).sort(byDateDesc);
-const heroPhoto = photos.find((p) => p.id === 'pillars-of-creation');
-const featured = photos.filter((p) => p.data.featured && p.id !== 'pillars-of-creation').slice(0, 3);
+const heroPhoto = photos.find((p) => p.id === 'andromeda-galaxy');
+const featured = photos.filter((p) => p.data.featured && p.id !== 'andromeda-galaxy').slice(0, 3);
 
 const entries = [
   {
@@ -45,7 +45,7 @@ const entries = [
     <Image
       src={heroImage}
       alt={heroPhoto?.data.alt ??
-        'The Pillars of Creation: three towering columns of dust and gas in the Eagle Nebula.'}
+        'The Andromeda Galaxy, a vast spiral galaxy spanning the frame in soft blue-white light.'}
       widths={[640, 960, 1440, 1920, 2200]}
       sizes="100vw"
       quality={72}

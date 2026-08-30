@@ -133,22 +133,20 @@ rate, and (if registered) let Stripe Tax handle GST. Copy the
 Every placeholder in the project, in one list. The site builds and runs with all
 of them in place — but do not launch until each box is checked.
 
-### 1. Photography (9 files)
+### 1. Photography
 
-All development images are **NASA/ESA Hubble placeholders** (filenames prefixed
-`PLACEHOLDER-`) and must be replaced with original photographs. Replace the file
-in `src/assets/photos/`, update the `image:` path + `alt:` in the matching
-content file(s), and delete the placeholder.
-
-- [ ] `PLACEHOLDER-pillars-of-creation.jpg` — also the **home hero** (`src/pages/index.astro` imports it directly) and the site-wide default OG image (`src/layouts/Base.astro`)
-- [ ] Remove the placeholder-imagery credit line in `src/components/Footer.astro`
-      once no Hubble images remain (attribution is required while they are used)
+- [x] All NASA/ESA Hubble placeholder images have been replaced with real
+      photographs, including the home hero (`src/pages/index.astro`) and the
+      site-wide default OG image (`src/layouts/Base.astro`), both now Andromeda
+      Galaxy. The placeholder-imagery credit line in `src/components/Footer.astro`
+      has been removed accordingly.
 
 ### 2. Copy
 
-- [ ] All 8 photo entries in `src/content/photos/` are **sample entries** —
-      rewrite acquisition data (telescope, camera, mount, filters, hours, dates,
-      locations) and body text to match the real work
+- [ ] Acquisition data (telescope, camera, mount, filters, hours, dates,
+      locations) and body text for Veil Nebula, Rosette Nebula, Pleiades,
+      North America/Pelican Nebula, and Whirlpool Galaxy's mount — all
+      currently marked "pending" in `src/content/photos/`
 - [ ] All 5 print entries in `src/content/prints/` — descriptions, editions, prices
 - [ ] Bio on `src/pages/about.astro` (marked `PLACEHOLDER COPY` in a comment)
 - [ ] Gear list on `src/pages/about.astro` (`gear` array)
