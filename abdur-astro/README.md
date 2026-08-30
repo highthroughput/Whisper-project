@@ -140,15 +140,7 @@ All development images are **NASA/ESA Hubble placeholders** (filenames prefixed
 in `src/assets/photos/`, update the `image:` path + `alt:` in the matching
 content file(s), and delete the placeholder.
 
-- [ ] `PLACEHOLDER-orion-nebula.jpg` — also the **home hero** (`src/pages/index.astro` imports it directly)
-- [ ] `PLACEHOLDER-whirlpool-galaxy.jpg`
-- [ ] `PLACEHOLDER-pillars-of-creation.jpg`
-- [ ] `PLACEHOLDER-veil-nebula.jpg`
-- [ ] `PLACEHOLDER-horsehead-nebula.jpg`
-- [ ] `PLACEHOLDER-crab-nebula.jpg`
-- [ ] `PLACEHOLDER-bubble-nebula.jpg`
-- [ ] `PLACEHOLDER-lagoon-nebula.jpg`
-- [ ] `PLACEHOLDER-portrait-telescope.jpg` — About-page portrait of Abdur with the rig
+- [ ] `PLACEHOLDER-pillars-of-creation.jpg` — also the **home hero** (`src/pages/index.astro` imports it directly) and the site-wide default OG image (`src/layouts/Base.astro`)
 - [ ] Remove the placeholder-imagery credit line in `src/components/Footer.astro`
       once no Hubble images remain (attribution is required while they are used)
 
@@ -172,12 +164,10 @@ Replace each token in the named file under `src/content/prints/` with a real
 | File | Tokens |
 | --- | --- |
 | `whirlpool-galaxy.md` | `STRIPE_LINK_WHIRLPOOL_12X18` · `STRIPE_LINK_WHIRLPOOL_12X18_BARYTA` · `STRIPE_LINK_WHIRLPOOL_16X24` · `STRIPE_LINK_WHIRLPOOL_16X24_BARYTA` · `STRIPE_LINK_WHIRLPOOL_24X36` · `STRIPE_LINK_WHIRLPOOL_24X36_BARYTA` |
-| `orion-nebula.md` | `STRIPE_LINK_ORION_12X18` · `STRIPE_LINK_ORION_12X18_BARYTA` · `STRIPE_LINK_ORION_16X24` · `STRIPE_LINK_ORION_16X24_BARYTA` · `STRIPE_LINK_ORION_24X36` · `STRIPE_LINK_ORION_24X36_BARYTA` |
 | `pillars-of-creation.md` | `STRIPE_LINK_PILLARS_12X18` · `STRIPE_LINK_PILLARS_12X18_BARYTA` · `STRIPE_LINK_PILLARS_16X24` · `STRIPE_LINK_PILLARS_16X24_BARYTA` · `STRIPE_LINK_PILLARS_24X36` · `STRIPE_LINK_PILLARS_24X36_BARYTA` |
 | `veil-nebula.md` | `STRIPE_LINK_VEIL_12X18` · `STRIPE_LINK_VEIL_12X18_BARYTA` · `STRIPE_LINK_VEIL_16X24` · `STRIPE_LINK_VEIL_16X24_BARYTA` · `STRIPE_LINK_VEIL_24X36` · `STRIPE_LINK_VEIL_24X36_BARYTA` |
-| `bubble-nebula.md` | `STRIPE_LINK_BUBBLE_12X18` · `STRIPE_LINK_BUBBLE_12X18_BARYTA` · `STRIPE_LINK_BUBBLE_16X24` · `STRIPE_LINK_BUBBLE_16X24_BARYTA` · `STRIPE_LINK_BUBBLE_24X36` · `STRIPE_LINK_BUBBLE_24X36_BARYTA` |
 
-- [ ] All 30 tokens replaced
+- [ ] Remaining tokens above replaced
 - [ ] Page prices match the amounts configured in Stripe
 
 ### 4. Contact form
