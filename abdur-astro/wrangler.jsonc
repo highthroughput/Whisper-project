@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Only relevant if this project deploys via Wrangler ("Workers Builds" —
+  // deploy command `npx wrangler deploy`) rather than a classic Pages
+  // project. It tells Wrangler this is a static-assets-only Worker: build
+  // first (`npm run build`), then deploy serves everything from dist/.
+  "name": "abdur-astro",
+  "compatibility_date": "2026-08-30",
+  "assets": {
+    "directory": "./dist",
+    // Serve our custom-styled 404.html for any unmatched route, matching
+    // how Cloudflare Pages handles 404s automatically.
+    "not_found_handling": "404-page"
+  }
+}
