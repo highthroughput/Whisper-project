@@ -13,15 +13,15 @@ export const SITE = {
   /** Approximate — a wink at the observation log, not a home address. */
   coordinates: '52.3° N · 113.8° W',
 
-  /** PLACEHOLDER — replace all three with real profile URLs. */
   social: {
-    youtube: 'https://www.youtube.com/@PLACEHOLDER_YOUTUBE',
-    instagram: 'https://www.instagram.com/PLACEHOLDER_INSTAGRAM',
-    facebook: 'https://www.facebook.com/PLACEHOLDER_FACEBOOK',
+    youtube: 'https://www.youtube.com/@AbdurAstro',
+    instagram: 'https://www.instagram.com/abdurastro/',
+    tiktok: 'https://www.tiktok.com/@abdurastro',
+    x: 'https://x.com/AbdurAstro',
+    patreon: 'https://www.patreon.com/cw/AbdurAstro',
   },
 
-  /** PLACEHOLDER — create a free key at https://web3forms.com and paste it here. */
-  web3formsKey: 'WEB3FORMS_ACCESS_KEY_PLACEHOLDER',
+  web3formsKey: 'c3c0b6ec-abf3-4103-935c-fffd766dbb08',
 } as const;
 
 /** Subjects offered on the contact form; services link here with ?topic=<key>. */

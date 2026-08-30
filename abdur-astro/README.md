@@ -172,22 +172,21 @@ Replace each token in the named file under `src/content/prints/` with a real
 
 ### 4. Contact form
 
-- [ ] Create a free access key at [web3forms.com](https://web3forms.com) for the
-      launch email address and replace `WEB3FORMS_ACCESS_KEY_PLACEHOLDER` in
+- [x] Real access key from [web3forms.com](https://web3forms.com) set in
       `src/config.ts`
 - [ ] Send a test message from the deployed site and confirm it arrives
-- [ ] The fallback email named in `src/scripts/contact-form.ts` matches the real one
+- [x] The fallback email named in `src/scripts/contact-form.ts` matches the real one
 
 ### 5. Email, socials, domain
 
 - [x] Domain: `site` in `astro.config.mjs` and the `Sitemap:` line in
       `public/robots.txt` are set to `https://abdurastro.com` — change only if
       the domain ever changes, then rebuild and spot-check a canonical tag
-- [ ] Email forwarding for `info@abdurastro.com` set up in Cloudflare Email
-      Routing and tested (the address is already wired into the site and the
-      contact form's fallback message)
-- [ ] Three social URLs in `src/config.ts` (`PLACEHOLDER_YOUTUBE`,
-      `PLACEHOLDER_INSTAGRAM`, `PLACEHOLDER_FACEBOOK`)
+- [x] Email forwarding for `info@abdurastro.com` set up in Cloudflare Email
+      Routing and tested (the address is wired into the site and the contact
+      form's fallback message)
+- [x] Social URLs in `src/config.ts` (`social`): YouTube, Instagram, TikTok,
+      X, and Patreon
 
 ## Deploying to Cloudflare Pages
 
