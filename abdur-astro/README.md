@@ -243,8 +243,5 @@ subdirectory — set the **root directory** accordingly in step 4.
 
 ## Placeholder image credits
 
-Development placeholders are ESA/Hubble releases, © NASA/ESA et al., used under
-[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/): heic0506a (M51),
-heic0601a (M42), heic1501a (M16), heic1307a (Horsehead), heic0515a (M1),
-heic1608a (NGC 7635), heic1808a (M8), heic1520a (Veil). The portrait placeholder
-is generated. All are resized dev stand-ins — none may remain at launch.
+No longer applicable: every development placeholder, including the ESA/Hubble
+stand-ins and the generated portrait, has been replaced with real photography.
