@@ -163,17 +163,22 @@ Replace each token in the named file under `src/content/prints/` with a real
 | --- | --- |
 | `whirlpool-galaxy.md` | `STRIPE_LINK_WHIRLPOOL_12X18` · `STRIPE_LINK_WHIRLPOOL_12X18_BARYTA` · `STRIPE_LINK_WHIRLPOOL_16X24` · `STRIPE_LINK_WHIRLPOOL_16X24_BARYTA` · `STRIPE_LINK_WHIRLPOOL_24X36` · `STRIPE_LINK_WHIRLPOOL_24X36_BARYTA` |
 | `veil-nebula.md` | `STRIPE_LINK_VEIL_12X18` · `STRIPE_LINK_VEIL_12X18_BARYTA` · `STRIPE_LINK_VEIL_16X24` · `STRIPE_LINK_VEIL_16X24_BARYTA` · `STRIPE_LINK_VEIL_24X36` · `STRIPE_LINK_VEIL_24X36_BARYTA` |
-| `andromeda-galaxy.md` | `STRIPE_LINK_ANDROMEDA_12X18` · `STRIPE_LINK_ANDROMEDA_12X18_BARYTA` · `STRIPE_LINK_ANDROMEDA_16X24` · `STRIPE_LINK_ANDROMEDA_16X24_BARYTA` · `STRIPE_LINK_ANDROMEDA_24X36` · `STRIPE_LINK_ANDROMEDA_24X36_BARYTA` |
+| `andromeda-galaxy.md` | done, all 6 real links filled in from the Stripe tracker sheet |
 
-- [ ] Remaining tokens above replaced
+- [ ] Remaining tokens above replaced (Whirlpool, Veil)
 - [ ] Page prices match the amounts configured in Stripe
 
-Andromeda now uses the same sizes and prices as the other two prints
-(12×18″ $145/$185, 16×24″ $210/$260, 24×36″ $340/$410, Archival matte/Baryta
-fibre) — all 6 need their own Payment Link, same as Whirlpool and Veil. The
-one real link provided earlier was configured for Andromeda's old, one-off
-pricing, so it no longer matches any of these amounts and has been dropped
-in favour of placeholder tokens to avoid charging the wrong price.
+**Pricing scheme conflict, needs a decision:** the shared Stripe tracker
+sheet's own pricing reference is a single price per size, no paper choice
+(8×12 $65, 16×24 $165, 24×36 $295), applied uniformly across all prints
+including Whirlpool and Veil. That's a different model from what's live now
+(3 sizes × 2 papers = 6 variants per print, at $145–$410). The tracker sheet
+itself flags this: "Live site prices differ from this tracker's grid." Before
+filling in Whirlpool/Veil's links or launching any of the other prints
+listed in the tracker, confirm which pricing model is the real one: keep
+the 6-variant matte/baryta structure (and update the tracker to match), or
+drop the paper choice and switch every print to the tracker's single price
+per size.
 
 ### 4. Contact form
 
