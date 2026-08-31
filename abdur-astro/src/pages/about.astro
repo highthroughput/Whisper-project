@@ -37,6 +37,15 @@ const gear = [
     ],
   },
 ];
+
+// The retailer links used across every gear-review video on the channel.
+const retailers = [
+  { name: 'Agena Astro', url: 'https://agenaastro.com/?rfsn=7861342.502056', note: 'Eyepieces, mounts & accessories' },
+  { name: 'High Point Scientific', url: 'https://www.highpointscientific.com/?rfsn=7861335.596f7c', note: 'Telescopes & astro cameras' },
+  { name: 'ZWO', url: 'https://www.zwoastro.com/?ref=abdurastro', note: 'Cameras, filters & focusers' },
+  { name: 'All Star Telescope', url: 'https://all-startelescope.com/?sca_ref=6403255.SHIEyEffKU', note: 'Telescopes & smart scopes' },
+  { name: 'Dwarflab', url: 'https://dwarflab.com?aff=132', note: 'Smart telescopes' },
+];
 ---
 
 <Base
@@ -123,6 +132,35 @@ const gear = [
               ))
             }
           </dl>
+        </section>
+
+        {/* Retailer links from the YouTube gear reviews, disclosed plainly rather than run as a shop banner */}
+        <section class="reveal mt-6 border hairline bg-surface" aria-labelledby="partners-heading">
+          <header
+            class="flex items-baseline justify-between border-b hairline px-5 py-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)]"
+          >
+            <h2 id="partners-heading" class="text-faint">Where I buy</h2>
+            <span class="text-dust">Retailers</span>
+          </header>
+          <dl class="px-5 py-3 font-mono text-[0.8125rem]">
+            <div class="py-3">
+              {
+                retailers.map(({ name, url, note }) => (
+                  <dd class="mt-2 flex items-baseline">
+                    <a href={url} target="_blank" rel="sponsored noopener noreferrer" class="link-quiet text-star">
+                      {name}
+                    </a>
+                    <span class="log-leader" aria-hidden="true" />
+                    <span class="text-right text-faint">{note}</span>
+                  </dd>
+                ))
+              }
+            </div>
+          </dl>
+          <p class="border-t hairline px-5 py-3 text-xs leading-relaxed text-faint">
+            The retailers used to buy and test gear covered on the YouTube channel. Some of these
+            are affiliate links: using them costs nothing extra and helps fund the next review.
+          </p>
         </section>
       </div>
     </div>

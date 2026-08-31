@@ -25,7 +25,7 @@ const sizes = [...new Set(data.options.map((o) => o.size))].map((size) => ({
 }));
 
 const canonical = new URL(cleanPathname(Astro.url.pathname), Astro.site).href;
-const description = `${data.title} fine art print: archival giclée astrophotography from Alberta on matte or baryta cotton papers, ${data.options[0].size} to ${data.options[data.options.length - 1].size}, from $${from} CAD. Ships across Canada.`;
+const description = `${data.title} fine art print: archival giclée astrophotography from Alberta on matte or baryta cotton papers, ${data.options[0].size} to ${data.options[data.options.length - 1].size}, from $${from} CAD. Ships across North America.`;
 
 const schemaImage = await getImage({ src: data.image, width: 1200, format: 'jpeg', quality: 80 });
 
@@ -45,7 +45,7 @@ const productSchema = {
     availability: 'https://schema.org/InStock',
     itemCondition: 'https://schema.org/NewCondition',
     url: canonical,
-    areaServed: 'CA',
+    areaServed: ['CA', 'US'],
   })),
 };
 ---
@@ -140,7 +140,7 @@ const productSchema = {
             authenticity included.
           </p>
           <p>
-            Ships across Canada in a rigid tube. Turnaround currently 7–10 business days{' '}
+            Ships across North America in a rigid tube. Turnaround currently 7–10 business days{' '}
             <span class="opacity-70">(placeholder)</span>. Shipping and taxes calculated at
             Stripe checkout. <a href="/contact?topic=prints" class="link-quiet">Questions?</a>
           </p>

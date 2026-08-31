@@ -124,9 +124,10 @@ Payment Link says**, so keep them in sync.
 
 For each print variant: Stripe Dashboard → **Payment Links → New** → create a
 product (e.g. "Whirlpool Galaxy — 16 × 24″ Archival matte"), price in **CAD**,
-one-time. Enable **shipping address collection** (Canada), add your shipping
-rate, and (if registered) let Stripe Tax handle GST. Copy the
-`https://buy.stripe.com/…` URL over the matching placeholder token below.
+one-time. Enable **shipping address collection** (Canada and the US, per the
+site's "ships across North America" copy), add your shipping rate, and (if
+registered) let Stripe Tax handle GST. Copy the `https://buy.stripe.com/…`
+URL over the matching placeholder token below.
 
 ## Replace before launch
 
