@@ -168,17 +168,14 @@ Replace each token in the named file under `src/content/prints/` with a real
 - [ ] Remaining tokens above replaced (Whirlpool, Veil)
 - [ ] Page prices match the amounts configured in Stripe
 
-**Pricing scheme conflict, needs a decision:** the shared Stripe tracker
-sheet's own pricing reference is a single price per size, no paper choice
-(8×12 $65, 16×24 $165, 24×36 $295), applied uniformly across all prints
-including Whirlpool and Veil. That's a different model from what's live now
-(3 sizes × 2 papers = 6 variants per print, at $145–$410). The tracker sheet
-itself flags this: "Live site prices differ from this tracker's grid." Before
-filling in Whirlpool/Veil's links or launching any of the other prints
-listed in the tracker, confirm which pricing model is the real one: keep
-the 6-variant matte/baryta structure (and update the tracker to match), or
-drop the paper choice and switch every print to the tracker's single price
-per size.
+**Pricing model, decided:** the live 6-variant structure (3 sizes × 2 papers
+per print, Andromeda's $145/$185, $210/$260, $340/$410) is the correct one.
+The Stripe tracker sheet's own pricing reference (8×12 $65, 16×24 $165,
+24×36 $295, one price per size, no paper choice) is wrong and out of date;
+ignore it. Whirlpool and Veil's remaining links, and any of the other prints
+listed in the tracker, should follow Andromeda's 6-variant pattern: one
+Payment Link per size/paper combination. The tracker sheet itself should be
+updated to match before it's used to fill in more links.
 
 ### 4. Contact form
 
