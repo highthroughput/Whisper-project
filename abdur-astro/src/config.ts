@@ -30,6 +30,7 @@ export const INQUIRY_TOPICS = {
   prints: 'Print order question',
   tutorials: 'One-on-one tutorial',
   consulting: 'Equipment consulting',
+  rentals: 'Equipment rental',
   speaking: 'Public speaking',
   starparty: 'Private star party',
 } as const;
