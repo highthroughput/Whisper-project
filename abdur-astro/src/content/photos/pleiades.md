@@ -8,7 +8,7 @@ dec: '+24° 07′'
 image: '../../assets/photos/pleiades.jpg'
 alt: 'The Pleiades open star cluster, a tight knot of brilliant blue-white stars wrapped in wisps of pale blue reflection nebulosity. Astrophotography from Alberta, Canada.'
 date: 2026-08-29
-featured: false
+featured: true
 ---
 
 The Pleiades, also known as the Seven Sisters, is one of the most famous open
