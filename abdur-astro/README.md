@@ -177,6 +177,12 @@ of them in place — but do not launch until each box is checked.
       ("Buymeacoffee"). 36 links total, no shared URLs.
 - [x] Scope rental rates (one night $20, weekend $35, weekly $70) have real
       live Payment Links in `src/pages/rentals.astro`.
+- [ ] Hourly booking links for one-on-one tutorials and equipment consulting
+      (`src/pages/services.astro`, `HourlyBooking.astro` component): $100/hour,
+      1 to 5 hours, one Payment Link per hour count per service. Ten
+      placeholder tokens await real links: `STRIPE_LINK_TUTORIAL_1HR` through
+      `_5HR` ($100/$200/$300/$400/$500) and `STRIPE_LINK_CONSULTING_1HR`
+      through `_5HR` (same ladder).
 - [ ] Page prices match the amounts configured in Stripe (spot-check against
       the live dashboard before launch)
 

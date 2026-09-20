@@ -3,8 +3,25 @@ import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import YouTubeEmbed from '../components/YouTubeEmbed.astro';
+import HourlyBooking from '../components/HourlyBooking.astro';
 import eventPhoto from '../assets/photos/event-photo.jpg';
 import { byDateDesc } from '../lib/photos';
+
+const HOURLY_RATE = 100;
+const TUTORIAL_HOUR_LINKS: [string, string, string, string, string] = [
+  'STRIPE_LINK_TUTORIAL_1HR',
+  'STRIPE_LINK_TUTORIAL_2HR',
+  'STRIPE_LINK_TUTORIAL_3HR',
+  'STRIPE_LINK_TUTORIAL_4HR',
+  'STRIPE_LINK_TUTORIAL_5HR',
+];
+const CONSULTING_HOUR_LINKS: [string, string, string, string, string] = [
+  'STRIPE_LINK_CONSULTING_1HR',
+  'STRIPE_LINK_CONSULTING_2HR',
+  'STRIPE_LINK_CONSULTING_3HR',
+  'STRIPE_LINK_CONSULTING_4HR',
+  'STRIPE_LINK_CONSULTING_5HR',
+];
 
 const photos = (await getCollection('photos')).sort(byDateDesc);
 const keyImage = photos.find((p) => p.id === 'veil-nebula')?.data.image;
@@ -79,6 +96,15 @@ const services = [
                   )
                 }
                 {
+                  service.id === 'tutorials' && (
+                    <HourlyBooking
+                      links={TUTORIAL_HOUR_LINKS}
+                      ratePerHour={HOURLY_RATE}
+                      label="Book a tutorial"
+                    />
+                  )
+                }
+                {
                   service.id === 'speaking' && (
                     <div class="mt-6 max-w-md">
                       <p class="mb-2 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
@@ -109,6 +135,15 @@ const services = [
                         title={'5" APO vs 6" Achromatic Refractor - Which one should you buy? (Abdur Astro)'}
                       />
                     </div>
+                  )
+                }
+                {
+                  service.id === 'consulting' && (
+                    <HourlyBooking
+                      links={CONSULTING_HOUR_LINKS}
+                      ratePerHour={HOURLY_RATE}
+                      label="Book consulting"
+                    />
                   )
                 }
               </div>
