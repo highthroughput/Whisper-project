@@ -103,4 +103,21 @@ const events = defineCollection({
   }),
 });
 
-export const collections = { photos, prints, events };
+/**
+ * Customer testimonials, sourced from Facebook Marketplace reviews.
+ * Adding one = one markdown file in src/content/testimonials/ with the quote
+ * as the body. See "Adding a new testimonial" in README.md.
+ */
+const testimonials = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/testimonials' }),
+  schema: z.object({
+    author: z.string(),
+    date: z.coerce.date(),
+    rating: z.number().min(1).max(5).default(5),
+    source: z.string().default('Facebook Marketplace'),
+    /** Notable strengths tagged by the reviewer, e.g. ['Pricing', 'Communication']. */
+    strengths: z.array(z.string()).optional(),
+  }),
+});
+
+export const collections = { photos, prints, events, testimonials };

@@ -1,0 +1,57 @@
+---
+import { getCollection } from 'astro:content';
+
+interface Props {
+  /** Cap the number shown, newest first. Omit to show all. */
+  limit?: number;
+  class?: string;
+}
+const { limit, class: className } = Astro.props;
+
+const testimonials = (await getCollection('testimonials'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, limit);
+---
+
+{
+  testimonials.length > 0 && (
+    <section class:list={['reveal', className]} aria-labelledby="testimonials-heading">
+      <p class="eyebrow">Word of mouth</p>
+      <h2 id="testimonials-heading" class="mt-3 font-display text-3xl sm:text-4xl">
+        What people say
+      </h2>
+
+      <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {testimonials.map(({ data, body }) => (
+          <figure class="border hairline bg-surface p-6">
+            <div class="flex text-dust" aria-label={`${data.rating} out of 5 stars`}>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 20 20"
+                  fill={i < data.rating ? 'currentColor' : 'none'}
+                  stroke="currentColor"
+                  stroke-width="1.2"
+                  aria-hidden="true"
+                  class="mr-0.5"
+                >
+                  <path d="M10 1.5l2.6 5.6 6 .7-4.5 4.1 1.2 6-5.3-3-5.3 3 1.2-6-4.5-4.1 6-.7z" />
+                </svg>
+              ))}
+            </div>
+            <blockquote class="mt-4 text-sm leading-relaxed text-star/85">
+              "{body?.trim()}"
+            </blockquote>
+            <figcaption class="mt-4 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+              {data.author} · {data.source}
+            </figcaption>
+            {data.strengths && data.strengths.length > 0 && (
+              <p class="mt-2 text-[0.6875rem] text-faint">Notable: {data.strengths.join(' · ')}</p>
+            )}
+          </figure>
+        ))}
+      </div>
+    </section>
+  )
+}

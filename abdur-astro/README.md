@@ -150,6 +150,25 @@ events drop off automatically.
 For an `astronomical` entry, use `infoUrl` instead of `rsvpLink` if you want a
 "Learn more" link (omit it to show no button, just the write-up).
 
+## Adding a new testimonial (under a minute)
+
+Shown on the home page, newest first, via the `<Testimonials />` component.
+
+1. Create `src/content/testimonials/some-name-date.md`:
+
+   ```markdown
+   ---
+   author: 'Jane'
+   date: 2026-10-01
+   rating: 5                            # 1–5, defaults to 5
+   strengths: ['Pricing', 'Communication'] # optional — Facebook Marketplace's tags
+   ---
+
+   The quote itself, verbatim.
+   ```
+
+2. `npm run dev` — it's on the home page. Done.
+
 ## Stripe Payment Links
 
 For each print variant: Stripe Dashboard → **Payment Links → New** → create a

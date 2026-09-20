@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import PhotoCard from '../components/PhotoCard.astro';
+import Testimonials from '../components/Testimonials.astro';
 import { byDateDesc } from '../lib/photos';
 import heroImage from '../assets/photos/andromeda-galaxy.jpg';
 
@@ -132,6 +133,9 @@ const entries = [
       }
     </div>
   </section>
+
+  {/* Testimonials */}
+  <Testimonials limit={6} class="mx-auto mt-24 w-full max-w-7xl px-5 sm:px-8" />
 
   {/* Services teaser */}
   <section class="mx-auto mt-28 w-full max-w-7xl px-5 sm:px-8" aria-labelledby="teaser-heading">
