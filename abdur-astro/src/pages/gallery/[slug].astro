@@ -29,7 +29,7 @@ const printFrom = print ? Math.min(...print.data.options.map((o) => o.price)) : 
 
 const total = totalHours(data.filters);
 const hours = formatHours(total);
-const locationPart = data.location?.split('·')[0]?.trim() ?? 'Central Alberta';
+const locationPart = data.location?.split('·')[0]?.trim() ?? 'Southern Alberta';
 const integrationPart =
   total > 0 ? `${hours} hours of ${filterNames(data.filters).replaceAll(' · ', '/')} integration. ` : '';
 const description = `${data.title} (${data.target}) photographed from ${locationPart}. ${integrationPart}Full acquisition log: telescope, camera, mount, filters and capture dates.`;

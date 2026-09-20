@@ -4,14 +4,14 @@
  */
 export const SITE = {
   name: 'Abdur Astro',
-  tagline: 'Deep-sky astrophotography from the dark skies of Central Alberta',
+  tagline: 'Deep-sky astrophotography from the dark skies of Southern Alberta',
 
   /** Goes live once Cloudflare Email Routing forwards it (see README deploy steps). */
   email: 'info@abdurastro.com',
 
-  region: 'Central Alberta, Canada',
+  region: 'Southern Alberta, Canada',
   /** Approximate — a wink at the observation log, not a home address. */
-  coordinates: '52.3° N · 113.8° W',
+  coordinates: '51.0° N · 114.1° W',
 
   social: {
     youtube: 'https://www.youtube.com/@AbdurAstro',

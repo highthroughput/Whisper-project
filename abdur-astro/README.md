@@ -75,7 +75,7 @@ abdur-astro/
      - { name: 'SII', hours: 5.0 }
    captured: 'Feb – Mar 2026 · 7 nights'            # optional — omit until confirmed
    date: 2026-03-04                    # last light; used for sort order
-   location: 'Backyard observatory · Central Alberta · Bortle 4'  # optional — omit until confirmed
+   location: 'Backyard observatory · Southern Alberta · Bortle 4'  # optional — omit until confirmed
    featured: false                     # true = appears on the home page
    ---
 
@@ -222,7 +222,7 @@ of them in place — but do not launch until each box is checked.
 - [ ] Print turnaround time ("7–10 business days") in `src/pages/prints/index.astro`
       and `src/pages/prints/[slug].astro` — the number itself is still an
       estimate, confirm before launch
-- [ ] Coordinates in `src/config.ts` (`coordinates`) if 52.3° N · 113.8° W isn't right
+- [ ] Coordinates in `src/config.ts` (`coordinates`) if 51.0° N · 114.1° W isn't right
 - [ ] No real hosted events (star parties, talks) are on the calendar yet.
       `src/content/events/` currently has only `kind: 'astronomical'` entries
       (meteor showers, the winter solstice — real, well-known annual dates).
