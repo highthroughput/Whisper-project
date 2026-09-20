@@ -157,7 +157,11 @@ of them in place — but do not launch until each box is checked.
       observation log and gallery cards hide a field rather than showing a
       placeholder for it. Add the real values to each `src/content/photos/*.md`
       file as they're confirmed.
-- [ ] All 5 print entries in `src/content/prints/` — descriptions, editions, prices
+- [x] All 6 print entries in `src/content/prints/` have real Stripe links and
+      confirmed prices. Pleiades, Rosette, and North America/Pelican Nebulae's
+      descriptions use only publicly known astronomical facts (distance,
+      catalogue designation) since no personal acquisition data is confirmed
+      for those three yet; revisit once real capture details come in.
 - [ ] Bio on `src/pages/about.astro` (marked `PLACEHOLDER COPY` in a comment)
 - [ ] Gear list on `src/pages/about.astro` (`gear` array)
 - [ ] Print turnaround time ("7–10 business days") in `src/pages/prints/index.astro`
@@ -167,40 +171,22 @@ of them in place — but do not launch until each box is checked.
 
 ### 3. Stripe Payment Links
 
-Replace each token in the named file under `src/content/prints/` with a real
-`https://buy.stripe.com/…` URL. Until then, Buy buttons point at the literal token.
-
-| File | Tokens |
-| --- | --- |
-| `whirlpool-galaxy.md` | `STRIPE_LINK_WHIRLPOOL_12X18` · `STRIPE_LINK_WHIRLPOOL_12X18_BARYTA` · `STRIPE_LINK_WHIRLPOOL_16X24` · `STRIPE_LINK_WHIRLPOOL_16X24_BARYTA` · `STRIPE_LINK_WHIRLPOOL_24X36` · `STRIPE_LINK_WHIRLPOOL_24X36_BARYTA` |
-| `veil-nebula.md` | `STRIPE_LINK_VEIL_12X18` · `STRIPE_LINK_VEIL_12X18_BARYTA` · `STRIPE_LINK_VEIL_16X24` · `STRIPE_LINK_VEIL_16X24_BARYTA` · `STRIPE_LINK_VEIL_24X36` · `STRIPE_LINK_VEIL_24X36_BARYTA` |
-| `andromeda-galaxy.md` | done, all 6 real links filled in from the Stripe tracker sheet |
-
-- [ ] Remaining tokens above replaced (Whirlpool, Veil)
-- [ ] Page prices match the amounts configured in Stripe
-
-The Rentals page (`src/pages/rentals.astro`) follows the same placeholder-token
-pattern for its own rate ledger, confirmed real from the Facebook ad for the
-Sky-Watcher 10″ 250P Flextube Dobsonian: one night $20, weekend $35, weekly
-$70. Create one Stripe Payment Link per rate (same CAD, one-time setup as the
-prints) and replace:
-
-| File | Tokens |
-| --- | --- |
-| `src/pages/rentals.astro` | `STRIPE_LINK_RENTAL_1NIGHT` ($20) · `STRIPE_LINK_RENTAL_WEEKEND` ($35) · `STRIPE_LINK_RENTAL_WEEKLY` ($70) |
-
-Rentals don't ship, so skip shipping address collection on these links;
-collect whatever pickup/contact info you need instead (e.g. a custom field
-for pickup date).
+- [x] All 6 prints (Andromeda, Whirlpool, Veil, Pleiades, Rosette, North
+      America/Pelican Nebulae) have real, live `https://buy.stripe.com/…`
+      links for all 3 sizes × 2 papers, from the live Stripe account
+      ("Buymeacoffee"). 36 links total, no shared URLs.
+- [x] Scope rental rates (one night $20, weekend $35, weekly $70) have real
+      live Payment Links in `src/pages/rentals.astro`.
+- [ ] Page prices match the amounts configured in Stripe (spot-check against
+      the live dashboard before launch)
 
 **Pricing model, decided:** the live 6-variant structure (3 sizes × 2 papers
-per print, Andromeda's $145/$185, $210/$260, $340/$410) is the correct one.
-The Stripe tracker sheet's own pricing reference (8×12 $65, 16×24 $165,
-24×36 $295, one price per size, no paper choice) is wrong and out of date;
-ignore it. Whirlpool and Veil's remaining links, and any of the other prints
-listed in the tracker, should follow Andromeda's 6-variant pattern: one
-Payment Link per size/paper combination. The tracker sheet itself should be
-updated to match before it's used to fill in more links.
+per print, $145/$185, $210/$260, $340/$410) is the correct one and is what
+every print now uses. The Stripe tracker sheet's own pricing reference (8×12
+$65, 16×24 $165, 24×36 $295, one price per size, no paper choice) was wrong
+and out of date; it was not used. An older Andromeda 24×36 $295 link exists
+in the account but was deliberately left unused, since it doesn't match the
+live pricing.
 
 ### 4. Contact form
 

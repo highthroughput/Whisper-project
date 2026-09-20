@@ -6,12 +6,12 @@ alt: 'Fine art print of the Whirlpool Galaxy, a face-on spiral with rust-brown d
 tagline: 'A grand-design spiral and its companion, 31 million light-years out · 30.5 hours of Alberta sky.'
 edition: 'Open edition · signed'
 options:
-  - { size: '12 × 18″', paper: 'Archival matte', price: 145, stripeLink: 'STRIPE_LINK_WHIRLPOOL_12X18' }
-  - { size: '12 × 18″', paper: 'Baryta fibre', price: 185, stripeLink: 'STRIPE_LINK_WHIRLPOOL_12X18_BARYTA' }
-  - { size: '16 × 24″', paper: 'Archival matte', price: 210, stripeLink: 'STRIPE_LINK_WHIRLPOOL_16X24' }
-  - { size: '16 × 24″', paper: 'Baryta fibre', price: 260, stripeLink: 'STRIPE_LINK_WHIRLPOOL_16X24_BARYTA' }
-  - { size: '24 × 36″', paper: 'Archival matte', price: 340, stripeLink: 'STRIPE_LINK_WHIRLPOOL_24X36' }
-  - { size: '24 × 36″', paper: 'Baryta fibre', price: 410, stripeLink: 'STRIPE_LINK_WHIRLPOOL_24X36_BARYTA' }
+  - { size: '12 × 18″', paper: 'Archival matte', price: 145, stripeLink: 'https://buy.stripe.com/3cI5kFdsq7sV0gF1J23Nm07' }
+  - { size: '12 × 18″', paper: 'Baryta fibre', price: 185, stripeLink: 'https://buy.stripe.com/5kQ5kF1JI5kNe7v1J23Nm08' }
+  - { size: '16 × 24″', paper: 'Archival matte', price: 210, stripeLink: 'https://buy.stripe.com/dRm00l74200taVjevO3Nm09' }
+  - { size: '16 × 24″', paper: 'Baryta fibre', price: 260, stripeLink: 'https://buy.stripe.com/8x2eVfgEC6oR3sR0EY3Nm0a' }
+  - { size: '24 × 36″', paper: 'Archival matte', price: 340, stripeLink: 'https://buy.stripe.com/aFafZj4VUfZrfbz87q3Nm0b' }
+  - { size: '24 × 36″', paper: 'Baryta fibre', price: 410, stripeLink: 'https://buy.stripe.com/7sY7sN3RQ14x5AZ4Ve3Nm0c' }
 featured: true
 order: 1
 ---
