@@ -21,15 +21,18 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
 ---
 
 <header
+  data-header
+  data-overlay={overlay ? 'true' : 'false'}
   class:list={[
-    'z-40 w-full',
-    overlay ? 'absolute inset-x-0 top-0' : 'relative border-b hairline bg-sky',
+    'z-40 w-full transition-colors duration-300',
+    overlay ? 'fixed inset-x-0 top-0' : 'sticky top-0 border-b hairline bg-sky',
   ]}
 >
   {
     overlay && (
       <div
-        class="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-sky/85 via-sky/45 to-transparent"
+        data-header-scrim
+        class="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-sky/85 via-sky/45 to-transparent transition-opacity duration-300"
         aria-hidden="true"
       />
     )
@@ -130,3 +133,19 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
     </details>
   </div>
 </header>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  if (header?.dataset.overlay === 'true') {
+    const scrim = header.querySelector<HTMLElement>('[data-header-scrim]');
+    const onScroll = () => {
+      const scrolled = window.scrollY > 40;
+      header.classList.toggle('bg-sky', scrolled);
+      header.classList.toggle('border-b', scrolled);
+      header.classList.toggle('hairline', scrolled);
+      if (scrim) scrim.style.opacity = scrolled ? '0' : '1';
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+</script>
