@@ -1,5 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
+import telescopeImage from '../assets/rentals/skywatcher-dobsonian.webp';
 
 const rates = [
   {
@@ -50,6 +52,19 @@ const included = [
           owning one. The collapsible Flextube design sets up in minutes and breaks back down
           for the drive home.
         </p>
+
+        <div class="reveal mt-8 border hairline bg-surface p-4 sm:p-5">
+          <Image
+            src={telescopeImage}
+            alt="The Sky-Watcher 10″ 250P Flextube Dobsonian telescope set up on its rocker base in a living room, showing the primary mirror, focuser with eyepiece, and collapsible truss tube."
+            widths={[480, 768, 1080, 1440]}
+            sizes="(min-width: 1024px) 55vw, 100vw"
+            quality={80}
+            loading="eager"
+            fetchpriority="high"
+            class="w-full object-cover"
+          />
+        </div>
 
         <div class="reveal mt-8 max-w-prose space-y-4 text-sm leading-relaxed text-star/85">
           <p>
