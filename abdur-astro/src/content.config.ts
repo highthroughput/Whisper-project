@@ -59,6 +59,10 @@ const prints = defineCollection({
       photo: z.string().optional(),
       image: image(),
       alt: z.string().min(10),
+      /** Real photo of the print in a room, used on the shop grid card instead of the raw astrophoto. Falls back to `image`. */
+      lifestyleImage: image().optional(),
+      /** Real close-up photo of the framed print, used on the product page instead of the raw astrophoto. Falls back to `image`. */
+      closeupImage: image().optional(),
       /** One line under the title on the product page. */
       tagline: z.string(),
       edition: z.string().default('Open edition, signed'),

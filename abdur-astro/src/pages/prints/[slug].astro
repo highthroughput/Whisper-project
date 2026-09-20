@@ -63,7 +63,7 @@ const productSchema = {
       <div class="lg:sticky lg:top-8 lg:self-start">
         <div class="border hairline bg-surface p-5 sm:p-8">
           <Image
-            src={data.image}
+            src={data.closeupImage ?? data.image}
             alt={data.alt}
             widths={[640, 1080, 1600, 2200]}
             sizes="(min-width: 1024px) 55vw, 100vw"

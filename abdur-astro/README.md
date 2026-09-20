@@ -122,6 +122,17 @@ confirmed.
 3. `npm run dev` — the print is in the shop grid with a product page, price
    ledger, buy buttons, and Product JSON-LD. Done.
 
+Once real product photography exists (the print framed and hung, or a close-up
+of the physical piece), add it to the frontmatter instead of relying on the
+raw astrophoto:
+
+```yaml
+lifestyleImage: '../../assets/prints/rosette-nebula-living-room.jpg' # shop grid card
+closeupImage: '../../assets/prints/rosette-nebula-closeup.jpg'       # product page hero
+```
+
+Both are optional and fall back to `image` (the raw astrophoto) when omitted.
+
 The page's prices are display-only; **the amount charged is whatever the Stripe
 Payment Link says**, so keep them in sync.
 

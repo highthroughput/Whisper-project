@@ -18,7 +18,7 @@ const from = Math.min(...data.options.map((o) => o.price));
   <div class="hover-lift border hairline bg-surface p-4 sm:p-5">
     <div class="overflow-hidden">
       <Image
-        src={data.image}
+        src={data.lifestyleImage ?? data.image}
         alt={data.alt}
         widths={[420, 640, 960, 1280]}
         sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw"
