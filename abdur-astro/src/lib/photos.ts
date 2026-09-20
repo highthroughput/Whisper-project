@@ -1,11 +1,11 @@
 import type { CollectionEntry } from 'astro:content';
 
 export type Photo = CollectionEntry<'photos'>;
-export type Filter = Photo['data']['filters'][number];
+export type Filter = NonNullable<Photo['data']['filters']>[number];
 
-/** Total integration across all filters, in hours. */
-export function totalHours(filters: Filter[]): number {
-  return filters.reduce((sum, f) => sum + f.hours, 0);
+/** Total integration across all filters, in hours. 0 if not confirmed yet. */
+export function totalHours(filters?: Filter[]): number {
+  return (filters ?? []).reduce((sum, f) => sum + f.hours, 0);
 }
 
 /** "30.5" / "20" — trims a trailing .0 so the log stays terse. */
@@ -13,14 +13,19 @@ export function formatHours(hours: number): string {
   return (Math.round(hours * 10) / 10).toFixed(1).replace(/\.0$/, '');
 }
 
-/** "HA · OIII · SII" for card log lines. */
-export function filterNames(filters: Filter[]): string {
-  return filters.map((f) => f.name.toUpperCase()).join(' · ');
+/** "HA · OIII · SII" for card log lines. Empty string if not confirmed yet. */
+export function filterNames(filters?: Filter[]): string {
+  return (filters ?? []).map((f) => f.name.toUpperCase()).join(' · ');
 }
 
-/** One-line log footer used on cards: "M 51 · 30.5 H · L R G B". */
+/** One-line log footer used on cards: "M 51 · 30.5 H · L R G B", skipping any part that isn't confirmed yet. */
 export function logLine(photo: Photo): string {
-  return `${photo.data.target} · ${formatHours(totalHours(photo.data.filters))} H · ${filterNames(photo.data.filters)}`;
+  const total = totalHours(photo.data.filters);
+  const parts = [photo.data.target];
+  if (total > 0) parts.push(`${formatHours(total)} H`);
+  const names = filterNames(photo.data.filters);
+  if (names) parts.push(names);
+  return parts.join(' · ');
 }
 
 /**

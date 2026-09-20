@@ -27,8 +27,18 @@ const prints = await getCollection('prints');
 const print = prints.find((p) => p.data.photo === photo.id);
 const printFrom = print ? Math.min(...print.data.options.map((o) => o.price)) : null;
 
-const hours = formatHours(totalHours(data.filters));
-const description = `${data.title} (${data.target}) photographed from ${data.location.split('·')[0]?.trim() ?? 'Central Alberta'}: ${hours} hours of ${filterNames(data.filters).replaceAll(' · ', '/')} integration. Full acquisition log: telescope, camera, mount, filters and capture dates.`;
+const total = totalHours(data.filters);
+const hours = formatHours(total);
+const locationPart = data.location?.split('·')[0]?.trim() ?? 'Central Alberta';
+const integrationPart =
+  total > 0 ? `${hours} hours of ${filterNames(data.filters).replaceAll(' · ', '/')} integration. ` : '';
+const description = `${data.title} (${data.target}) photographed from ${locationPart}. ${integrationPart}Full acquisition log: telescope, camera, mount, filters and capture dates.`;
+
+const captionParts = [data.target];
+if (total > 0) captionParts.push(`${hours} h`);
+const filterPart = filterNames(data.filters);
+if (filterPart) captionParts.push(filterPart);
+if (data.captured) captionParts.push(data.captured);
 ---
 
 <Base
@@ -61,7 +71,7 @@ const description = `${data.title} (${data.target}) photographed from ${data.loc
       />
     </div>
     <p class="mt-3 font-mono text-[0.6875rem] uppercase [letter-spacing:0.08em] text-faint">
-      {data.target} · {hours} h · {filterNames(data.filters)} · {data.captured}
+      {captionParts.join(' · ')}
     </p>
 
     <div class="mt-14 grid gap-12 lg:grid-cols-[1fr_minmax(22rem,26rem)] lg:gap-16">

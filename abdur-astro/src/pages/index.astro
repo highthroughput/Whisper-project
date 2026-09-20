@@ -48,14 +48,14 @@ const entries = [
         'The Andromeda Galaxy, a vast spiral galaxy spanning the frame in soft blue-white light.'}
       widths={[640, 960, 1440, 1920, 2200]}
       sizes="100vw"
-      quality={72}
+      quality={80}
       loading="eager"
       fetchpriority="high"
       class="absolute inset-0 h-full w-full object-cover"
     />
-    {/* Legibility scrim only — no decoration */}
+    {/* Legibility scrim, confined to the bottom text band so the rest of the photo shows at full brightness */}
     <div
-      class="absolute inset-0 bg-gradient-to-t from-sky via-sky/30 to-sky/10"
+      class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-sky via-sky/50 to-transparent"
       aria-hidden="true"
     >
     </div>
@@ -73,7 +73,8 @@ const entries = [
       {
         heroPhoto && (
           <p class="mt-8 font-mono text-[0.6875rem] uppercase [letter-spacing:0.08em] text-star/60">
-            In frame: {heroPhoto.data.target} {heroPhoto.data.title} · {heroPhoto.data.captured}
+            In frame: {heroPhoto.data.target} {heroPhoto.data.title}
+            {heroPhoto.data.captured && ` · ${heroPhoto.data.captured}`}
           </p>
         )
       }

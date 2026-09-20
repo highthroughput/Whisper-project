@@ -66,16 +66,16 @@ abdur-astro/
    dec: '+04° 59′ 54″'
    image: '../../assets/photos/rosette-nebula.jpg'
    alt: 'One full sentence describing what the photograph shows.'
-   telescope: 'Sky-Watcher Esprit 100ED · f/5.5'
-   camera: 'ZWO ASI2600MM Pro (mono)'
-   mount: 'Sky-Watcher EQ6-R Pro'
-   filters:                            # hours per filter — drives the log's integration bar
+   telescope: 'Sky-Watcher Esprit 100ED · f/5.5'    # optional — omit until confirmed
+   camera: 'ZWO ASI2600MM Pro (mono)'               # optional — omit until confirmed
+   mount: 'Sky-Watcher EQ6-R Pro'                   # optional — omit until confirmed
+   filters:                            # optional — hours per filter, drives the log's integration bar
      - { name: 'Ha', hours: 9.0 }
      - { name: 'OIII', hours: 6.5 }
      - { name: 'SII', hours: 5.0 }
-   captured: 'Feb – Mar 2026 · 7 nights'
+   captured: 'Feb – Mar 2026 · 7 nights'            # optional — omit until confirmed
    date: 2026-03-04                    # last light; used for sort order
-   location: 'Backyard observatory · Central Alberta · Bortle 4'
+   location: 'Backyard observatory · Central Alberta · Bortle 4'  # optional — omit until confirmed
    featured: false                     # true = appears on the home page
    ---
 
@@ -88,6 +88,11 @@ abdur-astro/
 Filter names map to the integration bar's colours automatically: `Ha` → emission
 red, `OIII` → teal, `SII` → dust gold; `L/R/G/B` render as monochrome steps.
 Anything else gets a neutral tone.
+
+Any optional field left out of the frontmatter (telescope, camera, mount,
+filters, captured, location) is simply omitted from the observation log and
+gallery card, not shown as a placeholder. Add it once the real value is
+confirmed.
 
 ## Adding a new print (under 5 minutes)
 
@@ -145,14 +150,19 @@ of them in place — but do not launch until each box is checked.
 ### 2. Copy
 
 - [ ] Acquisition data (telescope, camera, mount, filters, hours, dates,
-      locations) and body text for Veil Nebula, Rosette Nebula, Pleiades,
-      North America/Pelican Nebula, and Whirlpool Galaxy's mount — all
-      currently marked "pending" in `src/content/photos/`
+      locations) for Veil Nebula, Rosette Nebula, Pleiades, North
+      America/Pelican Nebula, Andromeda Galaxy, and most of Whirlpool
+      Galaxy. These fields are now `.optional()` in `content.config.ts` and
+      simply omitted from each file's frontmatter until confirmed; the
+      observation log and gallery cards hide a field rather than showing a
+      placeholder for it. Add the real values to each `src/content/photos/*.md`
+      file as they're confirmed.
 - [ ] All 5 print entries in `src/content/prints/` — descriptions, editions, prices
 - [ ] Bio on `src/pages/about.astro` (marked `PLACEHOLDER COPY` in a comment)
 - [ ] Gear list on `src/pages/about.astro` (`gear` array)
 - [ ] Print turnaround time ("7–10 business days") in `src/pages/prints/index.astro`
-      and `src/pages/prints/[slug].astro`
+      and `src/pages/prints/[slug].astro` — the number itself is still an
+      estimate, confirm before launch
 - [ ] Coordinates in `src/config.ts` (`coordinates`) if 52.3° N · 113.8° W isn't right
 
 ### 3. Stripe Payment Links

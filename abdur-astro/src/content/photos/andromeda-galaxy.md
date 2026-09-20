@@ -7,11 +7,6 @@ ra: '00h 42m 44s'
 dec: '+41° 16′ 09″'
 image: '../../assets/photos/andromeda-galaxy.jpg'
 alt: 'The Andromeda Galaxy, a vast spiral galaxy spanning the frame in soft blue-white light, with dark dust lanes threading through star-forming regions across its disk. Astrophotography from Alberta, Canada.'
-telescope: 'Gear details pending'
-camera: 'Gear details pending'
-mount: 'Gear details pending'
-filters:
-  - { name: 'Pending breakdown', hours: 1 }
 captured: 'Aug – Nov 2023'
 date: 2023-11-20
 location: 'Backyard observatory · Cochrane, Alberta'

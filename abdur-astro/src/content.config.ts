@@ -20,10 +20,11 @@ const photos = defineCollection({
       dec: z.string(),
       image: image(),
       alt: z.string().min(10),
-      telescope: z.string(),
-      camera: z.string(),
-      mount: z.string(),
-      /** Per-filter integration; total hours are computed by summing these. */
+      /** Omit any of these until the real acquisition data is confirmed; the log hides missing fields rather than showing a placeholder. */
+      telescope: z.string().optional(),
+      camera: z.string().optional(),
+      mount: z.string().optional(),
+      /** Per-filter integration; total hours are computed by summing these. Omit until confirmed. */
       filters: z
         .array(
           z.object({
@@ -31,12 +32,13 @@ const photos = defineCollection({
             hours: z.number().positive(),
           }),
         )
-        .min(1),
+        .min(1)
+        .optional(),
       /** Human-readable capture window, e.g. "Mar – Apr 2025 · 11 nights". */
-      captured: z.string(),
+      captured: z.string().optional(),
       /** Machine date (last light) used for sorting. */
       date: z.coerce.date(),
-      location: z.string(),
+      location: z.string().optional(),
       /** Featured photos appear on the home page. */
       featured: z.boolean().default(false),
     }),
