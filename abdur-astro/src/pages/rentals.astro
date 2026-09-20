@@ -1,0 +1,91 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import portrait from '../assets/photos/portrait.jpg';
+---
+
+<Base
+  title="Telescope & Equipment Rentals"
+  description="Rent a telescope, mount, or astrophotography camera by the week in Central Alberta. Try real gear on your own sky before you buy it, with a walkthrough included."
+  ogImage={portrait}
+  ogImageAlt="Abdur standing beside his Celestron EdgeHD and refractor telescopes on tracking mounts in a field."
+>
+  <section class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
+    <div class="grid gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-16">
+      <div>
+        <p class="eyebrow">Try before you buy</p>
+        <h1 class="mt-3 font-display text-4xl sm:text-5xl">Rentals</h1>
+        <p class="mt-6 max-w-2xl text-faint">
+          Not ready to buy? Try before you commit. I rent out backyard telescopes, mounts, and
+          astrophotography cameras by the week, the same gear I test and review, so you can put a
+          real setup on your own sky before spending real money. Good for a weekend at a dark
+          site, a loaner while your own gear is in for service, or simply working out whether
+          visual observing or imaging is the hobby you actually want.
+        </p>
+
+        <div class="mt-10 flex flex-wrap gap-4">
+          <a
+            href="/contact?topic=rentals"
+            class="btn btn-solid"
+            aria-label="Check rental availability and pricing"
+          >
+            Check availability →
+          </a>
+          <a href="/services" class="btn">All services</a>
+        </div>
+      </div>
+
+      <div class="border hairline bg-surface p-4 sm:p-5">
+        <Image
+          src={portrait}
+          alt="Abdur standing in a field beside his Celestron EdgeHD telescope on an orange-railed mount and a second refractor on a tracking mount."
+          widths={[420, 640, 960, 1280]}
+          sizes="(min-width: 1024px) 35vw, 92vw"
+          class="aspect-[4/5] w-full object-cover"
+          loading="eager"
+          quality={80}
+        />
+      </div>
+    </div>
+  </section>
+
+  <section
+    class="mx-auto mt-24 w-full max-w-7xl px-5 sm:px-8"
+    aria-labelledby="how-it-works-heading"
+  >
+    <div class="reveal border-t hairline pt-12">
+      <p class="eyebrow">The details</p>
+      <h2 id="how-it-works-heading" class="mt-3 font-display text-3xl">How renting works</h2>
+      <div class="mt-8 grid gap-10 text-sm text-faint md:grid-cols-3">
+        <div>
+          <h3 class="font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-star">
+            What's available
+          </h3>
+          <p class="mt-3 leading-relaxed">
+            Telescopes, mounts, and astrophotography cameras from the gear I actually use and
+            review, matched to what you're trying to do: visual observing, wide-field imaging, or
+            planetary and solar work.
+          </p>
+        </div>
+        <div>
+          <h3 class="font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-star">
+            Term & handoff
+          </h3>
+          <p class="mt-3 leading-relaxed">
+            Rentals run by the week. Every handoff includes a walkthrough of the gear, so you're
+            not learning a new mount alone under a dark sky for the first time.
+          </p>
+        </div>
+        <div>
+          <h3 class="font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-star">
+            Pickup & booking
+          </h3>
+          <p class="mt-3 leading-relaxed">
+            Pickup and return happen around Central Alberta. Availability and current pricing
+            depend on what's free that week, so booking starts with a quick message.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

@@ -21,6 +21,9 @@ export const SITE = {
     patreon: 'https://www.patreon.com/cw/AbdurAstro',
   },
 
+  /** Google Business Profile — used for the "Leave a review" link. */
+  googleBusiness: 'https://share.google/iRm8W7WB9Pi92lIkK',
+
   web3formsKey: 'c3c0b6ec-abf3-4103-935c-fffd766dbb08',
 } as const;
 
