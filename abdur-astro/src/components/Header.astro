@@ -64,7 +64,7 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
                 href={href}
                 aria-current={isCurrent(href) ? 'page' : undefined}
                 class:list={[
-                  'font-mono text-xs uppercase [letter-spacing:var(--tracking-log)] transition-colors duration-150',
+                  'font-mono text-sm uppercase [letter-spacing:var(--tracking-log)] transition-colors duration-150',
                   isCurrent(href) ? 'text-star' : 'text-star/75 hover:text-star',
                 ]}
               >
@@ -79,17 +79,17 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
 
     <div class="hidden items-center gap-6 md:flex">
       <SocialLinks platforms={['youtube', 'instagram', 'x']} />
-      <a href="/services" class="btn btn-solid !px-4 !py-2 !text-[0.6875rem]">
+      <a href="/services" class="btn btn-solid !px-4 !py-2 !text-xs">
         Book time
       </a>
-      <a href="/prints" class="btn btn-solid !px-4 !py-2 !text-[0.6875rem]">
+      <a href="/prints" class="btn btn-solid !px-4 !py-2 !text-xs">
         Shop prints
       </a>
     </div>
 
     <details class="group md:hidden">
       <summary
-        class="flex cursor-pointer list-none items-center gap-2 font-mono text-xs uppercase [letter-spacing:var(--tracking-log)] text-star [&::-webkit-details-marker]:hidden"
+        class="flex cursor-pointer list-none items-center gap-2 font-mono text-sm uppercase [letter-spacing:var(--tracking-log)] text-star [&::-webkit-details-marker]:hidden"
       >
         <span class="group-open:hidden">Menu</span>
         <span class="hidden group-open:inline">Close</span>
