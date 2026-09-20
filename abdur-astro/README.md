@@ -179,6 +179,20 @@ Replace each token in the named file under `src/content/prints/` with a real
 - [ ] Remaining tokens above replaced (Whirlpool, Veil)
 - [ ] Page prices match the amounts configured in Stripe
 
+The Rentals page (`src/pages/rentals.astro`) follows the same placeholder-token
+pattern for its own rate ledger, confirmed real from the Facebook ad for the
+Sky-Watcher 10″ 250P Flextube Dobsonian: one night $20, weekend $35, weekly
+$70. Create one Stripe Payment Link per rate (same CAD, one-time setup as the
+prints) and replace:
+
+| File | Tokens |
+| --- | --- |
+| `src/pages/rentals.astro` | `STRIPE_LINK_RENTAL_1NIGHT` ($20) · `STRIPE_LINK_RENTAL_WEEKEND` ($35) · `STRIPE_LINK_RENTAL_WEEKLY` ($70) |
+
+Rentals don't ship, so skip shipping address collection on these links;
+collect whatever pickup/contact info you need instead (e.g. a custom field
+for pickup date).
+
 **Pricing model, decided:** the live 6-variant structure (3 sizes × 2 papers
 per print, Andromeda's $145/$185, $210/$260, $340/$410) is the correct one.
 The Stripe tracker sheet's own pricing reference (8×12 $65, 16×24 $165,

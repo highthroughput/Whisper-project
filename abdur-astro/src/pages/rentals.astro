@@ -1,91 +1,113 @@
 ---
-import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import portrait from '../assets/photos/portrait.jpg';
+
+const rates = [
+  {
+    term: 'One night',
+    detail: 'Pick up same day, return the next day',
+    price: 20,
+    stripeLink: 'STRIPE_LINK_RENTAL_1NIGHT',
+  },
+  {
+    term: 'Weekend',
+    detail: 'Pick up Friday, drop off Monday',
+    price: 35,
+    stripeLink: 'STRIPE_LINK_RENTAL_WEEKEND',
+  },
+  {
+    term: 'Weekly',
+    detail: 'Pick up day 1, drop off day 8',
+    price: 70,
+    stripeLink: 'STRIPE_LINK_RENTAL_WEEKLY',
+  },
+];
+
+const included = [
+  'Upgraded Baader zoom eyepiece',
+  'Red dot finder',
+  'Laser collimator',
+  'Dew heater',
+  'Red headlamp',
+  'Curated observing guide',
+  'Setup and assembly directions',
+];
 ---
 
 <Base
-  title="Telescope & Equipment Rentals"
-  description="Rent a telescope, mount, or astrophotography camera by the week in Central Alberta. Try real gear on your own sky before you buy it, with a walkthrough included."
-  ogImage={portrait}
-  ogImageAlt="Abdur standing beside his Celestron EdgeHD and refractor telescopes on tracking mounts in a field."
+  title="Sky-Watcher 10″ Dobsonian Rental"
+  description="Rent a Sky-Watcher 10-inch 250P Flextube Dobsonian telescope in Central Alberta. One night, weekend, and weekly rates, with eyepiece, finder, and accessories included."
 >
-  <section class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
-    <div class="grid gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-16">
+  <article class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
+    <div class="grid gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(22rem,5fr)] lg:gap-16">
       <div>
-        <p class="eyebrow">Try before you buy</p>
-        <h1 class="mt-3 font-display text-4xl sm:text-5xl">Rentals</h1>
-        <p class="mt-6 max-w-2xl text-faint">
-          Not ready to buy? Try before you commit. I rent out backyard telescopes, mounts, and
-          astrophotography cameras by the week, the same gear I test and review, so you can put a
-          real setup on your own sky before spending real money. Good for a weekend at a dark
-          site, a loaner while your own gear is in for service, or simply working out whether
-          visual observing or imaging is the hobby you actually want.
+        <p class="eyebrow">Telescope rental</p>
+        <h1 class="mt-3 font-display text-4xl sm:text-5xl">
+          Sky-Watcher 10″ 250P Flextube Dobsonian
+        </h1>
+        <p class="mt-4 max-w-2xl text-faint">
+          A 10-inch reflector big enough to hold Saturn's rings, Jupiter's cloud bands, star
+          clusters, and galaxies steady in the eyepiece, without the cost or the storage of
+          owning one. The collapsible Flextube design sets up in minutes and breaks back down
+          for the drive home.
         </p>
 
-        <div class="mt-10 flex flex-wrap gap-4">
-          <a
-            href="/contact?topic=rentals"
-            class="btn btn-solid"
-            aria-label="Check rental availability and pricing"
+        <div class="reveal mt-8 max-w-prose space-y-4 text-sm leading-relaxed text-star/85">
+          <p>
+            The Dobsonian mount is push-to and point-and-look simple, so tracking an object down
+            is no harder on your first night than your hundredth. It's the same scope for a
+            backyard session, a camping trip, or a dark-sky drive out of the city, and it comes
+            back with you no matter how the night went.
+          </p>
+        </div>
+
+        <section class="mt-10 border hairline bg-surface" aria-labelledby="included-heading">
+          <header class="border-b hairline px-5 py-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+            <h2 id="included-heading">Included with every rental</h2>
+          </header>
+          <ul class="grid gap-x-6 gap-y-2 px-5 py-4 text-sm text-star/85 sm:grid-cols-2">
+            {included.map((item) => <li class="flex items-baseline gap-2"><span class="text-dust" aria-hidden="true">·</span>{item}</li>)}
+          </ul>
+        </section>
+      </div>
+
+      <div>
+        <section class="border hairline bg-surface" aria-labelledby="rates-heading">
+          <header
+            class="flex items-baseline justify-between border-b hairline px-5 py-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)]"
           >
-            Check availability →
-          </a>
-          <a href="/services" class="btn">All services</a>
-        </div>
-      </div>
+            <h2 id="rates-heading" class="text-faint">Rental rates</h2>
+            <span class="text-dust">CAD</span>
+          </header>
+          <ul class="px-5 py-2">
+            {
+              rates.map((rate, i) => (
+                <li class:list={['py-4', i > 0 && 'border-t hairline']}>
+                  <div class="flex items-baseline justify-between gap-3">
+                    <h3 class="font-mono text-sm text-star">{rate.term}</h3>
+                    <span class="log-leader" aria-hidden="true" />
+                    <span class="tabular-nums text-star">${rate.price}</span>
+                  </div>
+                  <p class="mt-1 text-xs text-faint">{rate.detail}</p>
+                  <a
+                    href={rate.stripeLink}
+                    class="btn btn-solid mt-3 w-full !text-[0.6875rem]"
+                    data-stripe-placeholder
+                    aria-label={`Rent for ${rate.term.toLowerCase()}, $${rate.price} CAD`}
+                  >
+                    Rent · {rate.term}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
 
-      <div class="border hairline bg-surface p-4 sm:p-5">
-        <Image
-          src={portrait}
-          alt="Abdur standing in a field beside his Celestron EdgeHD telescope on an orange-railed mount and a second refractor on a tracking mount."
-          widths={[420, 640, 960, 1280]}
-          sizes="(min-width: 1024px) 35vw, 92vw"
-          class="aspect-[4/5] w-full object-cover"
-          loading="eager"
-          quality={80}
-        />
+        <p class="mt-4 text-xs leading-relaxed text-faint">
+          Pickup and return around Central Alberta. Every handoff includes a walkthrough of the
+          scope and accessories.{' '}
+          <a href="/contact?topic=rentals" class="link-quiet">Questions or a custom date range?</a>
+        </p>
       </div>
     </div>
-  </section>
-
-  <section
-    class="mx-auto mt-24 w-full max-w-7xl px-5 sm:px-8"
-    aria-labelledby="how-it-works-heading"
-  >
-    <div class="reveal border-t hairline pt-12">
-      <p class="eyebrow">The details</p>
-      <h2 id="how-it-works-heading" class="mt-3 font-display text-3xl">How renting works</h2>
-      <div class="mt-8 grid gap-10 text-sm text-faint md:grid-cols-3">
-        <div>
-          <h3 class="font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-star">
-            What's available
-          </h3>
-          <p class="mt-3 leading-relaxed">
-            Telescopes, mounts, and astrophotography cameras from the gear I actually use and
-            review, matched to what you're trying to do: visual observing, wide-field imaging, or
-            planetary and solar work.
-          </p>
-        </div>
-        <div>
-          <h3 class="font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-star">
-            Term & handoff
-          </h3>
-          <p class="mt-3 leading-relaxed">
-            Rentals run by the week. Every handoff includes a walkthrough of the gear, so you're
-            not learning a new mount alone under a dark sky for the first time.
-          </p>
-        </div>
-        <div>
-          <h3 class="font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-star">
-            Pickup & booking
-          </h3>
-          <p class="mt-3 leading-relaxed">
-            Pickup and return happen around Central Alberta. Availability and current pricing
-            depend on what's free that week, so booking starts with a quick message.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
+  </article>
 </Base>
