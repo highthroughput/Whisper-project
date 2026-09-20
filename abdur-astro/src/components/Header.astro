@@ -25,6 +25,14 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
     overlay ? 'absolute inset-x-0 top-0' : 'relative border-b hairline bg-sky',
   ]}
 >
+  {
+    overlay && (
+      <div
+        class="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-sky/85 via-sky/45 to-transparent"
+        aria-hidden="true"
+      />
+    )
+  }
   <div class="relative mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-5 sm:px-8">
     <a href="/" class="group inline-flex items-center gap-3" aria-label="Abdur Astro, home">
       <svg
@@ -56,7 +64,7 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
                 aria-current={isCurrent(href) ? 'page' : undefined}
                 class:list={[
                   'font-mono text-xs uppercase [letter-spacing:var(--tracking-log)] transition-colors duration-150',
-                  isCurrent(href) ? 'text-star' : 'text-faint hover:text-star',
+                  isCurrent(href) ? 'text-star' : 'text-star/75 hover:text-star',
                 ]}
               >
                 {label}
