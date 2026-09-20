@@ -15,5 +15,11 @@ date: 2026-08-29
 featured: true
 ---
 
+The Whirlpool Galaxy is a face-on spiral in Canes Venatici, just off the handle of
+the Big Dipper. It lies about 23 million light-years away and spans roughly 77,000
+light-years. Gravity between the Whirlpool and its companion, NGC 5195, has pulled
+the Whirlpool's arms into the clean spiral we see and lit new stars along the dust
+lanes. It was the first galaxy in which astronomers recognized spiral structure.
+
 44.5 hours of total integration on this target, captured with a Celestron EdgeHD 11″
 and a ZWO ASI294MM Pro.
