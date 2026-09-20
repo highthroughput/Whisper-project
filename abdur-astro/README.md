@@ -125,6 +125,31 @@ confirmed.
 The page's prices are display-only; **the amount charged is whatever the Stripe
 Payment Link says**, so keep them in sync.
 
+## Adding a new event (under 2 minutes)
+
+The `/events` page lists two kinds of entries, sorted together by date; past
+events drop off automatically.
+
+1. Create `src/content/events/some-slug.md`:
+
+   ```markdown
+   ---
+   title: 'Private star party · Sylvan Lake'
+   kind: 'hosted'                      # 'hosted' (you're running it) or 'astronomical' (a sky event)
+   date: 2026-11-14                    # drives sorting and the drop-off-when-past behaviour
+   when: 'Sat, Nov 14 · 7–10pm'        # human-readable, shown as-is
+   location: 'Sylvan Lake, weather permitting'
+   rsvpLink: 'https://buy.stripe.com/…' # optional — falls back to /contact?topic=starparty
+   ---
+
+   A line or two about the event.
+   ```
+
+2. `npm run dev` — it's on the calendar. Done.
+
+For an `astronomical` entry, use `infoUrl` instead of `rsvpLink` if you want a
+"Learn more" link (omit it to show no button, just the write-up).
+
 ## Stripe Payment Links
 
 For each print variant: Stripe Dashboard → **Payment Links → New** → create a
@@ -168,6 +193,11 @@ of them in place — but do not launch until each box is checked.
       and `src/pages/prints/[slug].astro` — the number itself is still an
       estimate, confirm before launch
 - [ ] Coordinates in `src/config.ts` (`coordinates`) if 52.3° N · 113.8° W isn't right
+- [ ] No real hosted events (star parties, talks) are on the calendar yet.
+      `src/content/events/` currently has only `kind: 'astronomical'` entries
+      (meteor showers, the winter solstice — real, well-known annual dates).
+      Add `kind: 'hosted'` markdown files as real dates are confirmed; see
+      "Adding a new event" above.
 
 ### 3. Stripe Payment Links
 

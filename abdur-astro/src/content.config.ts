@@ -79,4 +79,28 @@ const prints = defineCollection({
     }),
 });
 
-export const collections = { photos, prints };
+/**
+ * Calendar entries: star parties and other events being hosted, plus
+ * astronomical events happening regardless (meteor showers, solstices, etc).
+ * Adding an event = one markdown file in src/content/events/. See
+ * "Adding a new event" in README.md.
+ */
+const events = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/events' }),
+  schema: z.object({
+    title: z.string(),
+    /** 'hosted' = a star party or talk being run personally; 'astronomical' = a sky event happening regardless. */
+    kind: z.enum(['hosted', 'astronomical']),
+    /** Machine date used for sorting; past events drop off the calendar. */
+    date: z.coerce.date(),
+    /** Human-readable date/time shown in the log, e.g. "Peak night, Oct 8" or "Sat Nov 14 · 7–10pm". */
+    when: z.string(),
+    location: z.string().optional(),
+    /** Hosted events: where to book or RSVP. */
+    rsvpLink: z.string().optional(),
+    /** Astronomical events: link to more detail. */
+    infoUrl: z.string().optional(),
+  }),
+});
+
+export const collections = { photos, prints, events };
