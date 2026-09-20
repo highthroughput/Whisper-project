@@ -44,7 +44,7 @@ const testimonials = (await getCollection('testimonials'))
               "{body?.trim()}"
             </blockquote>
             <figcaption class="mt-4 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
-              {data.author} · {data.source}
+              {data.author}
             </figcaption>
             {data.strengths && data.strengths.length > 0 && (
               <p class="mt-2 text-[0.6875rem] text-faint">Notable: {data.strengths.join(' · ')}</p>
