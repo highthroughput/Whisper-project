@@ -10,3 +10,9 @@ alt: 'The Pleiades open star cluster, a tight knot of brilliant blue-white stars
 date: 2026-08-29
 featured: false
 ---
+
+The Pleiades, also known as the Seven Sisters, is one of the most famous open
+star clusters in the night sky. It sits approximately 440 light-years from
+Earth, and the cluster is relatively young, with an estimated age of about
+100 million years. The blue color comes from its bright stars lighting up
+the gas around them.
