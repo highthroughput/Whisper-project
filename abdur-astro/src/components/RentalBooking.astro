@@ -1,0 +1,267 @@
+---
+import { SITE } from '../config';
+
+interface Rate {
+  term: string;
+  detail: string;
+  price: number;
+  /** Nights the term covers, used to derive the return date from the pickup date. */
+  nights: number;
+  stripeLink: string;
+}
+
+interface Props {
+  rates: Rate[];
+  class?: string;
+}
+
+const { rates, class: className } = Astro.props;
+---
+
+<section
+  class:list={['rental-booking border hairline bg-surface', className]}
+  data-rates={JSON.stringify(rates)}
+  aria-labelledby="rental-booking-heading"
+>
+  <header
+    class="flex items-baseline justify-between border-b hairline px-5 py-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)]"
+  >
+    <h2 id="rental-booking-heading" class="text-faint">Book the scope</h2>
+    <span class="text-dust">CAD</span>
+  </header>
+
+  <div class="js-only px-5 py-5">
+    <fieldset class="border-0 p-0">
+      <legend class="sr-only">Rental length</legend>
+      <div class="space-y-2">
+        {
+          rates.map((rate, i) => (
+            <div>
+              <input
+                type="radio"
+                id={`rental-term-${i}`}
+                name="rental-term"
+                value={i}
+                checked={i === 0}
+                class="sr-only"
+                data-term
+              />
+              <label for={`rental-term-${i}`} class="option-row">
+                <span class="flex items-baseline justify-between gap-3">
+                  <span class="font-mono text-sm text-star">{rate.term}</span>
+                  <span class="font-display text-xl tabular-nums text-star">${rate.price}</span>
+                </span>
+                <span class="mt-1 block text-xs text-faint">{rate.detail}</span>
+              </label>
+            </div>
+          ))
+        }
+      </div>
+    </fieldset>
+
+    <form id="rental-form" class="mt-5 space-y-3" action="https://api.web3forms.com/submit" method="POST">
+      <input type="hidden" name="access_key" value={SITE.web3formsKey} />
+      <input type="hidden" name="subject" value="Telescope rental request · Abdur Astro" />
+      <input type="hidden" name="from_name" value="Abdur Astro rental request" />
+      <input type="hidden" name="form" value="Rental request" />
+      {/* Filled by the script so the dates and reference reach the inbox and the sheet */}
+      <input type="hidden" name="rental_term" data-field-term />
+      <input type="hidden" name="pickup_date" data-field-pickup />
+      <input type="hidden" name="return_date" data-field-return />
+      <input type="hidden" name="reference" data-field-reference />
+      {/* Web3Forms honeypot — hidden from people, filled by bots */}
+      <input
+        type="checkbox"
+        name="botcheck"
+        class="hidden"
+        style="display:none"
+        tabindex="-1"
+        aria-hidden="true"
+      />
+
+      <div class="flex flex-col gap-1.5">
+        <label for="rental-pickup" class="eyebrow text-faint">Pick-up date</label>
+        <input
+          id="rental-pickup"
+          type="date"
+          required
+          data-pickup
+          class="w-full border field-edge bg-sky px-3 py-2 text-sm text-star"
+        />
+      </div>
+
+      <p class="flex items-baseline font-mono text-[0.8125rem]" data-return-row hidden>
+        <span class="shrink-0 text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+          Return
+        </span>
+        <span class="log-leader" aria-hidden="true"></span>
+        <span class="text-star" data-return-label></span>
+      </p>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="rental-name" class="sr-only">Name</label>
+        <input
+          id="rental-name"
+          name="name"
+          type="text"
+          required
+          autocomplete="name"
+          placeholder="Your name"
+          class="w-full border field-edge bg-sky px-3 py-2 text-sm text-star placeholder:text-faint"
+        />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label for="rental-email" class="sr-only">Email</label>
+        <input
+          id="rental-email"
+          name="email"
+          type="email"
+          required
+          autocomplete="email"
+          placeholder="you@example.com"
+          class="w-full border field-edge bg-sky px-3 py-2 text-sm text-star placeholder:text-faint"
+        />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label for="rental-message" class="sr-only">Anything we should know?</label>
+        <textarea
+          id="rental-message"
+          name="message"
+          rows="2"
+          placeholder="Anything we should know? (optional)"
+          class="w-full resize-y border field-edge bg-sky px-3 py-2 text-sm text-star placeholder:text-faint"
+        ></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-solid btn-sm w-full" data-submit-label>
+        Reserve and pay →
+      </button>
+      <p
+        data-status
+        class="font-mono text-[0.6875rem] text-faint empty:hidden"
+        role="status"
+        aria-live="polite"
+      >
+      </p>
+      <p class="text-xs leading-relaxed text-faint">
+        Your dates go on the calendar when we confirm by email, usually within a day.
+      </p>
+    </form>
+  </div>
+
+  {/* Payment happens after the dates are chosen, and the script is what carries
+      them, so there is no direct-to-Stripe fallback here on purpose. */}
+  <noscript>
+    <p class="px-5 py-5 text-sm text-star/85">
+      Booking needs JavaScript. Email{' '}
+      <a href={`mailto:${SITE.email}`} class="link-quiet">{SITE.email}</a> with the dates you want
+      and we will send back a payment link.
+    </p>
+  </noscript>
+</section>
+
+<script>
+  import { logToLeadSheet } from '../lib/leadSheet';
+
+  type Rate = { term: string; detail: string; price: number; nights: number; stripeLink: string };
+
+  document.querySelectorAll<HTMLElement>('.rental-booking').forEach((root) => {
+    const rates = JSON.parse(root.dataset.rates ?? '[]') as Rate[];
+    const form = root.querySelector<HTMLFormElement>('#rental-form');
+    const terms = [...root.querySelectorAll<HTMLInputElement>('[data-term]')];
+    const pickup = root.querySelector<HTMLInputElement>('[data-pickup]');
+    const returnRow = root.querySelector<HTMLElement>('[data-return-row]');
+    const returnLabel = root.querySelector<HTMLElement>('[data-return-label]');
+    const submitLabel = root.querySelector<HTMLElement>('[data-submit-label]');
+    const status = root.querySelector<HTMLElement>('[data-status]');
+    const submitButton = form?.querySelector<HTMLButtonElement>('button[type="submit"]');
+    if (!form || !pickup || !submitButton) return;
+
+    const field = (name: string) => form.querySelector<HTMLInputElement>(`[data-field-${name}]`);
+
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const toISO = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    // Parsed field by field: new Date('2026-10-08') is UTC midnight, which lands
+    // on the previous day everywhere west of Greenwich, Alberta included.
+    const fromISO = (value: string) => {
+      const [y, m, d] = value.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    };
+    const pretty = (d: Date) =>
+      d.toLocaleDateString('en-CA', { weekday: 'short', month: 'short', day: 'numeric' });
+
+    const today = new Date();
+    pickup.min = toISO(today);
+
+    const selected = () => rates[Number(terms.find((t) => t.checked)?.value ?? 0)];
+
+    const returnDate = () => {
+      if (!pickup.value) return null;
+      const start = fromISO(pickup.value);
+      const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + selected().nights);
+      return end;
+    };
+
+    const update = () => {
+      const rate = selected();
+      const end = returnDate();
+      if (end && returnRow && returnLabel) {
+        returnLabel.textContent = pretty(end);
+        returnRow.hidden = false;
+      } else if (returnRow) {
+        returnRow.hidden = true;
+      }
+      if (submitLabel) submitLabel.textContent = `Reserve ${rate.term.toLowerCase()} · $${rate.price} →`;
+    };
+
+    terms.forEach((t) => t.addEventListener('change', update));
+    pickup.addEventListener('change', update);
+    pickup.addEventListener('input', update);
+    update();
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+
+      const rate = selected();
+      const start = fromISO(pickup.value);
+      const end = returnDate();
+      if (!end) return;
+
+      if (start < fromISO(toISO(today))) {
+        if (status) status.textContent = 'Please choose a pick-up date that has not passed.';
+        return;
+      }
+
+      // Short reference so a Stripe payment can be matched to this request in
+      // the sheet; Stripe echoes client_reference_id back on the payment.
+      const reference = `AA-${toISO(start).replace(/-/g, '')}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+
+      field('term')!.value = `${rate.term} · $${rate.price}`;
+      field('pickup')!.value = `${pretty(start)} (${toISO(start)})`;
+      field('return')!.value = `${pretty(end)} (${toISO(end)})`;
+      field('reference')!.value = reference;
+
+      submitButton.disabled = true;
+      if (status) status.textContent = 'Sending your dates…';
+
+      const formData = new FormData(form);
+      logToLeadSheet(form);
+
+      const email = (form.querySelector<HTMLInputElement>('#rental-email')?.value ?? '').trim();
+      const checkout = new URL(rate.stripeLink);
+      checkout.searchParams.set('client_reference_id', reference);
+      if (email) checkout.searchParams.set('prefilled_email', email);
+
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: formData,
+      })
+        .catch(() => {})
+        .finally(() => {
+          window.location.href = checkout.toString();
+        });
+    });
+  });
+</script>

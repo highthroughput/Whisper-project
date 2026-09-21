@@ -205,6 +205,30 @@
     border-color: color-mix(in srgb, var(--color-star) 60%, transparent);
   }
 
+  /* A full-width selectable row (term, detail, price), chosen like a radio.
+     Same state grammar as .chip, sized for a narrow rail. */
+  .option-row {
+    @apply block cursor-pointer border px-4 py-3;
+    border-color: color-mix(in srgb, var(--color-star) 40%, transparent);
+    transition:
+      border-color 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .option-row:hover {
+    border-color: color-mix(in srgb, var(--color-star) 60%, transparent);
+  }
+
+  input:checked + .option-row {
+    border-color: var(--color-dust);
+    background-color: color-mix(in srgb, var(--color-dust) 14%, transparent);
+  }
+
+  input:focus-visible + .option-row {
+    outline: 2px solid var(--color-dust-bright);
+    outline-offset: 3px;
+  }
+
   input:checked + .chip {
     border-color: var(--color-dust);
     color: var(--color-star);

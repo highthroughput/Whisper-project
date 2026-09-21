@@ -2,24 +2,28 @@
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import telescopeImage from '../assets/rentals/skywatcher-dobsonian.webp';
+import RentalBooking from '../components/RentalBooking.astro';
 
 const rates = [
   {
     term: 'One night',
     detail: 'Pick up same day, return the next day',
     price: 20,
+    nights: 1,
     stripeLink: 'https://buy.stripe.com/5kQ7sN9cabJb0gFgDW3Nm0B',
   },
   {
     term: 'Weekend',
-    detail: 'Pick up Friday, drop off Monday',
+    detail: 'Three nights, typically Friday to Monday',
     price: 35,
+    nights: 3,
     stripeLink: 'https://buy.stripe.com/28E6oJ4VUbJbfbz2N63Nm0C',
   },
   {
     term: 'Weekly',
-    detail: 'Pick up day 1, drop off day 8',
+    detail: 'Seven nights, pick up day 1, drop off day 8',
     price: 70,
+    nights: 7,
     stripeLink: 'https://buy.stripe.com/dRm28tewu9B3gfD4Ve3Nm0D',
   },
 ];
@@ -78,38 +82,7 @@ const included = [
       </div>
 
       <div class="lg:sticky lg:top-24 lg:self-start">
-        <section class="border hairline bg-surface" aria-labelledby="rates-heading">
-          <header
-            class="flex items-baseline justify-between border-b hairline px-5 py-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)]"
-          >
-            <h2 id="rates-heading" class="text-faint">Rental rates</h2>
-            <span class="text-dust">CAD</span>
-          </header>
-          <ul class="px-5 py-2">
-            {
-              rates.map((rate, i) => (
-                <li class:list={['py-4', i > 0 && 'border-t hairline']}>
-                  <div class="flex items-baseline justify-between gap-3">
-                    <h3 class="font-mono text-sm text-star">{rate.term}</h3>
-                    <span class="log-leader" aria-hidden="true" />
-                    {/* The price is the row's anchor, so the three buttons can stay
-                        quiet instead of stacking as three identical red slabs. */}
-                    <span class="font-display text-xl tabular-nums text-star">${rate.price}</span>
-                  </div>
-                  <p class="mt-1 text-xs text-faint">{rate.detail}</p>
-                  <a
-                    href={rate.stripeLink}
-                    class="btn btn-sm mt-3 w-full"
-                    data-stripe-placeholder
-                    aria-label={`Rent for ${rate.term.toLowerCase()}, $${rate.price} CAD`}
-                  >
-                    Rent · {rate.term}
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </section>
+        <RentalBooking rates={rates} />
 
         {/* Kit list lives in the spec rail beside the rates, not under the copy:
             in the left column it left the right column half empty, and on phones
