@@ -190,7 +190,7 @@
      native control is invisible in a dark scheme, where an unchecked radio
      reads brighter than a checked one. */
   .chip {
-    @apply font-mono block cursor-pointer border text-[0.6875rem] uppercase text-faint;
+    @apply font-mono flex h-full cursor-pointer items-center justify-center border text-center text-[0.6875rem] uppercase text-faint;
     letter-spacing: var(--tracking-log);
     border-color: color-mix(in srgb, var(--color-star) 40%, transparent);
     padding: 0.55rem 0.85rem;
