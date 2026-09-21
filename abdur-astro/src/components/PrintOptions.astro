@@ -33,7 +33,7 @@ const initial = options[0];
     <span class="text-dust">CAD</span>
   </header>
 
-  <div class="space-y-4 px-5 py-5">
+  <div class="js-only space-y-4 px-5 py-5">
     <div class="flex flex-col gap-1.5">
       <label for="print-size" class="eyebrow text-faint">Size</label>
       <select id="print-size" data-size class="select-log w-full">
@@ -68,10 +68,10 @@ const initial = options[0];
     <p data-unavailable class="font-mono text-[0.6875rem] text-faint empty:hidden"></p>
   </div>
 
-  {/* Without JS the selects can't repoint the Buy link, so every combination is
-      listed as its own direct link rather than leaving the shop unusable. */}
+  {/* Without JS the selects above are hidden, so every combination is listed
+      here as its own direct link rather than leaving the shop unusable. */}
   <noscript>
-    <ul class="border-t hairline px-5 py-4 font-mono text-[0.8125rem]">
+    <ul class="px-5 py-4 font-mono text-[0.8125rem]">
       {
         options.map((option) => (
           <li class="flex items-baseline gap-3 py-1.5">

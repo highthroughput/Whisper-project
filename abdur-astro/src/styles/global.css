@@ -279,6 +279,13 @@
 }
 
 @layer utilities {
+  /* A control that only works once its script has run. Without this a no-JS
+     visitor can operate the print size and paper selects while the Buy link
+     stays pinned to the first option, i.e. pay for something they did not pick. */
+  html:not(.js) .js-only {
+    display: none;
+  }
+
   /* Soft reveal — only when JS is present and motion is allowed.
      Without JS (or with reduced motion) content is simply visible. */
   @media (prefers-reduced-motion: no-preference) {

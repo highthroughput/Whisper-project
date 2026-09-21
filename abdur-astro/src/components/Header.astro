@@ -61,8 +61,8 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
       </span>
     </a>
 
-    <nav aria-label="Main" class="hidden md:block">
-      <ul class="flex items-center gap-7">
+    <nav aria-label="Main" class="hidden lg:block">
+      <ul class="flex items-center gap-6">
         {
           links.map(({ href, label }) => (
             <li>
@@ -83,8 +83,12 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
       </ul>
     </nav>
 
-    <div class="hidden items-center gap-6 md:flex">
-      <SocialLinks platforms={['youtube', 'instagram', 'x']} />
+    <div class="hidden items-center gap-5 lg:flex">
+      {/* Socials only once there is room for them; they are in the footer
+          on every page and on the contact page regardless. */}
+      <div class="hidden xl:block">
+        <SocialLinks platforms={['youtube', 'instagram', 'x']} />
+      </div>
       {/* A matched pair: equal width and weight, and closer to each other than
           to the socials, so they read as one set of actions. */}
       <div class="flex items-center gap-2.5">
@@ -96,7 +100,7 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
     {/* Prints has no nav link (the desktop CTA stands in for it), and that CTA
         is desktop-only, so on mobile the shop needs its own visible entry in
         the bar rather than living one tap deep in the menu. */}
-    <div class="flex shrink-0 items-center gap-2 md:hidden">
+    <div class="flex shrink-0 items-center gap-2 lg:hidden">
       <a href="/prints" class="btn btn-solid btn-xs" aria-label="Shop prints">Shop</a>
 
       <details class="group">

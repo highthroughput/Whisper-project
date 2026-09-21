@@ -53,7 +53,7 @@ const freeCopy = `A quick call to see if ${fitSubject} is the right fit. No cost
       an unchecked radio renders as a bright filled disc and a checked one as a
       thin ring, so the unselected option reads as the selected one. */}
   <fieldset class="mt-4 grid grid-cols-2 items-stretch gap-2 border-0 p-0">
-    <legend class="sr-only">Call type</legend>
+    <legend class="sr-only">Call type for {service}</legend>
     <div>
       <input
         type="radio"
@@ -95,6 +95,7 @@ const freeCopy = `A quick call to see if ${fitSubject} is the right fit. No cost
   <form
     id={`${id}-lead-form`}
     data-lead-form
+    aria-label={`Book ${service}`}
     class="mt-4 space-y-3"
     action="https://api.web3forms.com/submit"
     method="POST"
@@ -158,6 +159,9 @@ const freeCopy = `A quick call to see if ${fitSubject} is the right fit. No cost
       aria-live="polite"
     >
     </p>
+    <a data-fallback-link href="#" class="link-quiet hidden font-mono text-[0.6875rem]" target="_blank" rel="noopener noreferrer">
+      Open the booking calendar →
+    </a>
   </form>
 </div>
 
@@ -178,6 +182,7 @@ const freeCopy = `A quick call to see if ${fitSubject} is the right fit. No cost
     const modeCopy = root.querySelector<HTMLElement>('[data-mode-copy]');
     const submitLabel = root.querySelector<HTMLElement>('[data-submit-label]');
     const status = root.querySelector<HTMLElement>('[data-status]');
+    const fallbackLink = root.querySelector<HTMLAnchorElement>('[data-fallback-link]');
     const subjectInput = form?.querySelector<HTMLInputElement>('input[name="subject"]');
     const submitButton = form?.querySelector<HTMLButtonElement>('button[type="submit"]');
     if (!form || !submitButton) return;
@@ -223,9 +228,19 @@ const freeCopy = `A quick call to see if ${fitSubject} is the right fit. No cost
           : `Free ${service} intro call request · Abdur Astro`;
       }
 
-      // Open the booking calendar synchronously, in the same click gesture as the
-      // submit, so browsers don't treat it as a blocked popup.
-      window.open(calendarLink, '_blank', 'noopener,noreferrer');
+      // Opened synchronously, in the same click gesture as the submit, so
+      // browsers don't treat it as a blocked popup. 'noopener' is left out of
+      // the feature string because it forces a null return, which would make a
+      // blocked popup indistinguishable from a successful one; opener is
+      // severed by hand instead.
+      const bookingTab = window.open(calendarLink, '_blank');
+      if (bookingTab) {
+        try {
+          bookingTab.opener = null;
+        } catch {
+          /* cross-origin, already isolated */
+        }
+      }
 
       submitButton.disabled = true;
       if (status) status.textContent = isPaid ? 'Booking your slot…' : 'Sending…';
@@ -240,6 +255,20 @@ const freeCopy = `A quick call to see if ${fitSubject} is the right fit. No cost
       })
         .catch(() => {})
         .finally(() => {
+          // Never send someone to pay for a session they have not booked.
+          if (!bookingTab) {
+            submitButton.disabled = false;
+            if (fallbackLink) {
+              fallbackLink.href = calendarLink;
+              fallbackLink.classList.remove('hidden');
+            }
+            if (status) {
+              status.textContent = isPaid
+                ? 'Your details are in, but the booking tab was blocked. Pick a time first, then we will take payment.'
+                : 'Your details are in, but the booking tab was blocked. Pick a time below.';
+            }
+            return;
+          }
           if (isPaid) {
             const stripeUrl = stripeLinks[hours - 1];
             if (stripeUrl) {
