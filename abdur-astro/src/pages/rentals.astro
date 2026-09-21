@@ -82,12 +82,9 @@ const included = [
       </div>
 
       <div class="lg:sticky lg:top-24 lg:self-start">
-        <RentalBooking rates={rates} />
-
-        {/* Kit list lives in the spec rail beside the rates, not under the copy:
-            in the left column it left the right column half empty, and on phones
-            it pushed the only purchase action most of a screen further down. */}
-        <section class="reveal mt-6 border hairline bg-surface" aria-labelledby="included-heading">
+        {/* What you get, then the request for it: the kit list answers the
+            question the form would otherwise raise. */}
+        <section class="reveal border hairline bg-surface" aria-labelledby="included-heading">
           <header class="border-b hairline px-5 py-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
             <h2 id="included-heading">Included with every rental</h2>
           </header>
@@ -102,6 +99,8 @@ const included = [
             }
           </ul>
         </section>
+
+        <RentalBooking rates={rates} class="mt-6" />
 
         <p class="mt-4 text-xs leading-relaxed text-faint">
           Pickup and return around Southern Alberta. Every handoff includes a walkthrough of the
