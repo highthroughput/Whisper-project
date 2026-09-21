@@ -77,7 +77,7 @@ const entries = [
       <h1
         class="font-display uppercase leading-[1.05] [letter-spacing:0.14em] text-star text-[clamp(2.4rem,8vw,6.5rem)]"
       >
-        Abdur&nbsp;Astro
+        Abdur Astro
       </h1>
       <p class="mt-5 max-w-xl text-lg text-star">
         Deep-sky astrophotography from the dark skies of Southern&nbsp;Alberta
@@ -111,7 +111,7 @@ const entries = [
           <li class="reveal border-b hairline first:border-t">
             <a
               href={href}
-              class="group grid grid-cols-[auto_1fr] items-baseline gap-x-6 gap-y-2 py-9 sm:grid-cols-[3.5rem_16rem_auto_minmax(0,1fr)] sm:gap-x-8"
+              class="group grid grid-cols-[auto_1fr] items-baseline gap-x-6 gap-y-2 py-9 sm:grid-cols-[3.5rem_16rem_auto_minmax(3rem,1fr)] sm:gap-x-8"
             >
               <span class="font-mono text-[0.6875rem] text-dust">{n}</span>
               <h2 class="font-display text-3xl text-star transition-colors duration-200 group-hover:text-dust-bright sm:text-4xl">
@@ -122,7 +122,7 @@ const entries = [
               <p class="col-start-2 max-w-md text-sm text-faint sm:col-start-3">{text}</p>
               {/* A dotted leader carries the eye to the arrow. Pinned to the far
                   right on its own, the arrow floated ~300px clear of the row. */}
-              <span class="hidden items-baseline sm:flex" aria-hidden="true">
+              <span class="hidden min-w-0 items-baseline sm:flex" aria-hidden="true">
                 <span class="log-leader" />
                 <span class="font-mono text-sm text-faint transition-all duration-200 group-hover:translate-x-1 group-hover:text-dust-bright">
                   →
