@@ -75,7 +75,7 @@ const freeCopy = `A quick call to see if ${fitSubject} is the right fit. No cost
         class="sr-only"
         data-call-type
       />
-      <label for={`${id}-call-type-paid`} class="chip">Paid · ${ratePerHour}/hr</label>
+      <label for={`${id}-call-type-paid`} class="chip">Paid session</label>
     </div>
   </fieldset>
 
@@ -195,7 +195,7 @@ const freeCopy = `A quick call to see if ${fitSubject} is the right fit. No cost
       paidOnly?.classList.toggle('hidden', !isPaid);
       if (modeCopy) {
         modeCopy.textContent = isPaid
-          ? 'Book a time, then pay for your session by the hour.'
+          ? 'Pick how long you need, book a time, then pay for your session.'
           : freeCopy;
       }
       if (submitLabel) {
