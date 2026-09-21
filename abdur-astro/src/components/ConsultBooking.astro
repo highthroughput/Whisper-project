@@ -191,9 +191,14 @@ const GOOGLE_CALENDAR_LINK =
       })
         .catch(() => {})
         .finally(() => {
-          const stripeUrl = isPaid ? stripeLinks[hours - 1] : undefined;
-          if (stripeUrl) {
-            window.location.href = stripeUrl;
+          if (isPaid) {
+            const stripeUrl = stripeLinks[hours - 1];
+            if (stripeUrl) {
+              window.location.href = stripeUrl;
+            } else if (status) {
+              submitButton.disabled = false;
+              status.textContent = 'Your details are in, but the payment link is missing. Please email to arrange payment.';
+            }
             return;
           }
           form.reset();
