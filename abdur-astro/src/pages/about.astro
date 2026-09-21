@@ -35,6 +35,8 @@ const gear = [
     group: 'Mount',
     items: [
       ['iOptron CEM70', 'center-balanced equatorial mount', hps('ioptron-cem70-center-balanced-equatorial-mount-c70a')],
+      // HPS carries no original HAE69, only the C/CEC/EC revisions, so this
+      // points at the current base model while the row names the real mount.
       ['iOptron HAE69', 'harmonic drive equatorial mount', hps('ioptron-hae69c-az-eq-mount')],
       ['ZWO AM3', 'harmonic drive · portable', hps('zwo-am3-harmonic-drive-equatorial-mount-am3n-2025')],
     ],
@@ -42,7 +44,10 @@ const gear = [
   {
     group: 'Filters',
     items: [
-      ['Astronomik LRGBSHO', 'LRGB & Ha · OIII · SII narrowband set', hps('brands/astronomik-filters/lrgb-filters')],
+      ['Astronomik LRGB', '31 mm round · broadband colour set', hps('astronomik-lrgb-filter-set-31-mm-round-lrgb-31')],
+      ['Astronomik Ha 6 nm MaxFR', '31 mm round · hydrogen-alpha', hps('astronomik-h-alpha-6-nm-ccd-maxfr-round-mounted-31mm-filter-ha6-maxfr-31')],
+      ['Astronomik OIII 6 nm MaxFR', '31 mm round · oxygen-III', hps('astronomik-maxfr-oiii-6-nm-ccd-round-31mm-filter-asf-oiii6-maxfr-31')],
+      ['Astronomik SII 6 nm MaxFR', '31 mm round · sulphur-II', hps('astronomik-maxfr-sii-6-nm-ccd-round-mounted-31mm-filter-sii6-maxfr-31')],
       ['Various duo-band filters', 'narrowband imaging under light pollution'],
     ],
   },
