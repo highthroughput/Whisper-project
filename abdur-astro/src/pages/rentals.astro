@@ -4,26 +4,32 @@ import Base from '../layouts/Base.astro';
 import telescopeImage from '../assets/rentals/skywatcher-dobsonian.webp';
 import RentalBooking from '../components/RentalBooking.astro';
 
-// Price by number of nights. The 1, 3 and 7 night rows are the published
-// rates and carry live Stripe links, so those lengths can be paid for on the
-// spot. The rest are priced against the same curve but have no link yet, so
-// they are taken as a request until one exists.
+// The three published terms. Each has its own Stripe Payment Link, and those
+// three links are the only lengths the scope is rented for.
 const rates = [
-  { nights: 1, price: 20, stripeLink: 'https://buy.stripe.com/5kQ7sN9cabJb0gFgDW3Nm0B' },
-  { nights: 2, price: 28 },
-  { nights: 3, price: 35, stripeLink: 'https://buy.stripe.com/28E6oJ4VUbJbfbz2N63Nm0C' },
-  { nights: 4, price: 44 },
-  { nights: 5, price: 53 },
-  { nights: 6, price: 61 },
-  { nights: 7, price: 70, stripeLink: 'https://buy.stripe.com/dRm28tewu9B3gfD4Ve3Nm0D' },
-  { nights: 8, price: 79 },
-  { nights: 9, price: 88 },
-  { nights: 10, price: 97 },
-  { nights: 11, price: 106 },
-  { nights: 12, price: 115 },
-  { nights: 13, price: 124 },
-  { nights: 14, price: 133 },
+  {
+    term: 'One night',
+    nights: 1,
+    detail: 'Pick up, return the next day',
+    price: 20,
+    stripeLink: 'https://buy.stripe.com/5kQ7sN9cabJb0gFgDW3Nm0B',
+  },
+  {
+    term: 'Weekend',
+    nights: 3,
+    detail: 'Three nights, typically Friday to Monday',
+    price: 35,
+    stripeLink: 'https://buy.stripe.com/28E6oJ4VUbJbfbz2N63Nm0C',
+  },
+  {
+    term: 'Weekly',
+    nights: 7,
+    detail: 'Seven nights, pick up day 1, drop off day 8',
+    price: 70,
+    stripeLink: 'https://buy.stripe.com/dRm28tewu9B3gfD4Ve3Nm0D',
+  },
 ];
+
 
 
 /** Public Scope Rentals calendar (America/Edmonton). Booked nights show as busy. */

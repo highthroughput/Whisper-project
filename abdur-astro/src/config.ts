@@ -24,7 +24,7 @@ export const SITE = {
   /** Google Business Profile — used for the "Leave a review" link. */
   googleBusiness: 'https://share.google/iRm8W7WB9Pi92lIkK',
 
-  web3formsKey: 'c3c0b6ec-abf3-4103-935c-fffd766dbb08',
+  web3formsKey: '53ec3c86-9b83-4d21-898a-f083a4706887',
 
   /** Google Apps Script Web App that logs every form submission to a lead-capture Google Sheet. */
   leadSheetWebhook:
