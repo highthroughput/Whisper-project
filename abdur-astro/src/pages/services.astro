@@ -115,7 +115,7 @@ const services = [
                   {service.mode}
                 </p>
                 <p class="mt-5 leading-relaxed text-star/85">{service.body}</p>
-                {/* Tutorials and consulting book themselves just below, so a
+                {/* Tutorials and consulting carry their own booking panel, so a
                     second general-enquiry CTA would compete with the real action. */}
                 {!service.booking && (
                   <a
@@ -125,32 +125,6 @@ const services = [
                   >
                     Inquire →
                   </a>
-                )}
-
-                {/* The booking panel sits under the copy that sells it, not under
-                    the video in the next column. */}
-                {service.id === 'tutorials' && (
-                  <ConsultBooking
-                    id="tutorial"
-                    service="tutorial"
-                    fitSubject="a tutorial"
-                    heading="Book a tutorial"
-                    hourlyLinks={TUTORIAL_HOUR_LINKS}
-                    introCalendarLink={TUTORIAL_INTRO_CALENDAR_LINK}
-                    hourlyCalendarLinks={TUTORIAL_HOUR_CALENDAR_LINKS}
-                    ratePerHour={HOURLY_RATE}
-                  />
-                )}
-                {service.id === 'consulting' && (
-                  <ConsultBooking
-                    id="consult"
-                    service="equipment consulting"
-                    fitSubject="equipment consulting"
-                    hourlyLinks={CONSULTING_HOUR_LINKS}
-                    introCalendarLink={CONSULTING_INTRO_CALENDAR_LINK}
-                    hourlyCalendarLinks={CONSULTING_HOUR_CALENDAR_LINKS}
-                    ratePerHour={HOURLY_RATE}
-                  />
                 )}
               </div>
 
@@ -207,6 +181,35 @@ const services = [
                   </section>
                 )}
               </div>
+
+              {/* The booking panels are their own grid children rather than part
+                  of the pitch column: that lets the single-column phone stack run
+                  copy, video, booking while `lg:` pins them back under the copy. */}
+              {service.id === 'tutorials' && (
+                <ConsultBooking
+                  id="tutorial"
+                  service="tutorial"
+                  fitSubject="a tutorial"
+                  heading="Book a tutorial"
+                  hourlyLinks={TUTORIAL_HOUR_LINKS}
+                  introCalendarLink={TUTORIAL_INTRO_CALENDAR_LINK}
+                  hourlyCalendarLinks={TUTORIAL_HOUR_CALENDAR_LINKS}
+                  ratePerHour={HOURLY_RATE}
+                  class="max-w-prose lg:col-start-2 lg:row-start-2"
+                />
+              )}
+              {service.id === 'consulting' && (
+                <ConsultBooking
+                  id="consult"
+                  service="equipment consulting"
+                  fitSubject="equipment consulting"
+                  hourlyLinks={CONSULTING_HOUR_LINKS}
+                  introCalendarLink={CONSULTING_INTRO_CALENDAR_LINK}
+                  hourlyCalendarLinks={CONSULTING_HOUR_CALENDAR_LINKS}
+                  ratePerHour={HOURLY_RATE}
+                  class="max-w-prose lg:col-start-2 lg:row-start-2"
+                />
+              )}
             </article>
           </li>
         ))
