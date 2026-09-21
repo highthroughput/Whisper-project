@@ -28,6 +28,13 @@ const rates = [
   },
 ];
 
+/** Public Scope Rentals calendar (America/Edmonton). Booked nights show as busy. */
+const RENTAL_CALENDAR_ID =
+  'a24b263e92232d46a35df8bc657074def44cf98567c23e8c3ba104f87c2de9a8@group.calendar.google.com';
+const calendarEmbed =
+  `https://calendar.google.com/calendar/embed?src=${encodeURIComponent(RENTAL_CALENDAR_ID)}` +
+  '&ctz=America%2FEdmonton&mode=MONTH&showTitle=0&showPrint=0&showTabs=0&showCalendars=0&showTz=0';
+
 const included = [
   'Upgraded Baader zoom eyepiece',
   'Red dot finder',
@@ -78,6 +85,25 @@ const included = [
             back with you no matter how the night went.
           </p>
         </div>
+
+        {/* Read-only view of the rental calendar. The browser cannot fetch this
+            feed cross-origin, so this shows availability rather than enforcing
+            it; the booking panel does not yet know what is on here. */}
+        <section class="reveal mt-10" aria-labelledby="availability-heading">
+          <p class="eyebrow">Before you book</p>
+          <h2 id="availability-heading" class="mt-2 font-display text-2xl">Check availability</h2>
+          <p class="mt-3 max-w-prose text-sm text-faint">
+            Busy days are already rented. Allow a day between rentals for checks and cleaning.
+          </p>
+          <div class="mt-5 border hairline bg-surface p-2">
+            <iframe
+              src={calendarEmbed}
+              title="Scope rental availability calendar"
+              loading="lazy"
+              class="h-[34rem] w-full border-0"
+            />
+          </div>
+        </section>
 
       </div>
 
