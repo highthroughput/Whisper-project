@@ -2,11 +2,11 @@
 import { SITE } from '../config';
 
 interface Rate {
-  term: string;
-  detail: string;
-  price: number;
-  /** Nights the term covers, used to derive the return date from the pickup date. */
   nights: number;
+  price: number;
+  /** Stripe Payment Link for exactly this many nights. Without one, this
+      length falls back to a request rather than an instant payment. */
+  stripeLink?: string;
 }
 
 interface Props {
@@ -15,15 +15,24 @@ interface Props {
 }
 
 const { rates, class: className } = Astro.props;
+const maxNights = Math.max(...rates.map((r) => r.nights));
 ---
 
-{/* data-rates carries only what the script needs. A payment link in the markup
-    would let someone pay before their dates were approved, which is the whole
-    point of requesting first. */}
+{/* Instant payment from a static page means the browser needs the Stripe URLs,
+    so they are in the markup by necessity. Only lengths that actually have a
+    link are emitted; the rest are priced and taken as a request. Anyone can
+    reach a payment link directly, which is inherent to Payment Links, so the
+    dates a booking is for come from the emailed record, not from Stripe. */}
 <section
   class:list={['rental-booking border hairline bg-surface', className]}
-  data-rates={JSON.stringify(rates.map(({ term, price, nights }) => ({ term, price, nights })))}
+  data-rates={JSON.stringify(
+    rates.map(({ nights, price, stripeLink }) => ({ nights, price, payable: Boolean(stripeLink) })),
+  )}
+  data-links={JSON.stringify(
+    Object.fromEntries(rates.filter((r) => r.stripeLink).map((r) => [r.nights, r.stripeLink])),
+  )}
   data-email={SITE.email}
+  data-max-nights={maxNights}
   aria-labelledby="rental-booking-heading"
 >
   <header
@@ -34,43 +43,15 @@ const { rates, class: className } = Astro.props;
   </header>
 
   <div class="js-only px-5 py-5">
-    <fieldset class="border-0 p-0">
-      <legend class="sr-only">Rental length</legend>
-      <div class="space-y-2">
-        {
-          rates.map((rate, i) => (
-            <div>
-              <input
-                type="radio"
-                id={`rental-term-${i}`}
-                name="rental-term"
-                value={i}
-                checked={i === 0}
-                class="sr-only"
-                data-term
-              />
-              <label for={`rental-term-${i}`} class="option-row">
-                <span class="flex items-baseline justify-between gap-3">
-                  <span class="font-mono text-sm text-star">{rate.term}</span>
-                  <span class="font-display text-xl tabular-nums text-star">${rate.price}</span>
-                </span>
-                <span class="mt-1 block text-xs text-faint">{rate.detail}</span>
-              </label>
-            </div>
-          ))
-        }
-      </div>
-    </fieldset>
-
-    <form id="rental-form" class="mt-5 space-y-3" action="https://api.web3forms.com/submit" method="POST">
+    <form id="rental-form" class="space-y-4" action="https://api.web3forms.com/submit" method="POST">
       <input type="hidden" name="access_key" value={SITE.web3formsKey} />
-      <input type="hidden" name="subject" value="Telescope rental request · Abdur Astro" />
-      <input type="hidden" name="from_name" value="Abdur Astro rental request" />
-      <input type="hidden" name="form" value="Rental request" />
-      {/* Filled by the script so the dates and reference reach the inbox and the sheet */}
-      <input type="hidden" name="rental_term" data-field-term />
-      <input type="hidden" name="pickup_date" data-field-pickup />
-      <input type="hidden" name="return_date" data-field-return />
+      <input type="hidden" name="subject" value="Telescope rental · Abdur Astro" />
+      <input type="hidden" name="from_name" value="Abdur Astro rental" />
+      <input type="hidden" name="form" value="Rental booking" />
+      <input type="hidden" name="pickup" data-field-pickup />
+      <input type="hidden" name="dropoff" data-field-dropoff />
+      <input type="hidden" name="nights" data-field-nights />
+      <input type="hidden" name="amount" data-field-amount />
       <input type="hidden" name="reference" data-field-reference />
       {/* Web3Forms honeypot — hidden from people, filled by bots */}
       <input
@@ -82,24 +63,69 @@ const { rates, class: className } = Astro.props;
         aria-hidden="true"
       />
 
-      <div class="flex flex-col gap-1.5">
-        <label for="rental-pickup" class="eyebrow text-faint">Pick-up date</label>
-        <input
-          id="rental-pickup"
-          type="date"
-          required
-          data-pickup
-          class="w-full border field-edge bg-sky px-3 py-2 text-sm text-star"
-        />
+      <div class="grid grid-cols-2 gap-3">
+        <div class="flex flex-col gap-1.5">
+          <label for="rental-pickup-date" class="eyebrow text-faint">Pick up</label>
+          <input
+            id="rental-pickup-date"
+            type="date"
+            required
+            data-pickup-date
+            class="w-full border field-edge bg-sky px-3 py-2 text-sm text-star"
+          />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="rental-pickup-time" class="eyebrow text-faint">Time</label>
+          <input
+            id="rental-pickup-time"
+            type="time"
+            required
+            value="18:00"
+            step="1800"
+            data-pickup-time
+            class="w-full border field-edge bg-sky px-3 py-2 text-sm text-star"
+          />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="rental-return-date" class="eyebrow text-faint">Return</label>
+          <input
+            id="rental-return-date"
+            type="date"
+            required
+            data-return-date
+            class="w-full border field-edge bg-sky px-3 py-2 text-sm text-star"
+          />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="rental-return-time" class="eyebrow text-faint">Time</label>
+          <input
+            id="rental-return-time"
+            type="time"
+            required
+            value="12:00"
+            step="1800"
+            data-return-time
+            class="w-full border field-edge bg-sky px-3 py-2 text-sm text-star"
+          />
+        </div>
       </div>
 
-      <p class="flex items-baseline font-mono text-[0.8125rem]" data-return-row hidden>
-        <span class="shrink-0 text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
-          Return
-        </span>
-        <span class="log-leader" aria-hidden="true"></span>
-        <span class="text-star" data-return-label></span>
-      </p>
+      <div class="border-t hairline pt-4" data-summary hidden>
+        <p class="flex items-baseline font-mono text-[0.8125rem]">
+          <span class="shrink-0 text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+            Length
+          </span>
+          <span class="log-leader" aria-hidden="true"></span>
+          <span class="text-star" data-nights-label></span>
+        </p>
+        <p class="mt-2 flex items-baseline font-mono text-[0.8125rem]">
+          <span class="shrink-0 text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+            Total
+          </span>
+          <span class="log-leader" aria-hidden="true"></span>
+          <span class="font-display text-xl tabular-nums text-star" data-price-label></span>
+        </p>
+      </div>
 
       <div class="flex flex-col gap-1.5">
         <label for="rental-name" class="sr-only">Name</label>
@@ -125,19 +151,9 @@ const { rates, class: className } = Astro.props;
           class="w-full border field-edge bg-sky px-3 py-2 text-sm text-star placeholder:text-faint"
         />
       </div>
-      <div class="flex flex-col gap-1.5">
-        <label for="rental-message" class="sr-only">Anything we should know?</label>
-        <textarea
-          id="rental-message"
-          name="message"
-          rows="2"
-          placeholder="Anything we should know? (optional)"
-          class="w-full resize-y border field-edge bg-sky px-3 py-2 text-sm text-star placeholder:text-faint"
-        ></textarea>
-      </div>
 
-      <button type="submit" class="btn btn-solid btn-sm w-full" data-submit-label>
-        Request these dates →
+      <button type="submit" class="btn btn-solid btn-sm w-full" data-submit-label disabled>
+        Choose your dates
       </button>
       <p
         data-status
@@ -147,14 +163,12 @@ const { rates, class: className } = Astro.props;
       >
       </p>
       <p class="text-xs leading-relaxed text-faint">
-        Nothing is charged here. We check the scope is free for your dates and email you a
-        payment link, usually within a day.
+        Check the calendar first: booked nights are already taken, and we need a day between
+        rentals to check the scope over. Your dates are confirmed by email after payment.
       </p>
     </form>
   </div>
 
-  {/* Payment happens after the dates are chosen, and the script is what carries
-      them, so there is no direct-to-Stripe fallback here on purpose. */}
   <noscript>
     <p class="px-5 py-5 text-sm text-star/85">
       Booking needs JavaScript. Email{' '}
@@ -167,89 +181,121 @@ const { rates, class: className } = Astro.props;
 <script>
   import { logToLeadSheet } from '../lib/leadSheet';
 
-  type Rate = { term: string; price: number; nights: number };
+  type Rate = { nights: number; price: number; payable: boolean };
 
   document.querySelectorAll<HTMLElement>('.rental-booking').forEach((root) => {
     const rates = JSON.parse(root.dataset.rates ?? '[]') as Rate[];
+    const links = JSON.parse(root.dataset.links ?? '{}') as Record<string, string>;
     const contactEmail = root.dataset.email ?? '';
+    const maxNights = Number(root.dataset.maxNights ?? 0);
+
     const form = root.querySelector<HTMLFormElement>('#rental-form');
-    const terms = [...root.querySelectorAll<HTMLInputElement>('[data-term]')];
-    const pickup = root.querySelector<HTMLInputElement>('[data-pickup]');
-    const returnRow = root.querySelector<HTMLElement>('[data-return-row]');
-    const returnLabel = root.querySelector<HTMLElement>('[data-return-label]');
+    const pickupDate = root.querySelector<HTMLInputElement>('[data-pickup-date]');
+    const pickupTime = root.querySelector<HTMLInputElement>('[data-pickup-time]');
+    const returnDate = root.querySelector<HTMLInputElement>('[data-return-date]');
+    const returnTime = root.querySelector<HTMLInputElement>('[data-return-time]');
+    const summary = root.querySelector<HTMLElement>('[data-summary]');
+    const nightsLabel = root.querySelector<HTMLElement>('[data-nights-label]');
+    const priceLabel = root.querySelector<HTMLElement>('[data-price-label]');
     const submitLabel = root.querySelector<HTMLElement>('[data-submit-label]');
     const status = root.querySelector<HTMLElement>('[data-status]');
     const submitButton = form?.querySelector<HTMLButtonElement>('button[type="submit"]');
-    if (!form || !pickup || !submitButton) return;
+    if (!form || !pickupDate || !pickupTime || !returnDate || !returnTime || !submitButton) return;
 
-    const field = (name: string) => form.querySelector<HTMLInputElement>(`[data-field-${name}]`);
-
+    const field = (n: string) => form.querySelector<HTMLInputElement>(`[data-field-${n}]`);
     const pad = (n: number) => String(n).padStart(2, '0');
     const toISO = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-    // Parsed field by field: new Date('2026-10-08') is UTC midnight, which lands
-    // on the previous day everywhere west of Greenwich, Alberta included.
-    const fromISO = (value: string) => {
-      const [y, m, d] = value.split('-').map(Number);
+    // Field by field: new Date('2026-10-08') is UTC midnight, which lands on the
+    // previous day everywhere west of Greenwich, Alberta included.
+    const fromISO = (v: string) => {
+      const [y, m, d] = v.split('-').map(Number);
       return new Date(y, m - 1, d);
     };
-    const pretty = (d: Date) =>
-      d.toLocaleDateString('en-CA', { weekday: 'short', month: 'short', day: 'numeric' });
+    const pretty = (d: Date, t: string) =>
+      `${d.toLocaleDateString('en-CA', { weekday: 'short', month: 'short', day: 'numeric' })}, ${t}`;
 
     const today = new Date();
-    pickup.min = toISO(today);
+    pickupDate.min = toISO(today);
+    returnDate.min = toISO(today);
 
-    const selected = () => rates[Number(terms.find((t) => t.checked)?.value ?? 0)];
+    const nightsBetween = () => {
+      if (!pickupDate.value || !returnDate.value) return null;
+      const a = fromISO(pickupDate.value);
+      const b = fromISO(returnDate.value);
+      return Math.round((b.getTime() - a.getTime()) / 86400000);
+    };
 
-    const returnDate = () => {
-      if (!pickup.value) return null;
-      const start = fromISO(pickup.value);
-      const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + selected().nights);
-      return end;
+    const rateFor = (n: number | null) => (n === null ? undefined : rates.find((r) => r.nights === n));
+
+    const setState = (label: string, enabled: boolean, note = '') => {
+      if (submitLabel) submitLabel.textContent = label;
+      submitButton.disabled = !enabled;
+      if (status) status.textContent = note;
     };
 
     const update = () => {
-      const rate = selected();
-      const end = returnDate();
-      if (end && returnRow && returnLabel) {
-        returnLabel.textContent = pretty(end);
-        returnRow.hidden = false;
-      } else if (returnRow) {
-        returnRow.hidden = true;
+      if (pickupDate.value) returnDate.min = pickupDate.value;
+      const n = nightsBetween();
+
+      if (n === null) {
+        if (summary) summary.hidden = true;
+        return setState('Choose your dates', false);
       }
-      // "Request", not "Reserve": nothing is held or charged at this step.
-      if (submitLabel) submitLabel.textContent = `Request ${rate.term.toLowerCase()} · $${rate.price} →`;
+      if (n <= 0) {
+        if (summary) summary.hidden = true;
+        return setState('Return must be after pick-up', false);
+      }
+      if (n > maxNights) {
+        if (summary) summary.hidden = true;
+        return setState(`Email us for ${n} nights`, false,
+          `Rentals run up to ${maxNights} nights on the site. Email ${contactEmail} for longer.`);
+      }
+
+      const rate = rateFor(n);
+      if (summary && nightsLabel && priceLabel && rate) {
+        nightsLabel.textContent = `${n} night${n > 1 ? 's' : ''}`;
+        priceLabel.textContent = `$${rate.price}`;
+        summary.hidden = false;
+      }
+      if (!rate) {
+        if (summary) summary.hidden = true;
+        return setState(`Email us for ${n} nights`, false, `Email ${contactEmail} for that length.`);
+      }
+      if (rate.payable) {
+        return setState(`Pay $${rate.price} · ${n} night${n > 1 ? 's' : ''} →`, true);
+      }
+      // Priced but no payment link yet: take it as a request rather than
+      // pretending the length cannot be booked at all.
+      return setState(`Request ${n} night${n > 1 ? 's' : ''} · $${rate.price} →`, true,
+        'We will confirm and send a payment link for this length.');
     };
 
-    terms.forEach((t) => t.addEventListener('change', update));
-    pickup.addEventListener('change', update);
-    pickup.addEventListener('input', update);
+    [pickupDate, pickupTime, returnDate, returnTime].forEach((el) => {
+      el.addEventListener('change', update);
+      el.addEventListener('input', update);
+    });
     update();
 
     form.addEventListener('submit', (event) => {
       event.preventDefault();
       if (!form.reportValidity()) return;
+      const n = nightsBetween();
+      const rate = rateFor(n);
+      if (n === null || n <= 0 || !rate) return;
 
-      const rate = selected();
-      const start = fromISO(pickup.value);
-      const end = returnDate();
-      if (!end) return;
-
-      if (start < fromISO(toISO(today))) {
-        if (status) status.textContent = 'Please choose a pick-up date that has not passed.';
-        return;
-      }
-
-      // Short reference so a Stripe payment can be matched to this request in
-      // the sheet; Stripe echoes client_reference_id back on the payment.
+      const start = fromISO(pickupDate.value);
+      const end = fromISO(returnDate.value);
       const reference = `AA-${toISO(start).replace(/-/g, '')}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
 
-      field('term')!.value = `${rate.term} · $${rate.price}`;
-      field('pickup')!.value = `${pretty(start)} (${toISO(start)})`;
-      field('return')!.value = `${pretty(end)} (${toISO(end)})`;
+      field('pickup')!.value = `${pretty(start, pickupTime.value)} (${pickupDate.value} ${pickupTime.value})`;
+      field('dropoff')!.value = `${pretty(end, returnTime.value)} (${returnDate.value} ${returnTime.value})`;
+      field('nights')!.value = String(n);
+      field('amount')!.value = `$${rate.price} CAD`;
       field('reference')!.value = reference;
 
+      const payUrl = links[String(n)];
       submitButton.disabled = true;
-      if (status) status.textContent = 'Sending your request…';
+      if (status) status.textContent = payUrl ? 'Taking you to payment…' : 'Sending your request…';
 
       const formData = new FormData(form);
       logToLeadSheet(form);
@@ -259,20 +305,20 @@ const { rates, class: className } = Astro.props;
         headers: { Accept: 'application/json' },
         body: formData,
       })
-        .then((res) => {
-          if (!res.ok) throw new Error(String(res.status));
+        .catch(() => {})
+        .finally(() => {
+          if (payUrl) {
+            const checkout = new URL(payUrl);
+            checkout.searchParams.set('client_reference_id', reference);
+            const email = (form.querySelector<HTMLInputElement>('#rental-email')?.value ?? '').trim();
+            if (email) checkout.searchParams.set('prefilled_email', email);
+            window.location.href = checkout.toString();
+            return;
+          }
           form.reset();
           update();
           if (status)
-            status.textContent = `Request sent (${reference}). We'll confirm the dates and email you a payment link.`;
-        })
-        .catch(() => {
-          if (status)
-            status.textContent =
-              `That did not send. Please email ${contactEmail} with your dates.`;
-        })
-        .finally(() => {
-          submitButton.disabled = false;
+            status.textContent = `Request sent (${reference}). We'll email you a payment link.`;
         });
     });
   });
