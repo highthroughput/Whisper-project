@@ -115,8 +115,8 @@ const services = [
                   {service.mode}
                 </p>
                 <p class="mt-5 leading-relaxed text-star/85">{service.body}</p>
-                {/* Tutorials and consulting book themselves in the right column, so
-                    a second general-enquiry CTA would compete with the real action. */}
+                {/* Tutorials and consulting book themselves just below, so a
+                    second general-enquiry CTA would compete with the real action. */}
                 {!service.booking && (
                   <a
                     href={`/contact?topic=${service.topic}`}
@@ -126,9 +126,35 @@ const services = [
                     Inquire →
                   </a>
                 )}
+
+                {/* The booking panel sits under the copy that sells it, not under
+                    the video in the next column. */}
+                {service.id === 'tutorials' && (
+                  <ConsultBooking
+                    id="tutorial"
+                    service="tutorial"
+                    fitSubject="a tutorial"
+                    heading="Book a tutorial"
+                    hourlyLinks={TUTORIAL_HOUR_LINKS}
+                    introCalendarLink={TUTORIAL_INTRO_CALENDAR_LINK}
+                    hourlyCalendarLinks={TUTORIAL_HOUR_CALENDAR_LINKS}
+                    ratePerHour={HOURLY_RATE}
+                  />
+                )}
+                {service.id === 'consulting' && (
+                  <ConsultBooking
+                    id="consult"
+                    service="equipment consulting"
+                    fitSubject="equipment consulting"
+                    hourlyLinks={CONSULTING_HOUR_LINKS}
+                    introCalendarLink={CONSULTING_INTRO_CALENDAR_LINK}
+                    hourlyCalendarLinks={CONSULTING_HOUR_CALENDAR_LINKS}
+                    ratePerHour={HOURLY_RATE}
+                  />
+                )}
               </div>
 
-              {/* Right: the proof and the booking action */}
+              {/* Right: the proof */}
               <div class="lg:col-start-3">
                 {service.id === 'tutorials' && (
                   <div>
@@ -179,29 +205,6 @@ const services = [
                       ))}
                     </dl>
                   </section>
-                )}
-                {service.id === 'tutorials' && (
-                  <ConsultBooking
-                    id="tutorial"
-                    service="tutorial"
-                    fitSubject="a tutorial"
-                    heading="Book a tutorial"
-                    hourlyLinks={TUTORIAL_HOUR_LINKS}
-                    introCalendarLink={TUTORIAL_INTRO_CALENDAR_LINK}
-                    hourlyCalendarLinks={TUTORIAL_HOUR_CALENDAR_LINKS}
-                    ratePerHour={HOURLY_RATE}
-                  />
-                )}
-                {service.id === 'consulting' && (
-                  <ConsultBooking
-                    id="consult"
-                    service="equipment consulting"
-                    fitSubject="equipment consulting"
-                    hourlyLinks={CONSULTING_HOUR_LINKS}
-                    introCalendarLink={CONSULTING_INTRO_CALENDAR_LINK}
-                    hourlyCalendarLinks={CONSULTING_HOUR_CALENDAR_LINKS}
-                    ratePerHour={HOURLY_RATE}
-                  />
                 )}
               </div>
             </article>
