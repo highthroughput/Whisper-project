@@ -19,6 +19,23 @@ export function filterNames(filters?: Filter[]): string {
 }
 
 /**
+ * The entry's markdown body reduced to plain paragraphs, for the lightbox panel
+ * where there is no place to render real markup.
+ */
+export function plainDescription(body?: string): string {
+  return (body ?? '')
+    .replace(/^---[\s\S]*?---/, '')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/^\s{0,3}#{1,6}\s+/gm, '')
+    .replace(/[*_`]/g, '')
+    .split(/\n\s*\n/)
+    .map((para) => para.replace(/\s+/g, ' ').trim())
+    .filter(Boolean)
+    .join('\n');
+}
+
+/**
  * True when the filter set is a single unbroken total rather than a real
  * breakdown, i.e. the integration is known but the per-filter split isn't.
  */

@@ -8,6 +8,7 @@ if (dialog && triggers.length > 0 && typeof dialog.showModal === 'function') {
   const image = document.getElementById('lb-image') as HTMLImageElement;
   const title = document.getElementById('lb-title')!;
   const log = document.getElementById('lb-log')!;
+  const desc = document.getElementById('lb-desc')!;
   const link = document.getElementById('lb-link') as HTMLAnchorElement;
   const status = document.getElementById('lb-status')!;
   const inner = dialog.querySelector<HTMLElement>('[data-lb-inner]')!;
@@ -32,6 +33,18 @@ if (dialog && triggers.length > 0 && typeof dialog.showModal === 'function') {
     image.alt = data.lbAlt ?? '';
     title.textContent = data.lbTitle ?? '';
     log.textContent = data.lbLog ?? '';
+    // Built as text nodes rather than innerHTML: the copy is ours, but the
+    // lightbox has no reason to be an HTML sink.
+    desc.replaceChildren(
+      ...(data.lbDesc ?? '')
+        .split('\n')
+        .filter(Boolean)
+        .map((para) => {
+          const p = document.createElement('p');
+          p.textContent = para;
+          return p;
+        }),
+    );
     link.href = data.lbHref ?? '#';
     status.textContent = `${data.lbTitle}, photograph ${current + 1} of ${count}`;
     preload(current + 1);

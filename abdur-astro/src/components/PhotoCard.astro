@@ -1,7 +1,7 @@
 ---
 import { Image, getImage } from 'astro:assets';
 import type { Photo } from '../lib/photos';
-import { logLine } from '../lib/photos';
+import { logLine, plainDescription } from '../lib/photos';
 
 interface Props {
   photo: Photo;
@@ -33,6 +33,7 @@ const lbImage = lightbox
   data-lb-title={lightbox ? photo.data.title : undefined}
   data-lb-log={lightbox ? logLine(photo) : undefined}
   data-lb-href={lightbox ? href : undefined}
+  data-lb-desc={lightbox ? plainDescription(photo.body) : undefined}
 >
   <div class="hover-lift overflow-hidden bg-surface">
     <Image

@@ -2,6 +2,16 @@
 import { SITE } from '../config';
 
 interface Props {
+  /** Unique slug for this instance. Namespaces element ids and the radio group
+      so two widgets can sit on the same page without colliding. */
+  id: string;
+  /** Lowercase service name, used in the email subject and the sheet. */
+  service: string;
+  /** Singular noun phrase for the copy, e.g. "a tutorial". Must read as a
+      grammatical subject: "A quick call to see if <fitSubject> is the right fit." */
+  fitSubject: string;
+  /** Heading for the panel. */
+  heading?: string;
   /** One Stripe Payment Link per hour, index 0 = 1 hour, for the paid session path. */
   hourlyLinks: [string, string, string, string, string];
   /** Google Calendar Appointment Schedule for the free 15-minute intro. */
@@ -11,8 +21,19 @@ interface Props {
   ratePerHour: number;
   class?: string;
 }
-const { hourlyLinks, introCalendarLink, hourlyCalendarLinks, ratePerHour, class: className } =
-  Astro.props;
+const {
+  id,
+  service,
+  fitSubject,
+  heading = 'Book a call',
+  hourlyLinks,
+  introCalendarLink,
+  hourlyCalendarLinks,
+  ratePerHour,
+  class: className,
+} = Astro.props;
+
+const freeCopy = `A quick call to see if ${fitSubject} is the right fit. No cost, no commitment.`;
 ---
 
 <div
@@ -20,13 +41,13 @@ const { hourlyLinks, introCalendarLink, hourlyCalendarLinks, ratePerHour, class:
   data-intro-calendar-link={introCalendarLink}
   data-hourly-calendar-links={JSON.stringify(hourlyCalendarLinks)}
   data-stripe-links={JSON.stringify(hourlyLinks)}
+  data-service={service}
+  data-free-copy={freeCopy}
 >
   <p class="mb-1 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
-    Book a call
+    {heading}
   </p>
-  <p class="text-sm text-star/85" data-mode-copy>
-    A quick call to see if equipment consulting is the right fit. No cost, no commitment.
-  </p>
+  <p class="text-sm text-star/85" data-mode-copy>{freeCopy}</p>
 
   {/* Segmented hairline chips rather than native radios: in a dark colour scheme
       an unchecked radio renders as a bright filled disc and a checked one as a
@@ -34,21 +55,33 @@ const { hourlyLinks, introCalendarLink, hourlyCalendarLinks, ratePerHour, class:
   <fieldset class="mt-4 grid grid-cols-2 items-stretch gap-2 border-0 p-0">
     <legend class="sr-only">Call type</legend>
     <div>
-      <input type="radio" id="call-type-free" name="call-type" value="free" checked class="sr-only" />
-      <label for="call-type-free" class="chip text-center">Free 15-min intro</label>
+      <input
+        type="radio"
+        id={`${id}-call-type-free`}
+        name={`${id}-call-type`}
+        value="free"
+        checked
+        class="sr-only"
+        data-call-type
+      />
+      <label for={`${id}-call-type-free`} class="chip">Free 15-min intro</label>
     </div>
     <div>
-      <input type="radio" id="call-type-paid" name="call-type" value="paid" class="sr-only" />
-      <label for="call-type-paid" class="chip text-center">Paid · ${ratePerHour}/hr</label>
+      <input
+        type="radio"
+        id={`${id}-call-type-paid`}
+        name={`${id}-call-type`}
+        value="paid"
+        class="sr-only"
+        data-call-type
+      />
+      <label for={`${id}-call-type-paid`} class="chip">Paid · ${ratePerHour}/hr</label>
     </div>
   </fieldset>
 
   <div data-paid-only class="mt-3 hidden">
-    <label for="consult-hours" class="sr-only">Number of hours</label>
-    <select
-      id="consult-hours"
-      class="hours-select select-log w-full"
-    >
+    <label for={`${id}-hours`} class="sr-only">Number of hours</label>
+    <select id={`${id}-hours`} class="hours-select select-log w-full">
       {
         [1, 2, 3, 4, 5].map((h) => (
           <option value={h}>
@@ -60,15 +93,16 @@ const { hourlyLinks, introCalendarLink, hourlyCalendarLinks, ratePerHour, class:
   </div>
 
   <form
-    id="consult-lead-form"
+    id={`${id}-lead-form`}
+    data-lead-form
     class="mt-4 space-y-3"
     action="https://api.web3forms.com/submit"
     method="POST"
   >
     <input type="hidden" name="access_key" value={SITE.web3formsKey} />
-    <input type="hidden" name="subject" value="Free consult call request · Abdur Astro" />
-    <input type="hidden" name="from_name" value="Abdur Astro consult request" />
-    <input type="hidden" name="form" value="Consult request" />
+    <input type="hidden" name="subject" value={`Free ${service} intro call request · Abdur Astro`} />
+    <input type="hidden" name="from_name" value="Abdur Astro booking request" />
+    <input type="hidden" name="form" value={`${service} request`} />
     {/* Web3Forms honeypot — hidden from people, filled by bots */}
     <input
       type="checkbox"
@@ -80,9 +114,9 @@ const { hourlyLinks, introCalendarLink, hourlyCalendarLinks, ratePerHour, class:
     />
 
     <div class="flex flex-col gap-1.5">
-      <label for="consult-name" class="sr-only">Name</label>
+      <label for={`${id}-name`} class="sr-only">Name</label>
       <input
-        id="consult-name"
+        id={`${id}-name`}
         name="name"
         type="text"
         required
@@ -92,9 +126,9 @@ const { hourlyLinks, introCalendarLink, hourlyCalendarLinks, ratePerHour, class:
       />
     </div>
     <div class="flex flex-col gap-1.5">
-      <label for="consult-email" class="sr-only">Email</label>
+      <label for={`${id}-email`} class="sr-only">Email</label>
       <input
-        id="consult-email"
+        id={`${id}-email`}
         name="email"
         type="email"
         required
@@ -104,9 +138,9 @@ const { hourlyLinks, introCalendarLink, hourlyCalendarLinks, ratePerHour, class:
       />
     </div>
     <div class="flex flex-col gap-1.5">
-      <label for="consult-message" class="sr-only">What are you hoping to figure out?</label>
+      <label for={`${id}-message`} class="sr-only">What are you hoping to figure out?</label>
       <textarea
-        id="consult-message"
+        id={`${id}-message`}
         name="message"
         rows="3"
         placeholder="What are you hoping to figure out? (optional)"
@@ -118,7 +152,7 @@ const { hourlyLinks, introCalendarLink, hourlyCalendarLinks, ratePerHour, class:
       Book my free call →
     </button>
     <p
-      id="consult-status"
+      data-status
       class="font-mono text-[0.6875rem] text-faint empty:hidden"
       role="status"
       aria-live="polite"
@@ -134,14 +168,16 @@ const { hourlyLinks, introCalendarLink, hourlyCalendarLinks, ratePerHour, class:
     const introCalendarLink = root.dataset.introCalendarLink ?? '';
     const hourlyCalendarLinks = JSON.parse(root.dataset.hourlyCalendarLinks ?? '[]') as string[];
     const stripeLinks = JSON.parse(root.dataset.stripeLinks ?? '[]') as string[];
+    const service = root.dataset.service ?? 'this service';
+    const freeCopy = root.dataset.freeCopy ?? '';
 
-    const form = root.querySelector<HTMLFormElement>('#consult-lead-form');
-    const radios = root.querySelectorAll<HTMLInputElement>('input[name="call-type"]');
+    const form = root.querySelector<HTMLFormElement>('[data-lead-form]');
+    const radios = root.querySelectorAll<HTMLInputElement>('[data-call-type]');
     const paidOnly = root.querySelector<HTMLElement>('[data-paid-only]');
     const hoursSelect = root.querySelector<HTMLSelectElement>('.hours-select');
     const modeCopy = root.querySelector<HTMLElement>('[data-mode-copy]');
     const submitLabel = root.querySelector<HTMLElement>('[data-submit-label]');
-    const status = root.querySelector<HTMLElement>('#consult-status');
+    const status = root.querySelector<HTMLElement>('[data-status]');
     const subjectInput = form?.querySelector<HTMLInputElement>('input[name="subject"]');
     const submitButton = form?.querySelector<HTMLButtonElement>('button[type="submit"]');
     if (!form || !submitButton) return;
@@ -155,7 +191,7 @@ const { hourlyLinks, introCalendarLink, hourlyCalendarLinks, ratePerHour, class:
       if (modeCopy) {
         modeCopy.textContent = isPaid
           ? 'Book a time, then pay for your session by the hour.'
-          : 'A quick call to see if equipment consulting is the right fit. No cost, no commitment.';
+          : freeCopy;
       }
       if (submitLabel) {
         submitLabel.textContent = isPaid
@@ -176,14 +212,15 @@ const { hourlyLinks, introCalendarLink, hourlyCalendarLinks, ratePerHour, class:
       const hours = Number(hoursSelect?.value ?? 1);
       const calendarLink = isPaid ? hourlyCalendarLinks[hours - 1] : introCalendarLink;
       if (!calendarLink) {
-        if (status) status.textContent = 'Booking link is missing for this option. Please email instead.';
+        if (status)
+          status.textContent = 'Booking link is missing for this option. Please email instead.';
         return;
       }
 
       if (subjectInput) {
         subjectInput.value = isPaid
-          ? `Paid consulting session request (${hours}h) · Abdur Astro`
-          : 'Free consult call request · Abdur Astro';
+          ? `Paid ${service} session request (${hours}h) · Abdur Astro`
+          : `Free ${service} intro call request · Abdur Astro`;
       }
 
       // Open the booking calendar synchronously, in the same click gesture as the
@@ -209,7 +246,8 @@ const { hourlyLinks, introCalendarLink, hourlyCalendarLinks, ratePerHour, class:
               window.location.href = stripeUrl;
             } else if (status) {
               submitButton.disabled = false;
-              status.textContent = 'Your details are in, but the payment link is missing. Please email to arrange payment.';
+              status.textContent =
+                'Your details are in, but the payment link is missing. Please email to arrange payment.';
             }
             return;
           }

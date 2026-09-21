@@ -3,7 +3,6 @@ import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import YouTubeEmbed from '../components/YouTubeEmbed.astro';
-import HourlyBooking from '../components/HourlyBooking.astro';
 import ConsultBooking from '../components/ConsultBooking.astro';
 import eventPhoto from '../assets/photos/event-photo.jpg';
 import { byDateDesc } from '../lib/photos';
@@ -36,12 +35,19 @@ const CONSULTING_HOUR_CALENDAR_LINKS: [string, string, string, string, string] =
   'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ35uHG-KkmSGbNe-0BWWb5h58YsDdmyW8nXvrvoPaw0axWNH4gtAejaLUR_mQpCF064DIAce-tQ',
 ];
 
+// TUTORIALS currently reuse the consulting appointment schedules: there are no
+// tutorial-specific ones yet, so a tutorial client's calendar invite will read
+// "consulting". Swap these two constants once the tutorial schedules exist.
+const TUTORIAL_INTRO_CALENDAR_LINK = CONSULTING_INTRO_CALENDAR_LINK;
+const TUTORIAL_HOUR_CALENDAR_LINKS = CONSULTING_HOUR_CALENDAR_LINKS;
+
 const photos = (await getCollection('photos')).sort(byDateDesc);
 const keyImage = photos.find((p) => p.id === 'veil-nebula')?.data.image;
 
 const services = [
   {
     id: 'tutorials',
+    booking: true,
     topic: 'tutorials',
     title: 'One-on-one tutorials',
     mode: 'Online across Canada · in person around Southern Alberta',
@@ -49,6 +55,7 @@ const services = [
   },
   {
     id: 'consulting',
+    booking: true,
     topic: 'consulting',
     title: 'Equipment consulting',
     mode: 'Buying advice · remote observatories · astronomy for business',
@@ -98,7 +105,7 @@ const services = [
       {
         services.map((service, i) => (
           <li id={service.id} class="reveal border-b hairline first:border-t">
-            <article class="grid gap-x-12 gap-y-8 py-14 lg:grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,26rem)]">
+            <article class="grid gap-x-12 gap-y-8 py-14 lg:grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,26rem)] xl:grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,30rem)]">
               <span class="font-mono text-[0.6875rem] text-dust">0{i + 1}</span>
 
               {/* Left: the pitch */}
@@ -108,13 +115,17 @@ const services = [
                   {service.mode}
                 </p>
                 <p class="mt-5 leading-relaxed text-star/85">{service.body}</p>
-                <a
-                  href={`/contact?topic=${service.topic}`}
-                  class="btn mt-7"
-                  aria-label={`Inquire about ${service.title.toLowerCase()}`}
-                >
-                  Inquire →
-                </a>
+                {/* Tutorials and consulting book themselves in the right column, so
+                    a second general-enquiry CTA would compete with the real action. */}
+                {!service.booking && (
+                  <a
+                    href={`/contact?topic=${service.topic}`}
+                    class="btn mt-7"
+                    aria-label={`Inquire about ${service.title.toLowerCase()}`}
+                  >
+                    Inquire →
+                  </a>
+                )}
               </div>
 
               {/* Right: the proof and the booking action */}
@@ -142,7 +153,7 @@ const services = [
                         src={eventPhoto}
                         alt="Abdur speaking to a crowd at an outdoor public astronomy event, beside a red Coronado solar telescope set up on a tracking mount."
                         widths={[420, 640, 960]}
-                        sizes="(min-width: 1024px) 26rem, 92vw"
+                        sizes="(min-width: 1280px) 30rem, (min-width: 1024px) 26rem, 92vw"
                         class="aspect-[3/2] w-full object-cover"
                         loading="lazy"
                         quality={80}
@@ -170,14 +181,22 @@ const services = [
                   </section>
                 )}
                 {service.id === 'tutorials' && (
-                  <HourlyBooking
-                    links={TUTORIAL_HOUR_LINKS}
+                  <ConsultBooking
+                    id="tutorial"
+                    service="tutorials"
+                    fitSubject="a tutorial"
+                    heading="Book a tutorial"
+                    hourlyLinks={TUTORIAL_HOUR_LINKS}
+                    introCalendarLink={TUTORIAL_INTRO_CALENDAR_LINK}
+                    hourlyCalendarLinks={TUTORIAL_HOUR_CALENDAR_LINKS}
                     ratePerHour={HOURLY_RATE}
-                    label="Book a tutorial"
                   />
                 )}
                 {service.id === 'consulting' && (
                   <ConsultBooking
+                    id="consult"
+                    service="equipment consulting"
+                    fitSubject="equipment consulting"
                     hourlyLinks={CONSULTING_HOUR_LINKS}
                     introCalendarLink={CONSULTING_INTRO_CALENDAR_LINK}
                     hourlyCalendarLinks={CONSULTING_HOUR_CALENDAR_LINKS}

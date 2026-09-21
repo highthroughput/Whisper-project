@@ -74,28 +74,32 @@ const entries = [
     </div>
 
     <div class="on-photo relative mx-auto w-full max-w-7xl px-5 pb-16 pt-40 sm:px-8 sm:pb-20">
-      {/* A local scrim, sized to the text: dust-orange at 11px sits on the galaxy's
-          own dust lane, where a page-wide gradient dark enough to carry it would
-          have cost the photograph most of its brightness. */}
-      <p class="eyebrow inline-block bg-sky/75 px-2.5 py-1 text-dust-bright backdrop-blur-sm">
-        Field station · 51.0° N · Southern Alberta, Canada
-      </p>
       <h1
-        class="mt-4 font-display uppercase leading-[1.05] [letter-spacing:0.14em] text-star text-[clamp(2.4rem,8vw,6.5rem)]"
+        class="font-display uppercase leading-[1.05] [letter-spacing:0.14em] text-star text-[clamp(2.4rem,8vw,6.5rem)]"
       >
         Abdur&nbsp;Astro
       </h1>
       <p class="mt-5 max-w-xl text-lg text-star">
         Deep-sky astrophotography from the dark skies of Southern&nbsp;Alberta
       </p>
-      {
-        heroPhoto && (
-          <p class="mt-8 inline-block bg-sky/75 px-2.5 py-1 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-star backdrop-blur-sm">
-            In frame: {heroPhoto.data.target} {heroPhoto.data.title}
-            {heroPhoto.data.captured && ` · ${heroPhoto.data.captured}`}
-          </p>
-        )
-      }
+      {/* The two metadata lines sit on local scrims, sized to the text: small type
+          on the galaxy's own dust lane needs its own footing, and a page-wide
+          gradient dark enough to carry it would cost the photograph its brightness.
+          A flex column keeps each plate on its own line: as bare inline-blocks
+          they would sit side by side wherever the viewport had room. */}
+      <div class="mt-8 flex flex-col items-start gap-2">
+        {
+          heroPhoto && (
+            <p class="bg-sky/75 px-2.5 py-1 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-star backdrop-blur-sm">
+              In frame: {heroPhoto.data.target} {heroPhoto.data.title}
+              {heroPhoto.data.captured && ` · ${heroPhoto.data.captured}`}
+            </p>
+          )
+        }
+        <p class="eyebrow bg-sky/75 px-2.5 py-1 text-dust-bright backdrop-blur-sm">
+          Field station · 51.0° N · Southern Alberta, Canada
+        </p>
+      </div>
     </div>
   </section>
 

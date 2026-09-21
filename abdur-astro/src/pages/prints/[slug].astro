@@ -3,6 +3,7 @@ import { Image, getImage } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { cleanPathname } from '../../lib/urls';
+import PrintOptions from '../../components/PrintOptions.astro';
 
 export async function getStaticPaths() {
   const prints = await getCollection('prints');
@@ -18,11 +19,6 @@ const photo = data.photo ? photos.find((p) => p.id === data.photo) : undefined;
 
 const from = Math.min(...data.options.map((o) => o.price));
 
-// Ledger rows grouped by size, preserving frontmatter order.
-const sizes = [...new Set(data.options.map((o) => o.size))].map((size) => ({
-  size,
-  papers: data.options.filter((o) => o.size === size),
-}));
 
 const canonical = new URL(cleanPathname(Astro.url.pathname), Astro.site).href;
 const description = `${data.title} fine art print: archival giclée astrophotography from Alberta on matte or baryta cotton papers, ${data.options[0].size} to ${data.options[data.options.length - 1].size}, from $${from} CAD. Ships across North America.`;
@@ -103,44 +99,7 @@ const productSchema = {
           <Content />
         </div>
 
-        {/* Price ledger — one Stripe Payment Link per size + paper */}
-        <section class="mt-10 border hairline bg-surface" aria-labelledby="options-heading">
-          <header
-            class="flex items-baseline justify-between border-b hairline px-5 py-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)]"
-          >
-            <h2 id="options-heading" class="text-faint">Sizes &amp; papers</h2>
-            <span class="text-dust">CAD</span>
-          </header>
-          <div class="px-5 py-2">
-            {
-              sizes.map(({ size, papers }, groupIndex) => (
-                <div class:list={['py-4', groupIndex > 0 && 'border-t hairline']}>
-                  <h3 class="font-mono text-sm text-star">{size}</h3>
-                  {/* The price carries each row and Buy stays an outline button:
-                      six solid Hα blocks read as one red ladder, which left the
-                      page with no single loudest action. */}
-                  <ul class="mt-3 space-y-4">
-                    {papers.map((option) => (
-                      <li class="flex items-baseline gap-3 font-mono text-[0.8125rem]">
-                        <span class="text-faint">{option.paper}</span>
-                        <span class="log-leader" aria-hidden="true" />
-                        <span class="text-[0.9375rem] tabular-nums text-star">${option.price}</span>
-                        <a
-                          href={option.stripeLink}
-                          class="btn btn-xs shrink-0"
-                          data-stripe-placeholder
-                          aria-label={`Buy ${data.title} ${option.size} on ${option.paper} for $${option.price} CAD`}
-                        >
-                          Buy
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))
-            }
-          </div>
-        </section>
+        <PrintOptions options={data.options} title={data.title} class="mt-10" />
 
         <div class="mt-6 space-y-2 text-xs leading-relaxed text-faint">
           <p>

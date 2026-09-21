@@ -1,0 +1,137 @@
+---
+interface Option {
+  size: string;
+  paper: string;
+  price: number;
+  stripeLink: string;
+}
+
+interface Props {
+  options: Option[];
+  /** Print title, used for the Buy button's accessible label. */
+  title: string;
+  class?: string;
+}
+
+const { options, title, class: className } = Astro.props;
+
+const sizes = [...new Set(options.map((o) => o.size))];
+const papers = [...new Set(options.map((o) => o.paper))];
+const initial = options[0];
+---
+
+<section
+  class:list={['print-options border hairline bg-surface', className]}
+  data-options={JSON.stringify(options)}
+  data-title={title}
+  aria-labelledby="options-heading"
+>
+  <header
+    class="flex items-baseline justify-between border-b hairline px-5 py-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)]"
+  >
+    <h2 id="options-heading" class="text-faint">Size &amp; paper</h2>
+    <span class="text-dust">CAD</span>
+  </header>
+
+  <div class="space-y-4 px-5 py-5">
+    <div class="flex flex-col gap-1.5">
+      <label for="print-size" class="eyebrow text-faint">Size</label>
+      <select id="print-size" data-size class="select-log w-full">
+        {sizes.map((size) => <option value={size}>{size}</option>)}
+      </select>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="print-paper" class="eyebrow text-faint">Paper</label>
+      <select id="print-paper" data-paper class="select-log w-full">
+        {papers.map((paper) => <option value={paper}>{paper}</option>)}
+      </select>
+    </div>
+
+    <div class="flex items-baseline border-t hairline pt-4">
+      <span class="eyebrow shrink-0 text-faint">Price</span>
+      <span class="log-leader" aria-hidden="true"></span>
+      <span data-price class="font-display text-2xl tabular-nums text-star">
+        ${initial.price}
+      </span>
+    </div>
+
+    <a
+      data-buy
+      href={initial.stripeLink}
+      class="btn btn-solid w-full"
+      data-stripe-placeholder
+      aria-label={`Buy ${title}, ${initial.size} on ${initial.paper}, $${initial.price} CAD`}
+    >
+      Buy this print →
+    </a>
+    <p data-unavailable class="font-mono text-[0.6875rem] text-faint empty:hidden"></p>
+  </div>
+
+  {/* Without JS the selects can't repoint the Buy link, so every combination is
+      listed as its own direct link rather than leaving the shop unusable. */}
+  <noscript>
+    <ul class="border-t hairline px-5 py-4 font-mono text-[0.8125rem]">
+      {
+        options.map((option) => (
+          <li class="flex items-baseline gap-3 py-1.5">
+            <span class="text-faint">
+              {option.size} · {option.paper}
+            </span>
+            <span class="log-leader" aria-hidden="true" />
+            <span class="tabular-nums text-star">${option.price}</span>
+            <a href={option.stripeLink} class="link-quiet shrink-0">
+              Buy
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </noscript>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.print-options').forEach((root) => {
+    type Option = { size: string; paper: string; price: number; stripeLink: string };
+    const options = JSON.parse(root.dataset.options ?? '[]') as Option[];
+    const title = root.dataset.title ?? 'this print';
+
+    const sizeSelect = root.querySelector<HTMLSelectElement>('[data-size]');
+    const paperSelect = root.querySelector<HTMLSelectElement>('[data-paper]');
+    const price = root.querySelector<HTMLElement>('[data-price]');
+    const buy = root.querySelector<HTMLAnchorElement>('[data-buy]');
+    const note = root.querySelector<HTMLElement>('[data-unavailable]');
+    if (!sizeSelect || !paperSelect || !price || !buy || !note) return;
+
+    const update = () => {
+      const match = options.find(
+        (o) => o.size === sizeSelect.value && o.paper === paperSelect.value,
+      );
+
+      if (!match) {
+        // A print can carry a partial matrix, so an unavailable pairing has to
+        // say so rather than send someone to the wrong Stripe link.
+        price.textContent = 'n/a';
+        buy.removeAttribute('href');
+        buy.setAttribute('aria-disabled', 'true');
+        buy.classList.add('pointer-events-none', 'opacity-45');
+        note.textContent = `${sizeSelect.value} isn't offered on ${paperSelect.value}. Try the other paper.`;
+        return;
+      }
+
+      price.textContent = `$${match.price}`;
+      buy.href = match.stripeLink;
+      buy.removeAttribute('aria-disabled');
+      buy.classList.remove('pointer-events-none', 'opacity-45');
+      buy.setAttribute(
+        'aria-label',
+        `Buy ${title}, ${match.size} on ${match.paper}, $${match.price} CAD`,
+      );
+      note.textContent = '';
+    };
+
+    sizeSelect.addEventListener('change', update);
+    paperSelect.addEventListener('change', update);
+    update();
+  });
+</script>

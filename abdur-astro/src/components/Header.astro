@@ -81,12 +81,12 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
 
     <div class="hidden items-center gap-6 md:flex">
       <SocialLinks platforms={['youtube', 'instagram', 'x']} />
-      <a href="/services" class="btn btn-solid !px-4 !py-2 !text-xs">
-        Book time
-      </a>
-      <a href="/prints" class="btn btn-solid !px-4 !py-2 !text-xs">
-        Shop prints
-      </a>
+      {/* A matched pair: equal width and weight, and closer to each other than
+          to the socials, so they read as one set of actions. */}
+      <div class="flex items-center gap-2.5">
+        <a href="/services" class="btn btn-solid btn-sm w-[7.5rem]">Book time</a>
+        <a href="/prints" class="btn btn-solid btn-sm w-[7.5rem]">Shop prints</a>
+      </div>
     </div>
 
     <details class="group md:hidden">
