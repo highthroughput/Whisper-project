@@ -189,6 +189,18 @@ site's "ships across North America" copy), add your shipping rate, and (if
 registered) let Stripe Tax handle GST. Copy the `https://buy.stripe.com/…`
 URL over the matching placeholder token below.
 
+## Free consult call booking
+
+Equipment consulting on `/services` has a free 15-minute pre-payment consult
+call: a lead-capture form (posts to Web3Forms) plus a "Book a time" button
+(`ConsultBooking.astro`), both on the same page so a visitor doesn't have to
+leave to reach either.
+
+Set up a **Google Calendar Appointment Schedule** on the `abdurastro@gmail.com`
+account (Google Calendar → Create → Appointment schedule) for a 15-minute
+free consult event, then paste its public booking URL over the
+`GOOGLE_CALENDAR_BOOKING_LINK` placeholder token in `ConsultBooking.astro`.
+
 ## Replace before launch
 
 Every placeholder in the project, in one list. The site builds and runs with all
@@ -243,6 +255,9 @@ of them in place — but do not launch until each box is checked.
       service).
 - [ ] Page prices match the amounts configured in Stripe (spot-check against
       the live dashboard before launch)
+- [ ] `GOOGLE_CALENDAR_BOOKING_LINK` placeholder in `ConsultBooking.astro`
+      needs the real Google Calendar Appointment Schedule URL for the free
+      15-minute consult call (see "Free consult call booking" above).
 
 **Pricing model, decided:** the live 6-variant structure (3 sizes × 2 papers
 per print, $145/$185, $210/$260, $340/$410) is the correct one and is what

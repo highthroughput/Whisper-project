@@ -4,6 +4,7 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import YouTubeEmbed from '../components/YouTubeEmbed.astro';
 import HourlyBooking from '../components/HourlyBooking.astro';
+import ConsultBooking from '../components/ConsultBooking.astro';
 import eventPhoto from '../assets/photos/event-photo.jpg';
 import { byDateDesc } from '../lib/photos';
 
@@ -137,6 +138,7 @@ const services = [
                     </div>
                   )
                 }
+                {service.id === 'consulting' && <ConsultBooking />}
                 {
                   service.id === 'consulting' && (
                     <HourlyBooking
