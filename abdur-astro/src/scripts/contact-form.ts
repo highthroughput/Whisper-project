@@ -2,6 +2,8 @@
 // 1. Preselect the topic from ?topic= (the Services "Inquire" buttons link here).
 // 2. Submit via fetch with inline status instead of leaving the site.
 // Without JS the form still works as a plain POST to Web3Forms.
+import { logToLeadSheet } from '../lib/leadSheet';
+
 const form = document.getElementById('contact-form') as HTMLFormElement | null;
 
 if (form) {
@@ -28,6 +30,7 @@ if (form) {
     if (status) status.textContent = 'Sending…';
 
     try {
+      logToLeadSheet(form);
       const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { Accept: 'application/json' },

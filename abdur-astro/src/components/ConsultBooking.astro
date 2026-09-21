@@ -20,6 +20,7 @@ const { class: className } = Astro.props;
     <input type="hidden" name="access_key" value={SITE.web3formsKey} />
     <input type="hidden" name="subject" value="Free consult call request · Abdur Astro" />
     <input type="hidden" name="from_name" value="Abdur Astro consult request" />
+    <input type="hidden" name="form" value="Consult request" />
     {/* Web3Forms honeypot — hidden from people, filled by bots */}
     <input
       type="checkbox"
@@ -83,6 +84,8 @@ const { class: className } = Astro.props;
 </div>
 
 <script>
+  import { logToLeadSheet } from '../lib/leadSheet';
+
   const form = document.getElementById('consult-lead-form') as HTMLFormElement | null;
 
   if (form) {
@@ -97,6 +100,7 @@ const { class: className } = Astro.props;
       if (status) status.textContent = 'Sending…';
 
       try {
+        logToLeadSheet(form);
         const response = await fetch('https://api.web3forms.com/submit', {
           method: 'POST',
           headers: { Accept: 'application/json' },

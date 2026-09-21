@@ -1,6 +1,6 @@
 // Footer newsletter signup: submit via fetch with inline status instead of
 // leaving the site. Without JS it still works as a plain POST to Web3Forms.
-export {}; // isolate this file's scope — see contact-form.ts's `form` for why
+import { logToLeadSheet } from '../lib/leadSheet';
 
 const form = document.getElementById('newsletter-form') as HTMLFormElement | null;
 
@@ -16,6 +16,7 @@ if (form) {
     if (status) status.textContent = 'Joining…';
 
     try {
+      logToLeadSheet(form);
       const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { Accept: 'application/json' },

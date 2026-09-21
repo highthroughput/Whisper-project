@@ -25,6 +25,10 @@ export const SITE = {
   googleBusiness: 'https://share.google/iRm8W7WB9Pi92lIkK',
 
   web3formsKey: 'c3c0b6ec-abf3-4103-935c-fffd766dbb08',
+
+  /** Google Apps Script Web App that logs every form submission to a lead-capture Google Sheet. */
+  leadSheetWebhook:
+    'https://script.google.com/macros/s/AKfycbxL0anvH5TP99RPXLD3oDZYR8-mEF8n1Pg7naXcEzjBdv2GgDngOPv8zvd90rJNBcg/exec',
 } as const;
 
 /** Subjects offered on the contact form; services link here with ?topic=<key>. */
