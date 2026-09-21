@@ -52,7 +52,11 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
         </g>
         <circle cx="16" cy="16" r="2" fill="#a63a28"></circle>
       </svg>
-      <span class="font-display text-[0.9375rem] uppercase [letter-spacing:var(--tracking-cap)]">
+      {/* Slightly tighter below sm: at full cap tracking the wordmark ate 169px
+          of a 360px bar, leaving the Shop button nothing to sit in. */}
+      <span
+        class="font-display text-[0.8125rem] uppercase [letter-spacing:0.16em] sm:text-[0.9375rem] sm:[letter-spacing:var(--tracking-cap)]"
+      >
         Abdur&nbsp;Astro
       </span>
     </a>
@@ -84,12 +88,18 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
       {/* A matched pair: equal width and weight, and closer to each other than
           to the socials, so they read as one set of actions. */}
       <div class="flex items-center gap-2.5">
-        <a href="/services" class="btn btn-solid btn-sm w-[7.5rem]">Book time</a>
-        <a href="/prints" class="btn btn-solid btn-sm w-[7.5rem]">Shop prints</a>
+        <a href="/services" class="btn btn-solid btn-sm w-[8.25rem]">Book consult</a>
+        <a href="/prints" class="btn btn-solid btn-sm w-[8.25rem]">Shop prints</a>
       </div>
     </div>
 
-    <details class="group md:hidden">
+    {/* Prints has no nav link (the desktop CTA stands in for it), and that CTA
+        is desktop-only, so on mobile the shop needs its own visible entry in
+        the bar rather than living one tap deep in the menu. */}
+    <div class="flex shrink-0 items-center gap-2 md:hidden">
+      <a href="/prints" class="btn btn-solid btn-xs" aria-label="Shop prints">Shop</a>
+
+      <details class="group">
       <summary
         class="flex cursor-pointer list-none items-center gap-2 font-mono text-sm uppercase [letter-spacing:var(--tracking-log)] text-star [&::-webkit-details-marker]:hidden"
       >
@@ -128,8 +138,15 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
             ))
           }
         </ul>
+        {/* The header CTAs are desktop-only, so without these the shop and the
+            booking page had no entry point anywhere in the mobile header. */}
+        <div class="mt-7 grid gap-3 border-t hairline pt-6">
+          <a href="/services" class="btn btn-solid w-full">Book consult</a>
+          <a href="/prints" class="btn btn-solid w-full">Shop prints</a>
+        </div>
       </nav>
-    </details>
+      </details>
+    </div>
   </div>
 </header>
 
