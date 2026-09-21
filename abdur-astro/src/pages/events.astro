@@ -23,7 +23,7 @@ const monthDay = (date: Date) =>
   title="Events Calendar"
   description="Upcoming star parties near Southern Alberta, plus meteor showers, solstices, and other astronomical events worth planning a night around."
 >
-  <section class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
+  <section class="mx-auto w-full max-w-5xl px-5 pt-14 sm:px-8 sm:pt-20">
     <p class="eyebrow">What's coming up</p>
     <h1 class="mt-3 font-display text-4xl sm:text-5xl">Events</h1>
     <p class="mt-6 max-w-2xl text-faint">
@@ -33,12 +33,15 @@ const monthDay = (date: Date) =>
 
     {
       !hasHosted && (
-        <p class="reveal mt-8 max-w-2xl border hairline bg-surface p-5 text-sm text-star/85">
-          No public star parties on the calendar right now.{' '}
-          <a href="/contact?topic=starparty" class="link-quiet">
-            Ask about booking a private one →
-          </a>
-        </p>
+        <div class="reveal mt-8 max-w-2xl border border-l-2 hairline border-l-dust bg-surface p-5">
+          <p class="eyebrow text-faint">Calendar status</p>
+          <p class="mt-2 text-sm text-star/85">
+            No public star parties on the calendar right now.{' '}
+            <a href="/contact?topic=starparty" class="link-quiet">
+              Ask about booking a private one →
+            </a>
+          </p>
+        </div>
       )
     }
 
@@ -49,15 +52,17 @@ const monthDay = (date: Date) =>
         ) : (
           entries.map(({ event, Content }) => (
             <li id={event.id} class="reveal border-b hairline first:border-t">
-              <article class="grid gap-x-8 gap-y-3 py-10 sm:grid-cols-[5.5rem_minmax(0,1fr)_auto] sm:items-start">
-                <div class="font-mono">
+              <article class="grid gap-x-8 gap-y-3 py-10 sm:grid-cols-[6.5rem_minmax(0,1fr)_9rem] sm:items-start">
+                {/* On phones the date is one inline row; stacking it put four
+                    micro-labels above the title before any real content. */}
+                <div class="flex items-baseline gap-2 font-mono sm:block">
                   <p class="text-2xl tabular-nums text-star">{monthDay(event.data.date)}</p>
-                  <p class="mt-1 text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+                  <p class="text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint sm:mt-1">
                     {event.data.date.getFullYear()}
                   </p>
                 </div>
 
-                <div class="max-w-2xl">
+                <div>
                   <p
                     class:list={[
                       'font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)]',
@@ -67,10 +72,14 @@ const monthDay = (date: Date) =>
                     {event.data.kind === 'hosted' ? 'Hosted' : 'Sky event'}
                   </p>
                   <h2 class="mt-1.5 font-display text-2xl">{event.data.title}</h2>
-                  <p class="mt-1 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+                  {/* The timing token stays in the log register; the viewing note
+                      is a sentence and reads as one, not as a tracked caps banner. */}
+                  <p class="mt-1.5 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
                     {event.data.when}
-                    {event.data.location && ` · ${event.data.location}`}
                   </p>
+                  {event.data.location && (
+                    <p class="mt-1 text-sm text-faint">{event.data.location}</p>
+                  )}
                   <div class="reveal mt-3 max-w-prose text-sm leading-relaxed text-star/85 [&_p]:mb-3 [&_p:last-child]:mb-0">
                     <Content />
                   </div>
@@ -81,7 +90,7 @@ const monthDay = (date: Date) =>
                     event.data.kind === 'hosted' ? (
                       <a
                         href={event.data.rsvpLink ?? '/contact?topic=starparty'}
-                        class="btn btn-solid !px-4 !py-2 !text-[0.6875rem]"
+                        class="btn btn-solid btn-sm"
                       >
                         RSVP →
                       </a>
@@ -89,7 +98,7 @@ const monthDay = (date: Date) =>
                       event.data.infoUrl && (
                         <a
                           href={event.data.infoUrl}
-                          class="btn !px-4 !py-2 !text-[0.6875rem]"
+                          class="btn btn-sm"
                           target="_blank"
                           rel="noopener noreferrer"
                         >

@@ -18,12 +18,24 @@ export function filterNames(filters?: Filter[]): string {
   return (filters ?? []).map((f) => f.name.toUpperCase()).join(' · ');
 }
 
+/**
+ * True when the filter set is a single unbroken total rather than a real
+ * breakdown, i.e. the integration is known but the per-filter split isn't.
+ */
+export function isUnsplitIntegration(filters?: Filter[]): boolean {
+  return filters?.length === 1 && /^total$/i.test(filters[0].name);
+}
+
 /** One-line log footer used on cards: "M 51 · 30.5 H · L R G B", skipping any part that isn't confirmed yet. */
 export function logLine(photo: Photo): string {
   const total = totalHours(photo.data.filters);
   const parts = [photo.data.target];
   if (total > 0) parts.push(`${formatHours(total)} H`);
-  const names = filterNames(photo.data.filters);
+  // A lone "Total" filter is the absence of a breakdown, so naming it as one
+  // would render "44.5 H · TOTAL" and say nothing the hours don't already.
+  const names = isUnsplitIntegration(photo.data.filters)
+    ? ''
+    : filterNames(photo.data.filters);
   if (names) parts.push(names);
   return parts.join(' · ');
 }

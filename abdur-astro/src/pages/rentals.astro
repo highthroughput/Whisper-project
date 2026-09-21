@@ -46,7 +46,7 @@ const included = [
         <h1 class="mt-3 font-display text-4xl sm:text-5xl">
           Sky-Watcher 10″ 250P Flextube Dobsonian
         </h1>
-        <p class="mt-4 max-w-2xl text-faint">
+        <p class="mt-6 max-w-2xl text-faint">
           A 10-inch reflector big enough to hold Saturn's rings, Jupiter's cloud bands, star
           clusters, and galaxies steady in the eyepiece, without the cost or the storage of
           owning one. The collapsible Flextube design sets up in minutes and breaks back down
@@ -75,17 +75,9 @@ const included = [
           </p>
         </div>
 
-        <section class="mt-10 border hairline bg-surface" aria-labelledby="included-heading">
-          <header class="border-b hairline px-5 py-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
-            <h2 id="included-heading">Included with every rental</h2>
-          </header>
-          <ul class="grid gap-x-6 gap-y-2 px-5 py-4 text-sm text-star/85 sm:grid-cols-2">
-            {included.map((item) => <li class="flex items-baseline gap-2"><span class="text-dust" aria-hidden="true">·</span>{item}</li>)}
-          </ul>
-        </section>
       </div>
 
-      <div>
+      <div class="lg:sticky lg:top-24 lg:self-start">
         <section class="border hairline bg-surface" aria-labelledby="rates-heading">
           <header
             class="flex items-baseline justify-between border-b hairline px-5 py-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)]"
@@ -100,17 +92,38 @@ const included = [
                   <div class="flex items-baseline justify-between gap-3">
                     <h3 class="font-mono text-sm text-star">{rate.term}</h3>
                     <span class="log-leader" aria-hidden="true" />
-                    <span class="tabular-nums text-star">${rate.price}</span>
+                    {/* The price is the row's anchor, so the three buttons can stay
+                        quiet instead of stacking as three identical red slabs. */}
+                    <span class="font-display text-xl tabular-nums text-star">${rate.price}</span>
                   </div>
                   <p class="mt-1 text-xs text-faint">{rate.detail}</p>
                   <a
                     href={rate.stripeLink}
-                    class="btn btn-solid mt-3 w-full !text-[0.6875rem]"
+                    class="btn btn-sm mt-3 w-full"
                     data-stripe-placeholder
                     aria-label={`Rent for ${rate.term.toLowerCase()}, $${rate.price} CAD`}
                   >
                     Rent · {rate.term}
                   </a>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+
+        {/* Kit list lives in the spec rail beside the rates, not under the copy:
+            in the left column it left the right column half empty, and on phones
+            it pushed the only purchase action most of a screen further down. */}
+        <section class="reveal mt-6 border hairline bg-surface" aria-labelledby="included-heading">
+          <header class="border-b hairline px-5 py-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+            <h2 id="included-heading">Included with every rental</h2>
+          </header>
+          <ul class="px-5 py-4 text-sm text-star/85">
+            {
+              included.map((item) => (
+                <li class="flex items-baseline gap-2 py-1">
+                  <span class="text-dust" aria-hidden="true">·</span>
+                  {item}
                 </li>
               ))
             }

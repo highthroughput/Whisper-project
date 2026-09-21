@@ -22,12 +22,12 @@ const year = new Date().getFullYear();
           nearby. No spam, unsubscribe anytime.
         </p>
       </div>
-      <div class="shrink-0">
+      <div class="w-full shrink-0 sm:w-auto">
         <form
           id="newsletter-form"
           action="https://api.web3forms.com/submit"
           method="POST"
-          class="flex gap-2"
+          class="flex w-full gap-2 sm:w-auto"
         >
           <input type="hidden" name="access_key" value={SITE.web3formsKey} />
           <input type="hidden" name="subject" value="New newsletter signup · Abdur Astro" />
@@ -51,9 +51,9 @@ const year = new Date().getFullYear();
             required
             autocomplete="email"
             placeholder="you@example.com"
-            class="w-44 min-w-0 border hairline bg-sky px-3 py-2.5 text-sm text-star placeholder:text-faint/60 sm:w-56"
+            class="w-full min-w-0 flex-1 border field-edge bg-sky px-3 py-2.5 text-sm text-star placeholder:text-faint sm:w-56 sm:flex-none"
           />
-          <button type="submit" class="btn btn-solid shrink-0 !px-4 !py-2.5 !text-[0.6875rem]">
+          <button type="submit" class="btn btn-solid btn-sm shrink-0">
             Join
           </button>
         </form>
@@ -71,23 +71,23 @@ const year = new Date().getFullYear();
       <nav aria-label="Footer, explore">
         <h2 class="eyebrow">Explore</h2>
         <ul class="mt-4 space-y-2.5 text-sm">
-          <li><a class="text-faint hover:text-star transition-colors" href="/gallery">Gallery</a></li>
-          <li><a class="text-faint hover:text-star transition-colors" href="/prints">Prints</a></li>
+          <li><a class="text-star/80 hover:text-star transition-colors" href="/gallery">Gallery</a></li>
+          <li><a class="text-star/80 hover:text-star transition-colors" href="/prints">Prints</a></li>
           <li>
-            <a class="text-faint hover:text-star transition-colors" href="/services">Services</a>
+            <a class="text-star/80 hover:text-star transition-colors" href="/services">Services</a>
           </li>
-          <li><a class="text-faint hover:text-star transition-colors" href="/events">Events</a></li>
+          <li><a class="text-star/80 hover:text-star transition-colors" href="/events">Events</a></li>
         </ul>
       </nav>
       <nav aria-label="Footer, studio">
         <h2 class="eyebrow">Studio</h2>
         <ul class="mt-4 space-y-2.5 text-sm">
-          <li><a class="text-faint hover:text-star transition-colors" href="/about">About</a></li>
+          <li><a class="text-star/80 hover:text-star transition-colors" href="/about">About</a></li>
           <li>
-            <a class="text-faint hover:text-star transition-colors" href="/contact">Contact</a>
+            <a class="text-star/80 hover:text-star transition-colors" href="/contact">Contact</a>
           </li>
           <li>
-            <a class="text-faint hover:text-star transition-colors" href={`mailto:${SITE.email}`}>
+            <a class="text-star/80 hover:text-star transition-colors" href={`mailto:${SITE.email}`}>
               {SITE.email}
             </a>
           </li>

@@ -90,85 +90,73 @@ const services = [
       {
         services.map((service, i) => (
           <li id={service.id} class="reveal border-b hairline first:border-t">
-            <article class="grid gap-x-10 gap-y-4 py-12 lg:grid-cols-[3.5rem_minmax(0,1fr)_auto]">
+            <article class="grid gap-x-12 gap-y-8 py-14 lg:grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,26rem)]">
               <span class="font-mono text-[0.6875rem] text-dust">0{i + 1}</span>
-              <div class="max-w-2xl">
+
+              {/* Left: the pitch */}
+              <div class="max-w-prose">
                 <h2 class="font-display text-3xl">{service.title}</h2>
                 <p class="mt-2 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
                   {service.mode}
                 </p>
                 <p class="mt-5 leading-relaxed text-star/85">{service.body}</p>
-                {
-                  service.id === 'tutorials' && (
-                    <div class="mt-6 max-w-md">
-                      <p class="mb-2 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
-                        A taste of the process
-                      </p>
-                      <YouTubeEmbed id="6wrQ08Mc2ac" title="NEW Siril Data Processing Guide V2 (Abdur Astro)" />
-                    </div>
-                  )
-                }
-                {
-                  service.id === 'tutorials' && (
-                    <HourlyBooking
-                      links={TUTORIAL_HOUR_LINKS}
-                      ratePerHour={HOURLY_RATE}
-                      label="Book a tutorial"
-                    />
-                  )
-                }
-                {
-                  service.id === 'speaking' && (
-                    <div class="mt-6 max-w-md">
-                      <p class="mb-2 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
-                        On location
-                      </p>
-                      <div class="border hairline bg-surface p-2">
-                        <Image
-                          src={eventPhoto}
-                          alt="Abdur speaking to a crowd at an outdoor public astronomy event, beside a red Coronado solar telescope set up on a tracking mount."
-                          widths={[420, 640, 960]}
-                          sizes="(min-width: 1024px) 30vw, 92vw"
-                          class="aspect-[3/2] w-full object-cover"
-                          loading="lazy"
-                          quality={80}
-                        />
-                      </div>
-                    </div>
-                  )
-                }
-                {
-                  service.id === 'consulting' && (
-                    <div class="mt-6 max-w-md">
-                      <p class="mb-2 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
-                        Buying advice, on camera
-                      </p>
-                      <YouTubeEmbed
-                        id="ZXVIQyI4_iE"
-                        title={'5" APO vs 6" Achromatic Refractor - Which one should you buy? (Abdur Astro)'}
-                      />
-                    </div>
-                  )
-                }
-                {
-                  service.id === 'consulting' && (
-                    <ConsultBooking
-                      hourlyLinks={CONSULTING_HOUR_LINKS}
-                      introCalendarLink={CONSULTING_INTRO_CALENDAR_LINK}
-                      hourlyCalendarLinks={CONSULTING_HOUR_CALENDAR_LINKS}
-                      ratePerHour={HOURLY_RATE}
-                    />
-                  )
-                }
-              </div>
-              <div class="lg:self-end">
                 <a
                   href={`/contact?topic=${service.topic}`}
-                  class="btn"
+                  class="btn mt-7"
                   aria-label={`Inquire about ${service.title.toLowerCase()}`}
                 >
                   Inquire →
                 </a>
+              </div>
+
+              {/* Right: the proof and the booking action */}
+              <div class="lg:col-start-3">
+                {service.id === 'tutorials' && (
+                  <div>
+                    <p class="eyebrow mb-2 text-faint">A taste of the process</p>
+                    <YouTubeEmbed id="6wrQ08Mc2ac" title="NEW Siril Data Processing Guide V2 (Abdur Astro)" />
+                  </div>
+                )}
+                {service.id === 'consulting' && (
+                  <div>
+                    <p class="eyebrow mb-2 text-faint">Buying advice, on camera</p>
+                    <YouTubeEmbed
+                      id="ZXVIQyI4_iE"
+                      title={'5" APO vs 6" Achromatic Refractor - Which one should you buy? (Abdur Astro)'}
+                    />
+                  </div>
+                )}
+                {service.id === 'speaking' && (
+                  <div>
+                    <p class="eyebrow mb-2 text-faint">On location</p>
+                    <div class="border hairline bg-surface p-4 sm:p-5">
+                      <Image
+                        src={eventPhoto}
+                        alt="Abdur speaking to a crowd at an outdoor public astronomy event, beside a red Coronado solar telescope set up on a tracking mount."
+                        widths={[420, 640, 960]}
+                        sizes="(min-width: 1024px) 26rem, 92vw"
+                        class="aspect-[3/2] w-full object-cover"
+                        loading="lazy"
+                        quality={80}
+                      />
+                    </div>
+                  </div>
+                )}
+                {service.id === 'tutorials' && (
+                  <HourlyBooking
+                    links={TUTORIAL_HOUR_LINKS}
+                    ratePerHour={HOURLY_RATE}
+                    label="Book a tutorial"
+                  />
+                )}
+                {service.id === 'consulting' && (
+                  <ConsultBooking
+                    hourlyLinks={CONSULTING_HOUR_LINKS}
+                    introCalendarLink={CONSULTING_INTRO_CALENDAR_LINK}
+                    hourlyCalendarLinks={CONSULTING_HOUR_CALENDAR_LINKS}
+                    ratePerHour={HOURLY_RATE}
+                  />
+                )}
               </div>
             </article>
           </li>

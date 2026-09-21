@@ -1,6 +1,12 @@
 ---
 import type { Photo } from '../lib/photos';
-import { filterColor, filterNames, formatHours, totalHours } from '../lib/photos';
+import {
+  filterColor,
+  filterNames,
+  formatHours,
+  isUnsplitIntegration,
+  totalHours,
+} from '../lib/photos';
 
 interface Props {
   photo: Photo;
@@ -12,6 +18,7 @@ interface Props {
 const { photo, number, class: className } = Astro.props;
 const { data } = photo;
 const total = totalHours(data.filters);
+const hasFilterBreakdown = Boolean(data.filters) && !isUnsplitIntegration(data.filters);
 
 // Each section only appears once it has confirmed data — a missing field is
 // left off the log entirely rather than shown as a placeholder.
@@ -19,7 +26,7 @@ const gearRows = [
   ['Telescope', data.telescope],
   ['Camera', data.camera],
   ['Mount', data.mount],
-  ['Filters', filterNames(data.filters)],
+  ['Filters', hasFilterBreakdown ? filterNames(data.filters) : ''],
 ].filter((row): row is [string, string] => Boolean(row[1]));
 
 const captureRows = [
@@ -45,16 +52,16 @@ const captureRows = [
         ['Target', `${data.target}${data.designation ? ` · ${data.designation}` : ''}`],
         ['Constellation', data.constellation],
       ].map(([label, value]) => (
-        <div class="flex items-baseline py-1.5">
+        <div class="log-row py-1.5">
           <dt class="shrink-0 text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
             {label}
           </dt>
           <span class="log-leader" aria-hidden="true" />
-          <dd class="text-right text-star">{value}</dd>
+          <dd class="text-star">{value}</dd>
         </div>
       ))
     }
-    <div class="flex items-baseline py-1.5">
+    <div class="log-row py-1.5">
       <dt
         class="shrink-0 text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint"
       >
@@ -69,12 +76,12 @@ const captureRows = [
         <Fragment>
           <div class="my-3 border-t hairline" role="presentation" />
           {gearRows.map(([label, value]) => (
-            <div class="flex items-baseline py-1.5">
+            <div class="log-row py-1.5">
               <dt class="shrink-0 text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
                 {label}
               </dt>
               <span class="log-leader" aria-hidden="true" />
-              <dd class="text-right text-star">{value}</dd>
+              <dd class="text-star">{value}</dd>
             </div>
           ))}
         </Fragment>
@@ -98,7 +105,11 @@ const captureRows = [
               </dd>
             </div>
 
-            {/* Proportional exposure per filter, in the colours the filters map to */}
+            {/* Proportional exposure per filter, in the colours the filters map to.
+                Skipped when the integration has no per-filter split: a single
+                full-width bar labelled "TOTAL" charts nothing. */}
+            {hasFilterBreakdown && (
+            <Fragment>
             <div
               class="mt-3 flex h-1.5 w-full overflow-hidden"
               role="img"
@@ -129,6 +140,8 @@ const captureRows = [
                 ))
               }
             </ul>
+            </Fragment>
+            )}
           </div>
         </Fragment>
       )
@@ -139,12 +152,12 @@ const captureRows = [
         <Fragment>
           <div class="my-3 border-t hairline" role="presentation" />
           {captureRows.map(([label, value]) => (
-            <div class="flex items-baseline py-1.5">
+            <div class="log-row py-1.5">
               <dt class="shrink-0 text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
                 {label}
               </dt>
               <span class="log-leader" aria-hidden="true" />
-              <dd class="text-right text-star">{value}</dd>
+              <dd class="text-star">{value}</dd>
             </div>
           ))}
         </Fragment>

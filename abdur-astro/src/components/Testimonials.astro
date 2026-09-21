@@ -21,9 +21,11 @@ const testimonials = (await getCollection('testimonials'))
         What people say
       </h2>
 
+      {/* The quote absorbs the slack so every card's attribution sits on the same
+          baseline, whether or not that reviewer listed strengths. */}
       <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {testimonials.map(({ data, body }) => (
-          <figure class="border hairline bg-surface p-6">
+          <figure class="flex flex-col border hairline bg-surface p-6">
             <div class="flex text-dust" aria-label={`${data.rating} out of 5 stars`}>
               {Array.from({ length: 5 }).map((_, i) => (
                 <svg
@@ -40,15 +42,19 @@ const testimonials = (await getCollection('testimonials'))
                 </svg>
               ))}
             </div>
-            <blockquote class="mt-4 text-sm leading-relaxed text-star/85">
+            <blockquote class="mt-4 flex-1 text-sm leading-relaxed text-star/85">
               "{body?.trim()}"
             </blockquote>
-            <figcaption class="mt-4 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
-              {data.author}
-            </figcaption>
-            {data.strengths && data.strengths.length > 0 && (
-              <p class="mt-2 text-[0.6875rem] text-faint">Notable: {data.strengths.join(' · ')}</p>
-            )}
+            <div class="mt-6">
+              <figcaption class="font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+                {data.author}
+              </figcaption>
+              {data.strengths && data.strengths.length > 0 && (
+                <p class="mt-2 font-mono text-[0.6875rem] text-faint">
+                  <span class="text-dust">Notable</span> {data.strengths.join(' · ')}
+                </p>
+              )}
+            </div>
           </figure>
         ))}
       </div>

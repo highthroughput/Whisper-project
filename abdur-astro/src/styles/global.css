@@ -76,6 +76,30 @@
     border-color: color-mix(in srgb, var(--color-star) 14%, transparent);
   }
 
+  /* Text sitting directly on a photograph. Keeps the image at full brightness
+     while stopping small type from dissolving into whatever is behind it —
+     the hero eyebrow is dust-orange over an orange dust lane without this. */
+  .on-photo {
+    text-shadow:
+      0 1px 2px rgb(0 0 0 / 0.55),
+      0 2px 14px rgb(0 0 0 / 0.75);
+  }
+
+  /* A label/value row joined by dotted leaders. Below sm a long value wraps and
+     squeezes the leader down to its 1.5rem minimum, which reads as a broken
+     rule, so the row stacks and the dots drop out entirely. */
+  .log-row {
+    @apply flex flex-col items-start sm:flex-row sm:items-baseline;
+  }
+
+  .log-row > .log-leader {
+    @apply hidden sm:block;
+  }
+
+  .log-row > dd {
+    @apply sm:text-right;
+  }
+
   /* Dotted leader between a log label and its value */
   .log-leader {
     flex: 1 1 2rem;
@@ -89,7 +113,9 @@
     @apply font-mono inline-flex items-center justify-center gap-2 text-[0.8125rem] uppercase;
     letter-spacing: var(--tracking-log);
     padding: 0.8rem 1.4rem;
-    border: 1px solid color-mix(in srgb, var(--color-star) 25%, transparent);
+    /* 40%, not 25%: at 25% the outline button's edge sat at 1.9:1 against the
+       page, under the 3:1 WCAG requires for a control boundary. */
+    border: 1px solid color-mix(in srgb, var(--color-star) 40%, transparent);
     color: var(--color-star);
     transition:
       border-color 200ms ease,
@@ -112,6 +138,82 @@
     background-color: var(--color-ha-deep);
     border-color: var(--color-ha-deep);
     color: var(--color-star);
+  }
+
+  /* Compact button, for buttons that live inside a card rather than in the page */
+  .btn-sm {
+    padding: 0.55rem 1rem;
+    font-size: 0.6875rem;
+  }
+
+  /* Smallest control, for repeated rows in a ledger. It still grows to the 44px
+     touch minimum on phones, where these stack close together. */
+  .btn-xs {
+    padding: 0.4rem 0.9rem;
+    font-size: 0.6875rem;
+  }
+
+  @media (width < 40rem) {
+    .btn-xs {
+      min-height: 2.75rem;
+      padding-inline: 1.1rem;
+    }
+  }
+
+  /* A <select> drawn in the log register. The chevron is painted here because
+     appearance:none otherwise leaves the control indistinguishable from a
+     static text field, and on the booking widgets it is the only way to
+     change what you are buying. */
+  /* Border for anything a visitor types into. The decorative .hairline sits at
+     1.35:1 against the page, which is fine for a rule but not for the edge
+     that tells you where a field begins. */
+  .field-edge {
+    border-color: color-mix(in srgb, var(--color-star) 40%, transparent);
+  }
+
+  .select-log {
+    @apply font-mono appearance-none border bg-sky text-star text-[0.8125rem];
+    border-color: color-mix(in srgb, var(--color-star) 40%, transparent);
+    padding: 0.55rem 2.25rem 0.55rem 0.75rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%23b4713d' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 0.7rem;
+    transition: border-color 200ms ease;
+  }
+
+  .select-log:hover {
+    border-color: color-mix(in srgb, var(--color-star) 55%, transparent);
+  }
+
+  /* A choice rendered as a hairline chip. Pairs with an sr-only radio: the
+     native control is invisible in a dark scheme, where an unchecked radio
+     reads brighter than a checked one. */
+  .chip {
+    @apply font-mono block cursor-pointer border text-[0.6875rem] uppercase text-faint;
+    letter-spacing: var(--tracking-log);
+    border-color: color-mix(in srgb, var(--color-star) 40%, transparent);
+    padding: 0.55rem 0.85rem;
+    transition:
+      border-color 180ms ease,
+      color 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .chip:hover {
+    color: var(--color-star);
+    border-color: color-mix(in srgb, var(--color-star) 60%, transparent);
+  }
+
+  input:checked + .chip {
+    border-color: var(--color-dust);
+    color: var(--color-star);
+    background-color: color-mix(in srgb, var(--color-dust) 14%, transparent);
+  }
+
+  input:focus-visible + .chip {
+    outline: 2px solid var(--color-dust-bright);
+    outline-offset: 3px;
   }
 
   .link-quiet {

@@ -16,7 +16,7 @@ const { hourlyLinks, introCalendarLink, hourlyCalendarLinks, ratePerHour, class:
 ---
 
 <div
-  class:list={['consult-booking mt-6 max-w-md border hairline bg-surface p-4 sm:p-5', className]}
+  class:list={['consult-booking mt-6 border hairline bg-surface p-4 sm:p-5', className]}
   data-intro-calendar-link={introCalendarLink}
   data-hourly-calendar-links={JSON.stringify(hourlyCalendarLinks)}
   data-stripe-links={JSON.stringify(hourlyLinks)}
@@ -28,23 +28,26 @@ const { hourlyLinks, introCalendarLink, hourlyCalendarLinks, ratePerHour, class:
     A quick call to see if equipment consulting is the right fit. No cost, no commitment.
   </p>
 
-  <fieldset class="mt-3 flex flex-wrap gap-x-5 gap-y-2 border-0 p-0">
+  {/* Segmented hairline chips rather than native radios: in a dark colour scheme
+      an unchecked radio renders as a bright filled disc and a checked one as a
+      thin ring, so the unselected option reads as the selected one. */}
+  <fieldset class="mt-4 grid grid-cols-2 gap-2 border-0 p-0">
     <legend class="sr-only">Call type</legend>
-    <label class="flex items-center gap-2 text-sm text-star/85">
-      <input type="radio" name="call-type" value="free" checked class="accent-ha" />
-      Free 15-minute intro
-    </label>
-    <label class="flex items-center gap-2 text-sm text-star/85">
-      <input type="radio" name="call-type" value="paid" class="accent-ha" />
-      Paid session · ${ratePerHour}/hr
-    </label>
+    <div>
+      <input type="radio" id="call-type-free" name="call-type" value="free" checked class="sr-only" />
+      <label for="call-type-free" class="chip text-center">Free 15-min intro</label>
+    </div>
+    <div>
+      <input type="radio" id="call-type-paid" name="call-type" value="paid" class="sr-only" />
+      <label for="call-type-paid" class="chip text-center">Paid · ${ratePerHour}/hr</label>
+    </div>
   </fieldset>
 
   <div data-paid-only class="mt-3 hidden">
     <label for="consult-hours" class="sr-only">Number of hours</label>
     <select
       id="consult-hours"
-      class="hours-select w-full appearance-none border hairline bg-sky px-3 py-2 text-sm text-star"
+      class="hours-select select-log w-full"
     >
       {
         [1, 2, 3, 4, 5].map((h) => (
@@ -85,7 +88,7 @@ const { hourlyLinks, introCalendarLink, hourlyCalendarLinks, ratePerHour, class:
         required
         autocomplete="name"
         placeholder="Your name"
-        class="w-full border hairline bg-sky px-3 py-2 text-sm text-star placeholder:text-faint/60"
+        class="w-full border field-edge bg-sky px-3 py-2 text-sm text-star placeholder:text-faint"
       />
     </div>
     <div class="flex flex-col gap-1.5">
@@ -97,7 +100,7 @@ const { hourlyLinks, introCalendarLink, hourlyCalendarLinks, ratePerHour, class:
         required
         autocomplete="email"
         placeholder="you@example.com"
-        class="w-full border hairline bg-sky px-3 py-2 text-sm text-star placeholder:text-faint/60"
+        class="w-full border field-edge bg-sky px-3 py-2 text-sm text-star placeholder:text-faint"
       />
     </div>
     <div class="flex flex-col gap-1.5">
@@ -105,18 +108,18 @@ const { hourlyLinks, introCalendarLink, hourlyCalendarLinks, ratePerHour, class:
       <textarea
         id="consult-message"
         name="message"
-        rows="2"
+        rows="3"
         placeholder="What are you hoping to figure out? (optional)"
-        class="w-full border hairline bg-sky px-3 py-2 text-sm text-star placeholder:text-faint/60"
+        class="w-full resize-y border field-edge bg-sky px-3 py-2 text-sm text-star placeholder:text-faint"
       ></textarea>
     </div>
 
-    <button type="submit" class="btn btn-solid w-full !px-4 !py-2 !text-xs" data-submit-label>
+    <button type="submit" class="btn btn-solid btn-sm w-full" data-submit-label>
       Book my free call →
     </button>
     <p
       id="consult-status"
-      class="font-mono text-[0.6875rem] text-faint"
+      class="font-mono text-[0.6875rem] text-faint empty:hidden"
       role="status"
       aria-live="polite"
     >

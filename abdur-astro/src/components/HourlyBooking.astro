@@ -4,12 +4,13 @@ interface Props {
   links: [string, string, string, string, string];
   ratePerHour: number;
   label?: string;
+  class?: string;
 }
-const { links, ratePerHour, label = 'Book now' } = Astro.props;
+const { links, ratePerHour, label = 'Book now', class: className } = Astro.props;
 const options = links.map((url, i) => ({ hours: i + 1, price: (i + 1) * ratePerHour, url }));
 ---
 
-<div class="hourly-booking mt-6 max-w-md border hairline bg-surface p-4">
+<div class:list={['hourly-booking mt-6 border hairline bg-surface p-4 sm:p-5', className]}>
   <p class="mb-2 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
     Book by the hour · ${ratePerHour}/hr
   </p>
@@ -17,7 +18,7 @@ const options = links.map((url, i) => ({ hours: i + 1, price: (i + 1) * ratePerH
     <label for={`hours-${label}`} class="sr-only">Number of hours</label>
     <select
       id={`hours-${label}`}
-      class="hours-select appearance-none border hairline bg-sky px-3 py-2 text-sm text-star"
+      class="hours-select select-log"
     >
       {
         options.map(({ hours, price }) => (
@@ -29,7 +30,7 @@ const options = links.map((url, i) => ({ hours: i + 1, price: (i + 1) * ratePerH
     </select>
     <a
       href={links[0]}
-      class="book-link btn btn-solid grow !px-4 !py-2 !text-[0.6875rem]"
+      class="book-link btn btn-solid btn-sm grow"
       data-stripe-placeholder
       data-links={JSON.stringify(links)}
       aria-label={`${label}, select hours above first`}

@@ -68,24 +68,29 @@ const entries = [
     />
     {/* Legibility scrim, confined to the bottom text band so the rest of the photo shows at full brightness */}
     <div
-      class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-sky via-sky/50 to-transparent"
+      class="absolute inset-x-0 bottom-0 h-[58%] bg-gradient-to-t from-sky via-sky/72 to-transparent"
       aria-hidden="true"
     >
     </div>
 
-    <div class="relative mx-auto w-full max-w-7xl px-5 pb-16 pt-40 sm:px-8 sm:pb-20">
-      <p class="eyebrow">Field station · 51.0° N · Southern Alberta, Canada</p>
+    <div class="on-photo relative mx-auto w-full max-w-7xl px-5 pb-16 pt-40 sm:px-8 sm:pb-20">
+      {/* A local scrim, sized to the text: dust-orange at 11px sits on the galaxy's
+          own dust lane, where a page-wide gradient dark enough to carry it would
+          have cost the photograph most of its brightness. */}
+      <p class="eyebrow inline-block bg-sky/75 px-2.5 py-1 text-dust-bright backdrop-blur-sm">
+        Field station · 51.0° N · Southern Alberta, Canada
+      </p>
       <h1
-        class="mt-4 font-display uppercase leading-[1.05] [letter-spacing:0.14em] text-star text-[clamp(2.4rem,7.5vw,5.25rem)]"
+        class="mt-4 font-display uppercase leading-[1.05] [letter-spacing:0.14em] text-star text-[clamp(2.4rem,8vw,6.5rem)]"
       >
         Abdur&nbsp;Astro
       </h1>
-      <p class="mt-5 max-w-xl text-lg text-star/85">
-        Deep-sky astrophotography from the dark skies of Central&nbsp;Alberta
+      <p class="mt-5 max-w-xl text-lg text-star">
+        Deep-sky astrophotography from the dark skies of Southern&nbsp;Alberta
       </p>
       {
         heroPhoto && (
-          <p class="mt-8 font-mono text-[0.6875rem] uppercase [letter-spacing:0.08em] text-star/60">
+          <p class="mt-8 inline-block bg-sky/75 px-2.5 py-1 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-star backdrop-blur-sm">
             In frame: {heroPhoto.data.target} {heroPhoto.data.title}
             {heroPhoto.data.captured && ` · ${heroPhoto.data.captured}`}
           </p>
@@ -95,25 +100,29 @@ const entries = [
   </section>
 
   {/* Five entry points */}
-  <section class="mx-auto w-full max-w-7xl px-5 sm:px-8" aria-label="Explore the site">
+  <section class="mx-auto mt-16 w-full max-w-7xl px-5 sm:mt-20 sm:px-8" aria-label="Explore the site">
     <ul>
       {
         entries.map(({ n, href, title, text }) => (
           <li class="reveal border-b hairline first:border-t">
             <a
               href={href}
-              class="group grid grid-cols-[auto_1fr] items-baseline gap-x-6 gap-y-2 py-9 sm:grid-cols-[3.5rem_14rem_1fr_auto] sm:gap-x-8"
+              class="group grid grid-cols-[auto_1fr] items-baseline gap-x-6 gap-y-2 py-9 sm:grid-cols-[3.5rem_16rem_auto_minmax(0,1fr)] sm:gap-x-8"
             >
               <span class="font-mono text-[0.6875rem] text-dust">{n}</span>
               <h2 class="font-display text-3xl text-star transition-colors duration-200 group-hover:text-dust-bright sm:text-4xl">
                 {title}
               </h2>
-              <p class="col-span-2 max-w-md text-sm text-faint sm:col-span-1">{text}</p>
-              <span
-                class="hidden font-mono text-sm text-faint transition-all duration-200 group-hover:translate-x-1 group-hover:text-dust-bright sm:block"
-                aria-hidden="true"
-              >
-                →
+              {/* col-start-2 on mobile so the description aligns under the title
+                  rather than under the row number, which left a two-step rag. */}
+              <p class="col-start-2 max-w-md text-sm text-faint sm:col-start-3">{text}</p>
+              {/* A dotted leader carries the eye to the arrow. Pinned to the far
+                  right on its own, the arrow floated ~300px clear of the row. */}
+              <span class="hidden items-baseline sm:flex" aria-hidden="true">
+                <span class="log-leader" />
+                <span class="font-mono text-sm text-faint transition-all duration-200 group-hover:translate-x-1 group-hover:text-dust-bright">
+                  →
+                </span>
               </span>
             </a>
           </li>
@@ -124,14 +133,19 @@ const entries = [
 
   {/* Featured observations */}
   <section class="mx-auto mt-24 w-full max-w-7xl px-5 sm:px-8" aria-labelledby="featured-heading">
-    <div class="reveal flex items-baseline justify-between gap-4">
+    {/* items-end puts the link on the h2's baseline instead of the eyebrow's,
+        and the header stacks at phone width rather than squeezing both sides. */}
+    <div class="reveal flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
         <p class="eyebrow">From the archive</p>
         <h2 id="featured-heading" class="mt-3 font-display text-3xl sm:text-4xl">
           Recent images
         </h2>
       </div>
-      <a href="/gallery" class="link-quiet font-mono text-xs uppercase [letter-spacing:var(--tracking-log)]">
+      <a
+        href="/gallery"
+        class="link-quiet whitespace-nowrap font-mono text-xs uppercase [letter-spacing:var(--tracking-log)]"
+      >
         Full archive →
       </a>
     </div>
@@ -150,10 +164,14 @@ const entries = [
   <Testimonials limit={6} class="mx-auto mt-24 w-full max-w-7xl px-5 sm:px-8" />
 
   {/* Services teaser */}
-  <section class="mx-auto mt-28 w-full max-w-7xl px-5 sm:px-8" aria-labelledby="teaser-heading">
-    <div class="reveal grid gap-10 border-t hairline pt-14 lg:grid-cols-2">
-      <h2 id="teaser-heading" class="font-display text-3xl leading-snug sm:text-4xl">
-        The dark sky is the resource.<br />Learning to use it is the craft.
+  <section class="mx-auto mt-24 w-full max-w-7xl px-5 sm:px-8" aria-labelledby="teaser-heading">
+    <div class="reveal grid gap-10 border-t hairline pt-12 lg:grid-cols-2">
+      {/* Its own size tier: at text-4xl this closing statement was identical to
+          the two list headings above it. The break is desktop-only, since at
+          phone width it forced a four-line rag with one word on the last line. */}
+      <h2 id="teaser-heading" class="font-display text-4xl leading-snug sm:text-5xl lg:text-[3.25rem]">
+        The dark sky is the resource.{' '}
+        <br class="hidden sm:inline" />Learning to use it is the craft.
       </h2>
       <div class="max-w-lg">
         <p class="text-faint">
@@ -161,9 +179,9 @@ const entries = [
           equipment consulting and rentals for observers and businesses, public speaking for
           astronomy events, and private star parties in and around Southern Alberta.
         </p>
-        <div class="mt-7 flex flex-wrap gap-4">
-          <a href="/services" class="btn">View services</a>
-          <a href="/contact" class="btn btn-solid">Get in touch</a>
+        <div class="mt-7 grid grid-cols-1 gap-3 sm:flex sm:flex-wrap sm:gap-4">
+          <a href="/services" class="btn w-full sm:w-auto">View services</a>
+          <a href="/contact" class="btn btn-solid w-full sm:w-auto">Get in touch</a>
         </div>
       </div>
     </div>
