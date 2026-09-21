@@ -3,7 +3,13 @@ import { Image } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ObservationLog from '../../components/ObservationLog.astro';
-import { byDateDesc, filterNames, formatHours, totalHours } from '../../lib/photos';
+import {
+  byDateDesc,
+  filterNames,
+  formatHours,
+  isUnsplitIntegration,
+  totalHours,
+} from '../../lib/photos';
 
 export async function getStaticPaths() {
   const photos = (await getCollection('photos')).sort(byDateDesc);
@@ -30,13 +36,17 @@ const printFrom = print ? Math.min(...print.data.options.map((o) => o.price)) : 
 const total = totalHours(data.filters);
 const hours = formatHours(total);
 const locationPart = data.location?.split('·')[0]?.trim() ?? 'Southern Alberta';
+// A lone "Total" filter means the per-filter split is unknown, so it is not a
+// filter name to read out here or in the caption below.
+const filterPart = isUnsplitIntegration(data.filters) ? '' : filterNames(data.filters);
 const integrationPart =
-  total > 0 ? `${hours} hours of ${filterNames(data.filters).replaceAll(' · ', '/')} integration. ` : '';
+  total > 0
+    ? `${hours} hours of ${filterPart ? `${filterPart.replaceAll(' · ', '/')} ` : ''}integration. `
+    : '';
 const description = `${data.title} (${data.target}) photographed from ${locationPart}. ${integrationPart}Full acquisition log: telescope, camera, mount, filters and capture dates.`;
 
 const captionParts = [data.target];
 if (total > 0) captionParts.push(`${hours} h`);
-const filterPart = filterNames(data.filters);
 if (filterPart) captionParts.push(filterPart);
 if (data.captured) captionParts.push(data.captured);
 ---

@@ -61,15 +61,22 @@ const captureRows = [
         </div>
       ))
     }
-    <div class="log-row py-1.5">
-      <dt
-        class="shrink-0 text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint"
-      >
-        Position
-      </dt>
-      <span class="log-leader" aria-hidden="true"></span>
-      <dd class="text-right text-oiii">RA {data.ra} · Dec {data.dec}</dd>
-    </div>
+    {/* RA and Dec are separate rows: as one compound value they wrapped
+        mid-coordinate on phones, leaving the declination adrift from its label. */}
+    {
+      [
+        ['RA', data.ra],
+        ['Dec', data.dec],
+      ].map(([label, value]) => (
+        <div class="log-row py-1.5">
+          <dt class="shrink-0 text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+            {label}
+          </dt>
+          <span class="log-leader" aria-hidden="true" />
+          <dd class="text-oiii">{value}</dd>
+        </div>
+      ))
+    }
 
     {
       gearRows.length > 0 && (
