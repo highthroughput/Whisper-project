@@ -4,18 +4,21 @@ import { SITE } from '../config';
 interface Props {
   /** One Stripe Payment Link per hour, index 0 = 1 hour, for the paid session path. */
   hourlyLinks: [string, string, string, string, string];
+  /** Google Calendar Appointment Schedule for the free 15-minute intro. */
+  introCalendarLink: string;
+  /** One Appointment Schedule per hour, index 0 = 1 hour, for the paid session path. */
+  hourlyCalendarLinks: [string, string, string, string, string];
   ratePerHour: number;
   class?: string;
 }
-const { hourlyLinks, ratePerHour, class: className } = Astro.props;
-
-const GOOGLE_CALENDAR_LINK =
-  'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ1wzNCPpL-aEZ6LJwf68WjZ8paYbrhmZrqM3Jxy9a14BvZ-sQQ_J75vlf3rvE6275tlJGTk0jzP';
+const { hourlyLinks, introCalendarLink, hourlyCalendarLinks, ratePerHour, class: className } =
+  Astro.props;
 ---
 
 <div
   class:list={['consult-booking mt-6 max-w-md border hairline bg-surface p-4 sm:p-5', className]}
-  data-calendar-link={GOOGLE_CALENDAR_LINK}
+  data-intro-calendar-link={introCalendarLink}
+  data-hourly-calendar-links={JSON.stringify(hourlyCalendarLinks)}
   data-stripe-links={JSON.stringify(hourlyLinks)}
 >
   <p class="mb-1 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
@@ -125,7 +128,8 @@ const GOOGLE_CALENDAR_LINK =
   import { logToLeadSheet } from '../lib/leadSheet';
 
   document.querySelectorAll<HTMLElement>('.consult-booking').forEach((root) => {
-    const calendarLink = root.dataset.calendarLink ?? '';
+    const introCalendarLink = root.dataset.introCalendarLink ?? '';
+    const hourlyCalendarLinks = JSON.parse(root.dataset.hourlyCalendarLinks ?? '[]') as string[];
     const stripeLinks = JSON.parse(root.dataset.stripeLinks ?? '[]') as string[];
 
     const form = root.querySelector<HTMLFormElement>('#consult-lead-form');
@@ -163,10 +167,15 @@ const GOOGLE_CALENDAR_LINK =
 
     form.addEventListener('submit', (event) => {
       event.preventDefault();
-      if (!form.reportValidity() || !calendarLink) return;
+      if (!form.reportValidity()) return;
 
       const isPaid = currentMode() === 'paid';
       const hours = Number(hoursSelect?.value ?? 1);
+      const calendarLink = isPaid ? hourlyCalendarLinks[hours - 1] : introCalendarLink;
+      if (!calendarLink) {
+        if (status) status.textContent = 'Booking link is missing for this option. Please email instead.';
+        return;
+      }
 
       if (subjectInput) {
         subjectInput.value = isPaid

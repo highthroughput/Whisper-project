@@ -189,17 +189,21 @@ site's "ships across North America" copy), add your shipping rate, and (if
 registered) let Stripe Tax handle GST. Copy the `https://buy.stripe.com/…`
 URL over the matching placeholder token below.
 
-## Free consult call booking
+## Consult call booking
 
-Equipment consulting on `/services` has a free 15-minute pre-payment consult
-call: a lead-capture form (posts to Web3Forms) plus a "Book a time" button
-(`ConsultBooking.astro`), both on the same page so a visitor doesn't have to
-leave to reach either.
+Equipment consulting on `/services` (`ConsultBooking.astro`) offers two paths
+from one widget: a free 15-minute intro call, or a paid session booked by the
+hour. Either way, the lead-capture form (name, email, note; posts to Web3Forms
+and the lead Sheet, see below) is submitted first. The free path then opens a
+Google Calendar Appointment Schedule to book the call, nothing else. The paid
+path opens the matching hour's Appointment Schedule to book the call, then
+redirects to the matching hourly Stripe Payment Link.
 
-Set up a **Google Calendar Appointment Schedule** on the `abdurastro@gmail.com`
-account (Google Calendar → Create → Appointment schedule) for a 15-minute
-free consult event, then paste its public booking URL over the
-`GOOGLE_CALENDAR_BOOKING_LINK` placeholder token in `ConsultBooking.astro`.
+All six real Appointment Schedule URLs (intro + 1 through 5 hours, on the
+`abdurastro@gmail.com` account) are live in `src/pages/services.astro`
+(`CONSULTING_INTRO_CALENDAR_LINK`, `CONSULTING_HOUR_CALENDAR_LINKS`). To
+create more (a different service, a schedule change), Google Calendar →
+Create → Appointment schedule, then pass the resulting URL in as a prop.
 
 ## Replace before launch
 
@@ -255,9 +259,9 @@ of them in place — but do not launch until each box is checked.
       service).
 - [ ] Page prices match the amounts configured in Stripe (spot-check against
       the live dashboard before launch)
-- [ ] `GOOGLE_CALENDAR_BOOKING_LINK` placeholder in `ConsultBooking.astro`
-      needs the real Google Calendar Appointment Schedule URL for the free
-      15-minute consult call (see "Free consult call booking" above).
+- [x] All six consult-call Appointment Schedule links (free intro, 1 to 5
+      hours) are real and live in `src/pages/services.astro` (see "Consult
+      call booking" above).
 
 **Pricing model, decided:** the live 6-variant structure (3 sizes × 2 papers
 per print, $145/$185, $210/$260, $340/$410) is the correct one and is what

@@ -24,6 +24,18 @@ const CONSULTING_HOUR_LINKS: [string, string, string, string, string] = [
   'https://buy.stripe.com/cNidRbage9B38Nbafy3Nm0N',
 ];
 
+/** Google Calendar Appointment Schedule for the free 15-minute consult intro. */
+const CONSULTING_INTRO_CALENDAR_LINK =
+  'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ1wzNCPpL-aEZ6LJwf68WjZ8paYbrhmZrqM3Jxy9a14BvZ-sQQ_J75vlf3rvE6275tlJGTk0jzP';
+/** One Appointment Schedule per hour, index 0 = 1 hour, for the paid session path. */
+const CONSULTING_HOUR_CALENDAR_LINKS: [string, string, string, string, string] = [
+  'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2KQSlQGdNNuRF1WPBwcwv_0bpVmcocmgyBAeDgid-3RAzCtZBK6rGuMyFX3bTbmymVppmglUXw',
+  'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ1L7mYmPjRNn5iOI-HtLAekN2BTcRnxv4RLYUXl3E8NDH8pGJY1rDs4PYPMTchGwJVGwG69pUIg',
+  'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2utrLh9BHVcK7XsT8-7cYvCiVY7pcXmZn5WVudg85igQCA00xEcRImVn2zJ-i5lX4rSMM9EYYo',
+  'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ3Ss9J_A5C3wxBVQz04ZGPtp6IlbzfCUgFqCvpo3-cvzw5_ujvQHDB13KPPn1pZM61t0KvwZ0Lt',
+  'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ35uHG-KkmSGbNe-0BWWb5h58YsDdmyW8nXvrvoPaw0axWNH4gtAejaLUR_mQpCF064DIAce-tQ',
+];
+
 const photos = (await getCollection('photos')).sort(byDateDesc);
 const keyImage = photos.find((p) => p.id === 'veil-nebula')?.data.image;
 
@@ -140,7 +152,12 @@ const services = [
                 }
                 {
                   service.id === 'consulting' && (
-                    <ConsultBooking hourlyLinks={CONSULTING_HOUR_LINKS} ratePerHour={HOURLY_RATE} />
+                    <ConsultBooking
+                      hourlyLinks={CONSULTING_HOUR_LINKS}
+                      introCalendarLink={CONSULTING_INTRO_CALENDAR_LINK}
+                      hourlyCalendarLinks={CONSULTING_HOUR_CALENDAR_LINKS}
+                      ratePerHour={HOURLY_RATE}
+                    />
                   )
                 }
               </div>
