@@ -7,7 +7,6 @@ interface Rate {
   price: number;
   /** Nights the term covers, used to derive the return date from the pickup date. */
   nights: number;
-  stripeLink: string;
 }
 
 interface Props {
@@ -18,9 +17,13 @@ interface Props {
 const { rates, class: className } = Astro.props;
 ---
 
+{/* data-rates carries only what the script needs. A payment link in the markup
+    would let someone pay before their dates were approved, which is the whole
+    point of requesting first. */}
 <section
   class:list={['rental-booking border hairline bg-surface', className]}
-  data-rates={JSON.stringify(rates)}
+  data-rates={JSON.stringify(rates.map(({ term, price, nights }) => ({ term, price, nights })))}
+  data-email={SITE.email}
   aria-labelledby="rental-booking-heading"
 >
   <header
@@ -134,7 +137,7 @@ const { rates, class: className } = Astro.props;
       </div>
 
       <button type="submit" class="btn btn-solid btn-sm w-full" data-submit-label>
-        Reserve and pay →
+        Request these dates →
       </button>
       <p
         data-status
@@ -144,7 +147,8 @@ const { rates, class: className } = Astro.props;
       >
       </p>
       <p class="text-xs leading-relaxed text-faint">
-        Your dates go on the calendar when we confirm by email, usually within a day.
+        Nothing is charged here. We check the scope is free for your dates and email you a
+        payment link, usually within a day.
       </p>
     </form>
   </div>
@@ -163,10 +167,11 @@ const { rates, class: className } = Astro.props;
 <script>
   import { logToLeadSheet } from '../lib/leadSheet';
 
-  type Rate = { term: string; detail: string; price: number; nights: number; stripeLink: string };
+  type Rate = { term: string; price: number; nights: number };
 
   document.querySelectorAll<HTMLElement>('.rental-booking').forEach((root) => {
     const rates = JSON.parse(root.dataset.rates ?? '[]') as Rate[];
+    const contactEmail = root.dataset.email ?? '';
     const form = root.querySelector<HTMLFormElement>('#rental-form');
     const terms = [...root.querySelectorAll<HTMLInputElement>('[data-term]')];
     const pickup = root.querySelector<HTMLInputElement>('[data-pickup]');
@@ -211,7 +216,8 @@ const { rates, class: className } = Astro.props;
       } else if (returnRow) {
         returnRow.hidden = true;
       }
-      if (submitLabel) submitLabel.textContent = `Reserve ${rate.term.toLowerCase()} · $${rate.price} →`;
+      // "Request", not "Reserve": nothing is held or charged at this step.
+      if (submitLabel) submitLabel.textContent = `Request ${rate.term.toLowerCase()} · $${rate.price} →`;
     };
 
     terms.forEach((t) => t.addEventListener('change', update));
@@ -243,24 +249,30 @@ const { rates, class: className } = Astro.props;
       field('reference')!.value = reference;
 
       submitButton.disabled = true;
-      if (status) status.textContent = 'Sending your dates…';
+      if (status) status.textContent = 'Sending your request…';
 
       const formData = new FormData(form);
       logToLeadSheet(form);
-
-      const email = (form.querySelector<HTMLInputElement>('#rental-email')?.value ?? '').trim();
-      const checkout = new URL(rate.stripeLink);
-      checkout.searchParams.set('client_reference_id', reference);
-      if (email) checkout.searchParams.set('prefilled_email', email);
 
       fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { Accept: 'application/json' },
         body: formData,
       })
-        .catch(() => {})
+        .then((res) => {
+          if (!res.ok) throw new Error(String(res.status));
+          form.reset();
+          update();
+          if (status)
+            status.textContent = `Request sent (${reference}). We'll confirm the dates and email you a payment link.`;
+        })
+        .catch(() => {
+          if (status)
+            status.textContent =
+              `That did not send. Please email ${contactEmail} with your dates.`;
+        })
         .finally(() => {
-          window.location.href = checkout.toString();
+          submitButton.disabled = false;
         });
     });
   });
