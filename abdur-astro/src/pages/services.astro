@@ -66,6 +66,14 @@ const services = [
     topic: 'starparty',
     title: 'Private star parties',
     mode: 'In and around Southern Alberta',
+    // The only block with no video or photo to anchor its column, so it carries
+    // a spec panel instead. Every row restates something in the copy below.
+    specs: [
+      ['Where', 'Your acreage, campground, lodge, or venue'],
+      ['Good for', 'Family gatherings, camps, team retreats, weddings'],
+      ['I bring', 'Telescopes, eyepieces, and the guided tour'],
+      ['Weather', 'A call the day before, plus a backup date'],
+    ] as [string, string][],
     body: `Some of the best skies in Canada are an easy drive from Calgary, and a telescope changes what an evening outdoors can be. I bring the equipment and the sky-knowledge to your acreage, campground, lodge, or event for a guided tour of the night sky by eye and by telescope: the Moon's terminator, planets, star clusters, and the same nebulae that hang in this gallery. Star parties in Southern Alberta work for family gatherings, camps, team retreats, and weddings; every booking includes a weather call the day before and a backup date, because Alberta.`,
   },
 ];
@@ -141,6 +149,25 @@ const services = [
                       />
                     </div>
                   </div>
+                )}
+                {'specs' in service && service.specs && (
+                  <section class="border hairline bg-surface" aria-label={`What ${service.title.toLowerCase()} include`}>
+                    <header class="border-b hairline px-5 py-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)]">
+                      <h3 class="text-faint">What a night looks like</h3>
+                    </header>
+                    {/* Stacked rather than leader-ruled: these values are phrases,
+                        and right-aligning them across a leader orphans the last word. */}
+                    <dl class="py-2 font-mono text-[0.8125rem]">
+                      {service.specs.map(([label, value], row) => (
+                        <div class:list={['px-5 py-3', row > 0 && 'border-t hairline']}>
+                          <dt class="text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+                            {label}
+                          </dt>
+                          <dd class="mt-1.5 leading-relaxed text-star">{value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </section>
                 )}
                 {service.id === 'tutorials' && (
                   <HourlyBooking
