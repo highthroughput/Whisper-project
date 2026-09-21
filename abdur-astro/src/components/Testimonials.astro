@@ -18,12 +18,20 @@ const testimonials = (await getCollection('testimonials'))
     <section class:list={['reveal', className]} aria-labelledby="testimonials-heading">
       <p class="eyebrow">Word of mouth</p>
       <h2 id="testimonials-heading" class="mt-3 font-display text-3xl sm:text-4xl">
-        What people say
+        From students and buyers
       </h2>
 
-      {/* The quote absorbs the slack so every card's attribution sits on the same
-          baseline, whether or not that reviewer listed strengths. */}
-      <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {/* The track count follows the number of quotes: at three columns, two
+          testimonials leave a third of the row empty and read as a gap rather
+          than a layout. The quote absorbs the slack so every card's attribution
+          sits on the same baseline. */}
+      <div
+        class:list={[
+          'mt-10 grid gap-6',
+          testimonials.length === 1 ? 'max-w-xl' : 'sm:grid-cols-2',
+          testimonials.length >= 3 && 'lg:grid-cols-3',
+        ]}
+      >
         {testimonials.map(({ data, body }) => (
           <figure class="flex flex-col border hairline bg-surface p-6">
             <div class="flex text-dust" aria-label={`${data.rating} out of 5 stars`}>
@@ -45,16 +53,9 @@ const testimonials = (await getCollection('testimonials'))
             <blockquote class="mt-4 flex-1 text-sm leading-relaxed text-star/85">
               "{body?.trim()}"
             </blockquote>
-            <div class="mt-6">
-              <figcaption class="font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
-                {data.author}
-              </figcaption>
-              {data.strengths && data.strengths.length > 0 && (
-                <p class="mt-2 font-mono text-[0.6875rem] text-faint">
-                  <span class="text-dust">Notable</span> {data.strengths.join(' · ')}
-                </p>
-              )}
-            </div>
+            <figcaption class="mt-6 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+              {data.author}
+            </figcaption>
           </figure>
         ))}
       </div>

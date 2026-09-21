@@ -171,14 +171,18 @@ Shown on the home page, newest first, via the `<Testimonials />` component.
    ---
    author: 'Jane'
    date: 2026-10-01
-   rating: 5                            # 1–5, defaults to 5
-   strengths: ['Pricing', 'Communication'] # optional — Facebook Marketplace's tags
+   rating: 5     # 1–5, defaults to 5
    ---
 
    The quote itself, verbatim.
    ```
 
 2. `npm run dev` — it's on the home page. Done.
+
+The grid follows the count: one quote runs on its own, two sit side by side,
+three or more fill three columns. Keep quotes about the teaching or the
+photographs. A review of the transaction ("packaged well", "fast shipping")
+belongs on the marketplace listing, since here it reads as a used-gear ad.
 
 ## Stripe Payment Links
 
@@ -278,7 +282,26 @@ live pricing.
 - [ ] Send a test message from the deployed site and confirm it arrives
 - [x] The fallback email named in `src/scripts/contact-form.ts` matches the real one
 
-### 5. Email, socials, domain
+### 5. Footer signup
+
+- [ ] The free Siril + Seestar processing guide itself. Put the file in
+      `public/` and set `newsletter.guideUrl` in `src/config.ts`. Until that is
+      set the footer shows the old newsletter pitch instead, so the site never
+      offers a download that does not exist.
+- [ ] A real mailing list. Signups currently POST to Web3Forms, which emails
+      them, and to the lead sheet. Neither can send a broadcast or deliver the
+      guide automatically, so today this is a list of addresses that someone
+      has to mail by hand. Kit and MailerLite both have a free tier that covers
+      this; connecting one means pointing the form at their endpoint and
+      matching their field names.
+
+### 6. Testimonials
+
+- [ ] Replace the two remaining quotes with print and tutorial reviews as they
+      come in. The four marketplace reviews were removed: they reviewed the
+      sale rather than the work, and one was about a used microscope.
+
+### 7. Email, socials, domain
 
 - [x] Domain: `site` in `astro.config.mjs` and the `Sitemap:` line in
       `public/robots.txt` are set to `https://abdurastro.com` — change only if

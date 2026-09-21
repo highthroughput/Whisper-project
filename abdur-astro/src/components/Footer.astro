@@ -3,6 +3,28 @@ import { SITE } from '../config';
 import SocialLinks from './SocialLinks.astro';
 
 const year = new Date().getFullYear();
+
+/**
+ * The footer makes one of two offers. With a guide to give away it is a lead
+ * magnet; without one it falls back to the plain newsletter, because a
+ * download promised in the copy has to exist when the form succeeds.
+ */
+const guide = SITE.newsletter.guideUrl;
+const offer = guide
+  ? {
+      heading: 'Free guide: processing your first deep-sky image',
+      body: 'A walkthrough of stacking and stretching a Seestar or DSLR set in Siril, from raw subs to a finished frame. Sent to your inbox, plus the occasional new photograph or star party.',
+      label: 'Processing guide request',
+      cta: 'Send it',
+      success: 'Thank you. Your guide is ready below.',
+    }
+  : {
+      heading: 'New image released. Next dark-sky weekend.',
+      body: 'An occasional email when a new photograph or print drops, or a star party opens up nearby. No spam, unsubscribe anytime.',
+      label: 'Newsletter signup',
+      cta: 'Join',
+      success: "You're on the list, thank you.",
+    };
 ---
 
 <footer class="mt-24 border-t hairline">
@@ -16,11 +38,8 @@ const year = new Date().getFullYear();
 
     <div class="reveal mt-10 flex flex-col gap-5 border hairline bg-surface p-6 sm:flex-row sm:items-center sm:justify-between sm:p-7">
       <div>
-        <h2 class="font-display text-xl">New image released. Next dark-sky weekend.</h2>
-        <p class="mt-1.5 max-w-md text-sm text-faint">
-          An occasional email when a new photograph or print drops, or a star party opens up
-          nearby. No spam, unsubscribe anytime.
-        </p>
+        <h2 class="font-display text-xl">{offer.heading}</h2>
+        <p class="mt-1.5 max-w-md text-sm text-faint">{offer.body}</p>
       </div>
       <div class="w-full shrink-0 sm:w-auto">
         <form
@@ -30,10 +49,10 @@ const year = new Date().getFullYear();
           class="flex w-full gap-2 sm:w-auto"
         >
           <input type="hidden" name="access_key" value={SITE.web3formsKey} />
-          <input type="hidden" name="subject" value="New newsletter signup · Abdur Astro" />
-          <input type="hidden" name="from_name" value="Abdur Astro newsletter signup" />
-          <input type="hidden" name="message" value="New newsletter signup from the site footer." />
-          <input type="hidden" name="form" value="Newsletter signup" />
+          <input type="hidden" name="subject" value={`${offer.label} · Abdur Astro`} />
+          <input type="hidden" name="from_name" value={`Abdur Astro ${offer.label.toLowerCase()}`} />
+          <input type="hidden" name="message" value={`${offer.label} from the site footer.`} />
+          <input type="hidden" name="form" value={offer.label} />
           {/* Web3Forms honeypot — hidden from people, filled by bots */}
           <input
             type="checkbox"
@@ -54,7 +73,7 @@ const year = new Date().getFullYear();
             class="w-full min-w-0 flex-1 border field-edge bg-sky px-3 py-2.5 text-sm text-star placeholder:text-faint sm:w-56 sm:flex-none"
           />
           <button type="submit" class="btn btn-solid btn-sm shrink-0">
-            Join
+            {offer.cta}
           </button>
         </form>
         <p
@@ -62,6 +81,8 @@ const year = new Date().getFullYear();
           class="mt-2 font-mono text-[0.6875rem] text-faint"
           role="status"
           aria-live="polite"
+          data-guide-url={SITE.newsletter.guideUrl || undefined}
+          data-success={offer.success}
         >
         </p>
       </div>

@@ -26,6 +26,24 @@ export const SITE = {
 
   web3formsKey: '53ec3c86-9b83-4d21-898a-f083a4706887',
 
+  /**
+   * Footer signup. Set `guideUrl` to the free Siril + Seestar processing guide
+   * and the footer switches from a general newsletter pitch to offering the
+   * guide in exchange for an email. While it is empty the footer keeps the
+   * newsletter copy, so the site never promises a download that isn't there.
+   *
+   * PLACEHOLDER: no guide file exists yet. Drop it in `public/` (or use a
+   * hosted URL) and set the path here.
+   *
+   * NOTE: submissions currently go to Web3Forms, which emails them, and to the
+   * lead sheet below. That is a record of signups, not a mailing list: nothing
+   * here can send a broadcast or an automated delivery. Connecting Kit or
+   * MailerLite is listed in README "Replace before launch".
+   */
+  newsletter: {
+    guideUrl: '',
+  },
+
   /** Google Apps Script Web App that logs every form submission to a lead-capture Google Sheet. */
   leadSheetWebhook:
     'https://script.google.com/macros/s/AKfycbxL0anvH5TP99RPXLD3oDZYR8-mEF8n1Pg7naXcEzjBdv2GgDngOPv8zvd90rJNBcg/exec',

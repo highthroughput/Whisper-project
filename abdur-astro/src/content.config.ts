@@ -111,9 +111,12 @@ const events = defineCollection({
 });
 
 /**
- * Customer testimonials, sourced from Facebook Marketplace reviews.
- * Adding one = one markdown file in src/content/testimonials/ with the quote
- * as the body. See "Adding a new testimonial" in README.md.
+ * Testimonials from people Abdur has taught or sold to. Adding one = one
+ * markdown file in src/content/testimonials/ with the quote as the body.
+ * See "Adding a new testimonial" in README.md.
+ *
+ * Quotes about the transaction rather than the work ("packaged well", "fast
+ * shipping") belong on the marketplace listing, not here.
  */
 const testimonials = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/testimonials' }),
@@ -122,8 +125,6 @@ const testimonials = defineCollection({
     date: z.coerce.date(),
     rating: z.number().min(1).max(5).default(5),
     source: z.string().default('Facebook Marketplace'),
-    /** Notable strengths tagged by the reviewer, e.g. ['Pricing', 'Communication']. */
-    strengths: z.array(z.string()).optional(),
   }),
 });
 
