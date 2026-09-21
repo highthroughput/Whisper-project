@@ -3,38 +3,46 @@ import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import portrait from '../assets/photos/portrait.jpg';
 
+// Affiliate referral suffix, defined once so the inventory links and the
+// retailer list below can never drift apart. Verified against live product
+// pages: the param survives redirects and fires Refersion's click endpoint.
+const HPS_REF = 'rfsn=7861335.596f7c';
+/** High Point Scientific product link carrying the referral. Slugs have no
+    query string of their own, so '?' is always the right joiner here. */
+const hps = (slug: string) => `https://www.highpointscientific.com/${slug}?${HPS_REF}`;
+
 const gear = [
   {
     group: 'Optics',
     items: [
       ['Obsession 18″ f/4.5', 'truss Dobsonian · visual light bucket'],
-      ['Celestron EdgeHD 11″', 'f/10 SCT · deep-sky imaging'],
-      ['Celestron EdgeHD 8″', 'f/10 SCT · deep-sky imaging'],
-      ['Askar FRA300 Quintuplet', 'apo refractor · widefield imaging'],
+      ['Celestron EdgeHD 11″', 'f/10 SCT · deep-sky imaging', hps('celestron-edge-hd-11-f-10-aplanatic-sct-ota-with-edge-hd-optics-91050-xlt')],
+      ['Celestron EdgeHD 8″', 'f/10 SCT · deep-sky imaging', hps('celestron-edgehd-8-ota-8-quot-f-10-aplanatic-sct-ota-cge-dovetail-91030-xlt')],
+      ['Askar FRA300 Quintuplet', 'apo refractor · widefield imaging', hps('askar-60-mm-f5-quintuplet-flat-field-astrograph-fra300pro')],
       ['SVBONY SV545 Petzval', 'apo refractor · widefield imaging'],
-      ['Seestar S30 Pro', 'smart compact telescope · grab-and-go'],
+      ['Seestar S30 Pro', 'smart compact telescope · grab-and-go', hps('zwo-seestar-s30-pro-smart-telescope')],
     ],
   },
   {
     group: 'Camera',
     items: [
-      ['ZWO ASI294MM Pro', 'cooled mono · Four Thirds'],
+      ['ZWO ASI294MM Pro', 'cooled mono · Four Thirds', hps('zwo-asi294mm-pro-monochrome-cooled-camera-asi294mm-p')],
       ['Sony IMX410', 'full-frame CMOS sensor'],
-      ['ZWO ASI2600MC Duo', 'cooled colour · built-in guide camera'],
+      ['ZWO ASI2600MC Duo', 'cooled colour · built-in guide camera', hps('zwo-asi2600mc-duo-built-in-dual-sensor-astronomy-camera')],
     ],
   },
   {
     group: 'Mount',
     items: [
-      ['iOptron CEM70', 'center-balanced equatorial mount'],
-      ['iOptron HAE69', 'harmonic drive equatorial mount'],
-      ['ZWO AM3', 'harmonic drive · portable'],
+      ['iOptron CEM70', 'center-balanced equatorial mount', hps('ioptron-cem70-center-balanced-equatorial-mount-c70a')],
+      ['iOptron HAE69', 'harmonic drive equatorial mount', hps('ioptron-hae69c-az-eq-mount')],
+      ['ZWO AM3', 'harmonic drive · portable', hps('zwo-am3-harmonic-drive-equatorial-mount-am3n-2025')],
     ],
   },
   {
     group: 'Filters',
     items: [
-      ['Astronomik LRGBSHO', 'LRGB & Ha · OIII · SII narrowband set'],
+      ['Astronomik LRGBSHO', 'LRGB & Ha · OIII · SII narrowband set', hps('brands/astronomik-filters/lrgb-filters')],
       ['Various duo-band filters', 'narrowband imaging under light pollution'],
     ],
   },
@@ -140,9 +148,22 @@ const retailers = [
                 <dt class="text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
                   {group}
                 </dt>
-                {items.map(([name, note]) => (
+                {items.map(([name, note, url]) => (
                   <dd class="mt-2 flex flex-col sm:flex-row sm:items-baseline">
-                    <span class="text-star">{name}</span>
+                    {/* A dotted underline marks which rows are links: half the
+                        inventory is not, and text-star alone made them identical. */}
+                    {url ? (
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="sponsored nofollow noopener noreferrer"
+                        class="text-star underline decoration-star/25 decoration-dotted underline-offset-4 transition-colors duration-150 hover:text-dust-bright hover:decoration-dust-bright"
+                      >
+                        {name}
+                      </a>
+                    ) : (
+                      <span class="text-star">{name}</span>
+                    )}
                     <span class="log-leader hidden sm:block" aria-hidden="true" />
                     <span class="text-faint sm:text-right">{note}</span>
                   </dd>
@@ -151,6 +172,11 @@ const retailers = [
             ))
           }
         </dl>
+        <p class="border-t hairline px-5 py-3 text-xs leading-relaxed text-faint">
+          Linked items go to High Point Scientific through an affiliate link. Using one costs
+          nothing extra and helps fund the next review. Items with no link are bought direct or
+          are free software.
+        </p>
       </section>
 
       {/* Retailer links from the YouTube gear reviews, disclosed plainly rather than run as a shop banner */}
