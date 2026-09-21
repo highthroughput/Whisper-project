@@ -82,36 +82,40 @@ const included = [
           </p>
         </div>
 
+        {/* What you get, then the handoff terms: both answer questions the
+            booking form would otherwise raise, so they read before it. One
+            wrapper sets the width for both: `max-w-prose` is 65ch, so each
+            block would resolve it against its own font size and leave three
+            different right edges running down the column. */}
+        <div class="mt-10 max-w-[32.5rem]">
+          <section class="reveal border hairline bg-surface" aria-labelledby="included-heading">
+            <header class="border-b hairline px-5 py-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+              <h2 id="included-heading">Included with every rental</h2>
+            </header>
+            {/* Two columns from tablet width up: seven short entries stacked
+                single-file left most of the panel empty. */}
+            <ul class="px-5 py-4 text-sm text-star/85 sm:columns-2 sm:gap-x-8">
+              {
+                included.map((item) => (
+                  <li class="flex break-inside-avoid items-baseline gap-2 py-1">
+                    <span class="text-dust" aria-hidden="true">·</span>
+                    {item}
+                  </li>
+                ))
+              }
+            </ul>
+          </section>
 
+          <p class="mt-6 text-xs leading-relaxed text-faint">
+            Pickup and return around Southern Alberta. Every handoff includes a walkthrough of
+            the scope and accessories.{' '}
+            <a href="/contact?topic=rentals" class="link-quiet">Questions or a custom date range?</a>
+          </p>
+        </div>
       </div>
 
       <div class="lg:sticky lg:top-24 lg:self-start">
-        {/* What you get, then the request for it: the kit list answers the
-            question the form would otherwise raise. */}
-        <section class="reveal border hairline bg-surface" aria-labelledby="included-heading">
-          <header class="border-b hairline px-5 py-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
-            <h2 id="included-heading">Included with every rental</h2>
-          </header>
-          <ul class="px-5 py-4 text-sm text-star/85">
-            {
-              included.map((item) => (
-                <li class="flex items-baseline gap-2 py-1">
-                  <span class="text-dust" aria-hidden="true">·</span>
-                  {item}
-                </li>
-              ))
-            }
-          </ul>
-        </section>
-
-        <p class="mt-6 text-xs leading-relaxed text-faint">
-          Pickup and return around Southern Alberta. Every handoff includes a walkthrough of the
-          scope and accessories.{' '}
-          <a href="/contact?topic=rentals" class="link-quiet">Questions or a custom date range?</a>
-        </p>
-
-        <RentalBooking rates={rates} class="mt-6" />
-
+        <RentalBooking rates={rates} />
       </div>
     </div>
   </article>
