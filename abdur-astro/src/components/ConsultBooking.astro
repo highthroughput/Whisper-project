@@ -52,7 +52,7 @@ const freeCopy = `A quick call to see if ${fitSubject} is the right fit. No cost
   {/* Segmented hairline chips rather than native radios: in a dark colour scheme
       an unchecked radio renders as a bright filled disc and a checked one as a
       thin ring, so the unselected option reads as the selected one. */}
-  <fieldset class="mt-4 grid grid-cols-2 items-stretch gap-2 border-0 p-0">
+  <fieldset class="js-only mt-4 grid grid-cols-2 items-stretch gap-2 border-0 p-0">
     <legend class="sr-only">Call type for {service}</legend>
     <div>
       <input
@@ -79,7 +79,7 @@ const freeCopy = `A quick call to see if ${fitSubject} is the right fit. No cost
     </div>
   </fieldset>
 
-  <div data-paid-only class="mt-3 hidden">
+  <div data-paid-only class="js-only mt-3 hidden">
     <label for={`${id}-hours`} class="sr-only">Number of hours</label>
     <select id={`${id}-hours`} class="hours-select select-log w-full">
       {
@@ -96,7 +96,7 @@ const freeCopy = `A quick call to see if ${fitSubject} is the right fit. No cost
     id={`${id}-lead-form`}
     data-lead-form
     aria-label={`Book ${service}`}
-    class="mt-4 space-y-3"
+    class="js-only mt-4 space-y-3"
     action="https://api.web3forms.com/submit"
     method="POST"
   >
@@ -163,6 +163,22 @@ const freeCopy = `A quick call to see if ${fitSubject} is the right fit. No cost
       Open the booking calendar →
     </a>
   </form>
+
+  {/* The script is what opens the calendar and hands off to payment, so without
+      it the form would take someone's details and tell them they had booked a
+      call that was never scheduled. Send them straight to the calendar instead,
+      which needs no JavaScript of ours. */}
+  <noscript>
+    <p class="mt-3 text-sm text-star/85">
+      Booking needs JavaScript. You can still{' '}
+      <a href={introCalendarLink} target="_blank" rel="noopener noreferrer" class="link-quiet">
+        pick a time for a free 15-minute intro
+      </a>{' '}
+      or email{' '}
+      <a href={`mailto:${SITE.email}`} class="link-quiet">{SITE.email}</a> to arrange a paid
+      session.
+    </p>
+  </noscript>
 </div>
 
 <script>
