@@ -138,14 +138,9 @@ const services = [
                     </div>
                   )
                 }
-                {service.id === 'consulting' && <ConsultBooking />}
                 {
                   service.id === 'consulting' && (
-                    <HourlyBooking
-                      links={CONSULTING_HOUR_LINKS}
-                      ratePerHour={HOURLY_RATE}
-                      label="Book consulting"
-                    />
+                    <ConsultBooking hourlyLinks={CONSULTING_HOUR_LINKS} ratePerHour={HOURLY_RATE} />
                   )
                 }
               </div>
