@@ -84,7 +84,7 @@ if (data.captured) captionParts.push(data.captured);
       {captionParts.join(' · ')}
     </p>
 
-    <div class="mt-14 grid gap-12 lg:grid-cols-[1fr_minmax(22rem,26rem)] lg:gap-16">
+    <div class="mt-14 grid gap-12 lg:grid-cols-[1fr_minmax(22rem,26rem)] lg:content-start lg:gap-16">
       <div>
         <div
           class="reveal max-w-prose text-star/85 leading-relaxed [&_p]:mb-5 [&_p:last-child]:mb-0"
@@ -92,22 +92,33 @@ if (data.captured) captionParts.push(data.captured);
           <Content />
         </div>
 
-        {
-          print && (
-            <aside class="reveal mt-12 border hairline p-6 sm:p-7" aria-label="Print availability">
-              <p class="eyebrow">In the print shop</p>
-              <p class="mt-3 text-star">
-                This observation is available as an archival giclée print, from ${printFrom} CAD.
-              </p>
-              <a href={`/prints/${print.id}`} class="btn mt-5">
-                View print options
-              </a>
-            </aside>
-          )
-        }
       </div>
 
-      <ObservationLog photo={photo} number={number} class="reveal h-fit lg:sticky lg:top-8" />
+      {/* The log comes before the print box in source so it leads on mobile.
+          Pinned to column two across both rows, desktop is unchanged: copy
+          top-left, print box beneath it, log down the right rail. */}
+      <ObservationLog
+        photo={photo}
+        number={number}
+        class="reveal h-fit lg:sticky lg:top-8 lg:col-start-2 lg:row-span-2 lg:row-start-1"
+      />
+
+      {
+        print && (
+          <aside
+            class="reveal border hairline p-6 sm:p-7 lg:col-start-1 lg:row-start-2"
+            aria-label="Print availability"
+          >
+            <p class="eyebrow">In the print shop</p>
+            <p class="mt-3 text-star">
+              This observation is available as an archival giclée print, from ${printFrom} CAD.
+            </p>
+            <a href={`/prints/${print.id}`} class="btn mt-5">
+              View print options
+            </a>
+          </aside>
+        )
+      }
     </div>
 
     <nav
