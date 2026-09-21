@@ -19,6 +19,21 @@ const photo = data.photo ? photos.find((p) => p.id === data.photo) : undefined;
 
 const from = Math.min(...data.options.map((o) => o.price));
 
+// The framed piece leads: it is what someone is buying. The artwork follows.
+const slides = [
+  ...(data.lifestyleImage
+    ? [
+        {
+          kind: 'framed' as const,
+          src: data.lifestyleImage,
+          alt: data.lifestyleAlt ?? `${data.title} print, framed and hung on a wall.`,
+          label: 'The print, framed',
+        },
+      ]
+    : []),
+  { kind: 'artwork' as const, src: data.image, alt: data.alt, label: 'The photograph' },
+];
+
 
 const canonical = new URL(cleanPathname(Astro.url.pathname), Astro.site).href;
 const description = `${data.title} fine art print: archival giclée astrophotography from Alberta on matte or baryta cotton papers, ${data.options[0].size} to ${data.options[data.options.length - 1].size}, from $${from} CAD. Ships across North America.`;
@@ -55,57 +70,83 @@ const productSchema = {
 >
   <article class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
     <div class="grid gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(22rem,5fr)] lg:gap-16">
-      {/* The framed piece first, because that is what someone is buying, then
-          the photograph itself at full size. Prints without a framed photo show
-          the artwork alone, as before. */}
-      <div class="space-y-8">
+      {/* One image at a time, swiped. Native CSS scroll-snap does the swiping,
+          so it works on a phone with no JavaScript at all; the dots and the
+          arrows are enhancement layered on top. */}
+      <div class="print-gallery">
+        <ul
+          data-track
+          tabindex="0"
+          role="group"
+          aria-label={`${data.title} images`}
+          class="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {
+            slides.map((slide, i) => (
+              <li class="w-full shrink-0 snap-center">
+                <figure>
+                  <div class="border hairline bg-surface p-4 sm:p-5">
+                    <Image
+                      src={slide.src}
+                      alt={slide.alt}
+                      widths={[640, 1080, 1600, 2200]}
+                      sizes="(min-width: 1024px) 55vw, 100vw"
+                      quality={80}
+                      loading={i === 0 ? 'eager' : 'lazy'}
+                      fetchpriority={i === 0 ? 'high' : undefined}
+                      class="w-full object-contain"
+                    />
+                  </div>
+                  <figcaption class="mt-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+                    {slide.kind === 'artwork' && photo ? (
+                      <>
+                        {photo.data.target}
+                        {photo.data.captured && ` · ${photo.data.captured}`} ·{' '}
+                        <a href={`/gallery/${photo.id}`} class="link-quiet normal-case">
+                          View the observation log →
+                        </a>
+                      </>
+                    ) : (
+                      slide.label
+                    )}
+                  </figcaption>
+                </figure>
+              </li>
+            ))
+          }
+        </ul>
+
         {
-          data.lifestyleImage && (
-            <figure>
-              <div class="border hairline bg-surface p-4 sm:p-5">
-                <Image
-                  src={data.lifestyleImage}
-                  alt={data.lifestyleAlt ?? `${data.title} print, framed and hung on a wall.`}
-                  widths={[640, 1080, 1600, 2200]}
-                  sizes="(min-width: 1024px) 55vw, 100vw"
-                  quality={80}
-                  loading="eager"
-                  fetchpriority="high"
-                  class="w-full object-contain"
-                />
+          slides.length > 1 && (
+            /* Dots and arrows are script-driven; without it the track still
+               swipes natively, so dead controls are hidden rather than shown. */
+            <div class="js-only mt-4 flex items-center justify-between gap-4">
+              <div class="flex gap-2" data-dots>
+                {slides.map((slide, i) => (
+                  <button
+                    type="button"
+                    data-dot
+                    data-index={i}
+                    aria-label={`Show ${slide.label.toLowerCase()}`}
+                    class="h-2.5 w-2.5 rounded-full border border-star/40 transition-colors duration-200"
+                  />
+                ))}
               </div>
-              <figcaption class="eyebrow mt-3 text-faint">The print, framed</figcaption>
-            </figure>
+              <div class="flex gap-2">
+                <button type="button" data-prev class="lb-control static h-9 w-9 disabled:cursor-not-allowed disabled:opacity-35" aria-label="Previous image">
+                  <svg width="16" height="12" viewBox="0 0 18 14" aria-hidden="true">
+                    <path d="M8 1L2 7l6 6M2 7h15" stroke="currentColor" stroke-width="1.5" fill="none" />
+                  </svg>
+                </button>
+                <button type="button" data-next class="lb-control static h-9 w-9 disabled:cursor-not-allowed disabled:opacity-35" aria-label="Next image">
+                  <svg width="16" height="12" viewBox="0 0 18 14" aria-hidden="true">
+                    <path d="M10 1l6 6-6 6M16 7H1" stroke="currentColor" stroke-width="1.5" fill="none" />
+                  </svg>
+                </button>
+              </div>
+            </div>
           )
         }
-
-        <figure>
-          <div class="border hairline bg-surface p-4 sm:p-5">
-            <Image
-              src={data.image}
-              alt={data.alt}
-              widths={[640, 1080, 1600, 2200]}
-              sizes="(min-width: 1024px) 55vw, 100vw"
-              quality={80}
-              loading={data.lifestyleImage ? 'lazy' : 'eager'}
-              fetchpriority={data.lifestyleImage ? undefined : 'high'}
-              class="w-full object-contain"
-            />
-          </div>
-          <figcaption class="mt-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
-            {photo ? (
-              <>
-                {photo.data.target}
-                {photo.data.captured && ` · ${photo.data.captured}`} ·{' '}
-                <a href={`/gallery/${photo.id}`} class="link-quiet normal-case">
-                  View the observation log →
-                </a>
-              </>
-            ) : (
-              'The photograph'
-            )}
-          </figcaption>
-        </figure>
       </div>
 
       <div>
@@ -143,3 +184,44 @@ const productSchema = {
     </div>
   </article>
 </Base>
+<script>
+  document.querySelectorAll<HTMLElement>('.print-gallery').forEach((gallery) => {
+    const track = gallery.querySelector<HTMLElement>('[data-track]');
+    const dots = [...gallery.querySelectorAll<HTMLButtonElement>('[data-dot]')];
+    const prev = gallery.querySelector<HTMLButtonElement>('[data-prev]');
+    const next = gallery.querySelector<HTMLButtonElement>('[data-next]');
+    if (!track || dots.length < 2) return;
+
+    const slides = [...track.children] as HTMLElement[];
+    const activeDot = 'bg-dust border-dust';
+
+    // Derived from scroll position, not from a counter, so it stays correct
+    // however the slide changed: swipe, dot, arrow, keyboard or trackpad.
+    const currentIndex = () =>
+      Math.round(track.scrollLeft / (track.scrollWidth / slides.length));
+
+    const sync = () => {
+      const i = Math.min(Math.max(currentIndex(), 0), slides.length - 1);
+      dots.forEach((dot, n) => {
+        dot.classList.toggle('bg-dust', n === i);
+        dot.classList.toggle('border-dust', n === i);
+        dot.setAttribute('aria-current', n === i ? 'true' : 'false');
+      });
+      if (prev) prev.disabled = i === 0;
+      if (next) next.disabled = i === slides.length - 1;
+    };
+
+    const goTo = (i: number) => {
+      const clamped = Math.min(Math.max(i, 0), slides.length - 1);
+      track.scrollTo({ left: slides[clamped].offsetLeft - track.offsetLeft, behavior: 'smooth' });
+    };
+
+    dots.forEach((dot) => dot.addEventListener('click', () => goTo(Number(dot.dataset.index))));
+    prev?.addEventListener('click', () => goTo(currentIndex() - 1));
+    next?.addEventListener('click', () => goTo(currentIndex() + 1));
+    track.addEventListener('scroll', () => requestAnimationFrame(sync), { passive: true });
+    window.addEventListener('resize', sync);
+    sync();
+  });
+</script>
+
