@@ -75,4 +75,29 @@ const keyImage = prints[0]?.data.image;
       </div>
     </div>
   </section>
+  <div
+    hidden
+    data-print-list={JSON.stringify(
+      prints.map((print) => ({
+        id: print.id,
+        name: `${print.data.title} print`,
+        category: 'print',
+        value: Math.min(...print.data.options.map((o) => o.price)),
+      })),
+    )}
+  />
 </Base>
+
+<script>
+  import { viewItemList, type TrackedItem } from '../../lib/track';
+
+  // An index, not a place to buy: GA4 gets the list, Meta doesn't get a
+  // product view (each print page sends its own).
+  const el = document.querySelector<HTMLElement>('[data-print-list]');
+  try {
+    viewItemList('Prints', JSON.parse(el?.dataset.printList ?? '[]') as TrackedItem[]);
+  } catch {
+    /* malformed data: skip the event rather than break the page */
+  }
+</script>
+

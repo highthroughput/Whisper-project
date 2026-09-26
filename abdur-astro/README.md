@@ -208,8 +208,15 @@ empty, no tag code ships at all. Each piece switches on independently:
 
 What fires where:
 
+- **Every page** (all 13 templates share `Base.astro`, and there is no
+  client-side routing): one page view to each configured tag, plus a Meta
+  Contact / GA4 `contact` event whenever the email address is clicked.
 - **Print pages**: view on load (at the "from" price), checkout when Buy is
   clicked (at the size and paper actually chosen).
+- **Prints index**: a GA4 item list of every print. No Meta product view,
+  since nothing is bought there; each print page sends its own.
+- **Rentals** and **Services**: a product view on load (from $20; tutorials and
+  consulting at one hour), since that's where they are bought.
 - **Rentals / paid sessions**: checkout at the hand-off to Stripe. A paid
   session whose booking tab was blocked never reaches Stripe, so it isn't counted.
 - **Free intro call, contact form, email sign-up**: lead, on success.

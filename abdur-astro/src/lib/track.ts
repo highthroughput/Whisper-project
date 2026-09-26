@@ -107,6 +107,41 @@ export function viewItem(item: TrackedItem): void {
 }
 
 /**
+ * A page listing several things for sale. GA4 gets the list; Meta only gets
+ * ViewContent where something can be bought on the page itself (`buyable`),
+ * so its product-view audiences don't fill up with people who only browsed
+ * an index.
+ */
+export function viewItemList(listName: string, items: TrackedItem[], buyable = false): void {
+  if (!items.length) return;
+  if (buyable) {
+    window.fbq?.('track', 'ViewContent', {
+      content_ids: items.map((i) => i.id),
+      content_type: 'product',
+      content_name: listName,
+    });
+  }
+  window.gtag?.('event', 'view_item_list', {
+    item_list_name: listName,
+    items: items.map(ga4Item),
+  });
+}
+
+/**
+ * Clicks on the email address anywhere on the site, reported as Meta's
+ * standard Contact event. Delegated once from the layout, so links added
+ * later are covered too.
+ */
+export function watchContactLinks(): void {
+  document.addEventListener('click', (event) => {
+    const link = (event.target as Element | null)?.closest?.('a[href^="mailto:"]');
+    if (!link) return;
+    window.fbq?.('track', 'Contact');
+    window.gtag?.('event', 'contact', { method: 'email' });
+  });
+}
+
+/**
  * The visitor is being handed to Stripe. Also remembers what they chose, so
  * the thank-you page can still value the sale if Stripe's redirect doesn't
  * name the link (e.g. a redirect set by hand without `link=`).

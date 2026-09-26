@@ -212,3 +212,20 @@ const services = [
     </p>
   </section>
 </Base>
+
+<script>
+  import { viewItemList } from '../lib/track';
+
+  // Tutorials and consulting are bought on this page, so it counts as their
+  // product view. Values are one hour, the "from" price.
+  const rate = Number(document.querySelector<HTMLElement>('.consult-booking')?.dataset.rate ?? 0);
+  viewItemList(
+    'Services',
+    [
+      { id: 'tutorial', name: 'One-on-one tutorial', variant: '1 hour', category: 'tutorial', value: rate },
+      { id: 'consulting', name: 'Equipment consulting', variant: '1 hour', category: 'consulting', value: rate },
+    ],
+    true,
+  );
+</script>
+

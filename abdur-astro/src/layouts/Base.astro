@@ -149,5 +149,9 @@ const jsonLd = [localBusiness, ...schema];
     <Footer />
     <ConsentBanner />
     <script src="../scripts/enhance.ts"></script>
+    <script>
+      import { watchContactLinks } from '../lib/track';
+      watchContactLinks();
+    </script>
   </body>
 </html>

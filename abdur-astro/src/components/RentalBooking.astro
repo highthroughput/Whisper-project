@@ -199,7 +199,7 @@ const longest = Math.max(...rates.map((r) => r.nights));
 
 <script>
   import { logToLeadSheet } from '../lib/leadSheet';
-  import { beginCheckout } from '../lib/track';
+  import { beginCheckout, viewItem } from '../lib/track';
 
   type Rate = { term: string; nights: number; detail: string; price: number; stripeLink: string };
 
@@ -304,6 +304,18 @@ const longest = Math.max(...rates.map((r) => r.nights));
       el.addEventListener('input', update);
     });
     update();
+
+    // The rental's product view, at the cheapest rate: the "from" price, the
+    // same convention the print pages use.
+    if (rates[0]) {
+      viewItem({
+        id: 'scope-rental',
+        name: 'Sky-Watcher 10″ Dobsonian rental',
+        variant: rates[0].term,
+        category: 'rental',
+        value: rates[0].price,
+      });
+    }
 
     form.addEventListener('submit', (event) => {
       event.preventDefault();
