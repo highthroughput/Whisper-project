@@ -15,6 +15,10 @@ const usesMeta = Boolean(t.metaPixelId.trim());
 const usesGoogle = Boolean(t.ga4Id.trim() || t.googleAdsId.trim());
 const measuring = usesMeta || usesGoogle;
 const tools = [usesMeta && 'the Meta Pixel', usesGoogle && 'the Google tag'].filter(Boolean).join(' and ');
+const optIn = t.consent === 'opt-in';
+// Google is always a processor (Sheets for form copies, Calendar for booking);
+// Meta only when its pixel is actually configured.
+const processors = ['Stripe', 'Google', usesMeta && 'Meta', 'Web3Forms'].filter(Boolean).join(', ');
 const updated = 'September 26, 2026';
 ---
 
@@ -74,16 +78,20 @@ const updated = 'September 26, 2026';
                 No form contents, card details or addresses are sent to either.
               </p>
               <p class="mt-3">
-                You can turn this off for this browser below. If your browser sends a Global
-                Privacy Control signal, it is already off.
+                {optIn
+                  ? 'Nothing loads unless you turn it on, here or in the banner, and you can turn it back off at any time.'
+                  : 'You can turn this off for this browser below.'}{' '}
+                If your browser sends a Global Privacy Control signal, or blocks site storage, it
+                stays off.
               </p>
               <div class="mt-5 border hairline bg-surface p-5" data-tracking-control>
                 <p class="font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
                   Ad measurement on this browser
                 </p>
-                <p class="mt-2 text-sm" data-tracking-state>
-                  Checking…
-                </p>
+                {/* Empty until the script fills it, so a no-JS visitor sees only
+                    the noscript line rather than a status that never resolves.
+                    role="status" announces the result of pressing the button. */}
+                <p class="mt-2 text-sm" data-tracking-state role="status" />
                 <button type="button" class="btn btn-sm mt-4" data-tracking-toggle hidden />
                 <noscript>
                   <p class="mt-2 text-sm text-faint">
@@ -123,8 +131,8 @@ const updated = 'September 26, 2026';
       <section aria-labelledby="p-where">
         <h2 id="p-where" class="font-display text-2xl text-star">Where it's handled</h2>
         <p class="mt-3">
-          Stripe, Google, Meta, Web3Forms and Cloudflare, which hosts the site, may process and
-          store information outside Canada, including in the United States, under their own
+          {processors} and Cloudflare, which hosts the site, may process and store information
+          outside Canada, including in the United States, under their own
           privacy policies. Nothing is sold, and nothing is shared beyond what these services
           need to do their part.
         </p>
@@ -149,11 +157,11 @@ const updated = 'September 26, 2026';
   const box = document.querySelector<HTMLElement>('[data-tracking-control]');
   const state = box?.querySelector<HTMLElement>('[data-tracking-state]');
   const toggle = box?.querySelector<HTMLButtonElement>('[data-tracking-toggle]');
-  const gpc = (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true;
-  const consentMode = (window as Window & { aaTrackingConsent?: string }).aaTrackingConsent ?? 'opt-out';
+  const gpc = navigator.globalPrivacyControl === true;
+  const consentMode = window.aaTrackingConsent ?? 'opt-out';
 
   const isOn = () => {
-    if (gpc) return false;
+    if (gpc || window.aaStorageBlocked) return false;
     const choice = trackingChoice();
     return consentMode === 'opt-in' ? choice === 'on' : choice !== 'off';
   };
@@ -165,6 +173,11 @@ const updated = 'September 26, 2026';
       toggle.hidden = true;
       return;
     }
+    if (window.aaStorageBlocked) {
+      state.textContent = 'Off. This browser blocks site storage, so none of these tools load.';
+      toggle.hidden = true;
+      return;
+    }
     const on = isOn();
     state.textContent = on ? 'On.' : 'Off. None of these tools load on this browser.';
     toggle.textContent = on ? 'Turn it off' : 'Turn it on';
@@ -173,12 +186,20 @@ const updated = 'September 26, 2026';
 
   toggle?.addEventListener('click', () => {
     const turningOn = !isOn();
-    setTrackingChoice(turningOn ? 'on' : 'off');
-    if (turningOn) (window as Window & { aaLoadTracking?: () => void }).aaLoadTracking?.();
+    const saved = setTrackingChoice(turningOn ? 'on' : 'off');
+    if (!saved) {
+      if (state) state.textContent = "This browser wouldn't save the choice, so it can't be changed here.";
+      return;
+    }
+    if (turningOn) window.aaLoadTracking?.();
+    else window.aaStopTracking?.();
     render();
-    // Tags that already loaded on this page can't be unloaded; the choice
-    // applies from the next page onward, which the message says.
-    if (!turningOn && state) state.textContent = 'Off from the next page you open. Nothing new is sent.';
+    // The site's own events stop at once, but a tag already loaded on this
+    // page can't be fully unloaded, so the message only promises the rest
+    // from the next page.
+    if (!turningOn && state) {
+      state.textContent = "Off. This site's events stop now, and the tools won't load from the next page.";
+    }
   });
 
   render();

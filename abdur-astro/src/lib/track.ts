@@ -35,6 +35,15 @@ declare global {
     fbq?: (...args: unknown[]) => void;
     gtag?: (...args: unknown[]) => void;
     aaAds?: AdsConfig;
+    aaTrackingLoaded?: boolean;
+    aaTrackingOff?: boolean;
+    aaTrackingConsent?: 'opt-out' | 'opt-in';
+    aaStorageBlocked?: boolean;
+    aaLoadTracking?: () => void;
+    aaStopTracking?: () => void;
+  }
+  interface Navigator {
+    globalPrivacyControl?: boolean;
   }
 }
 
@@ -78,6 +87,18 @@ const store = {
   },
 };
 
+/**
+ * Whether the site may send an event right now. Checked on every call, not
+ * just at page load: a visitor who turns measurement off on /privacy, or in
+ * another tab, stops being measured from their next click, not their next page.
+ */
+export function trackingActive(): boolean {
+  if (!window.aaTrackingLoaded || window.aaTrackingOff) return false;
+  if (navigator.globalPrivacyControl === true) return false;
+  const choice = trackingChoice();
+  return window.aaTrackingConsent === 'opt-in' ? choice === 'on' : choice !== 'off';
+}
+
 const metaParams = (item: TrackedItem) => ({
   content_ids: [item.id],
   content_type: 'product',
@@ -98,6 +119,7 @@ const ga4Item = (item: TrackedItem) => ({
 
 /** A product page was viewed. */
 export function viewItem(item: TrackedItem): void {
+  if (!trackingActive()) return;
   window.fbq?.('track', 'ViewContent', metaParams(item));
   window.gtag?.('event', 'view_item', {
     currency: CURRENCY,
@@ -113,7 +135,7 @@ export function viewItem(item: TrackedItem): void {
  * an index.
  */
 export function viewItemList(listName: string, items: TrackedItem[], buyable = false): void {
-  if (!items.length) return;
+  if (!items.length || !trackingActive()) return;
   if (buyable) {
     window.fbq?.('track', 'ViewContent', {
       content_ids: items.map((i) => i.id),
@@ -135,7 +157,7 @@ export function viewItemList(listName: string, items: TrackedItem[], buyable = f
 export function watchContactLinks(): void {
   document.addEventListener('click', (event) => {
     const link = (event.target as Element | null)?.closest?.('a[href^="mailto:"]');
-    if (!link) return;
+    if (!link || !trackingActive()) return;
     window.fbq?.('track', 'Contact');
     window.gtag?.('event', 'contact', { method: 'email' });
   });
@@ -147,17 +169,21 @@ export function watchContactLinks(): void {
  * name the link (e.g. a redirect set by hand without `link=`).
  */
 export function beginCheckout(item: TrackedItem, stripeUrl: string): void {
+  // Remembered whether or not measurement is on: it only lets the thank-you
+  // page name the order, and never leaves the browser.
+  store.set(PENDING_KEY, JSON.stringify({ ...item, link: linkId(stripeUrl), at: Date.now() }));
+  if (!trackingActive()) return;
   window.fbq?.('track', 'InitiateCheckout', { ...metaParams(item), num_items: 1 });
   window.gtag?.('event', 'begin_checkout', {
     currency: CURRENCY,
     value: item.value,
     items: [ga4Item(item)],
   });
-  store.set(PENDING_KEY, JSON.stringify({ ...item, link: linkId(stripeUrl), at: Date.now() }));
 }
 
 /** A form that starts a conversation succeeded (newsletter, contact, free intro). */
 export function lead(source: string, category?: string): void {
+  if (!trackingActive()) return;
   window.fbq?.('track', 'Lead', { content_name: source, content_category: category });
   window.gtag?.('event', 'generate_lead', { lead_source: source });
   const ads = window.aaAds;
@@ -172,6 +198,7 @@ export function lead(source: string, category?: string): void {
  * session is counted once.
  */
 export function purchase(item: TrackedItem, transactionId: string): void {
+  if (!trackingActive()) return;
   window.fbq?.(
     'track',
     'Purchase',
@@ -232,6 +259,8 @@ export function trackingChoice(): 'on' | 'off' | null {
   const v = store.get(TRACKING_CHOICE_KEY);
   return v === 'on' || v === 'off' ? v : null;
 }
-export function setTrackingChoice(choice: 'on' | 'off'): void {
+/** Saves the choice; false if this browser wouldn't store it. */
+export function setTrackingChoice(choice: 'on' | 'off'): boolean {
   store.set(TRACKING_CHOICE_KEY, choice);
+  return store.get(TRACKING_CHOICE_KEY) === choice;
 }

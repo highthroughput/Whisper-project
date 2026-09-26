@@ -16,7 +16,7 @@ const catalog = Object.fromEntries((await getCheckoutCatalog()).map((entry) => [
 
 <Base
   title="Thank you"
-  description="Your payment to Abdur Astro went through. Your receipt is on its way from Stripe."
+  description="Your payment to Abdur Astro went through."
   noindex
 >
   <section class="mx-auto flex w-full max-w-7xl flex-col items-start px-5 pt-24 sm:px-8 sm:pt-32">
@@ -27,43 +27,45 @@ const catalog = Object.fromEntries((await getCheckoutCatalog()).map((entry) => [
 
     {/* One message per kind of purchase; the script reveals the matching one.
         The general message is the no-JS and unknown-link fallback. */}
-    <div class="mt-6 max-w-xl space-y-4 text-faint">
-      <div data-thanks="general">
+    <div class="mt-6 max-w-xl text-faint">
+      <div data-thanks="general" class="space-y-4">
         <p>
-          Your payment went through, and Stripe has emailed your receipt. If anything about the
-          order needs a word, reply to that email or write to{' '}
+          Your payment went through, and Stripe emails your receipt. If anything about the order
+          needs a word, write to{' '}
           <a href={`mailto:${SITE.email}`} class="link-quiet">{SITE.email}</a>.
         </p>
       </div>
-      <div data-thanks="print" hidden>
+      <div data-thanks="print" class="space-y-4" hidden>
         <p>
           Your print goes into production now. It ships rolled in a rigid tube with its
           certificate of authenticity, 7 to 10 business days from today, and tracking follows by
           email when it leaves.
         </p>
         <p>
-          Stripe has emailed your receipt. Questions about the order:{' '}
+          Stripe emails your receipt. Questions about the order:{' '}
           <a href={`mailto:${SITE.email}`} class="link-quiet">{SITE.email}</a>.
         </p>
       </div>
-      <div data-thanks="rental" hidden>
+      <div data-thanks="rental" class="space-y-4" hidden>
         <p>
           Your scope is booked. Expect an email within a day confirming your dates and where to
           meet for the pickup walkthrough. Clear skies for the first night out.
         </p>
         <p>
-          Stripe has emailed your receipt. Need to change the dates? Write to{' '}
+          Stripe emails your receipt. Need to change the dates? Write to{' '}
           <a href={`mailto:${SITE.email}`} class="link-quiet">{SITE.email}</a>.
         </p>
       </div>
-      <div data-thanks="session" hidden>
+      <div data-thanks="session" class="space-y-4" hidden>
         <p>
-          Your session is paid. The calendar invite from your booking has the time and the video
-          link; bring your questions, and your data if it's a processing session.
+          Your session is paid. If you picked a time, your calendar invite has it, with the call
+          link for an online session or the meeting details for one in person. Didn't get to pick
+          a time? Write to <a href={`mailto:${SITE.email}`} class="link-quiet">{SITE.email}</a>{' '}
+          and we'll set one up.
         </p>
         <p>
-          Stripe has emailed your receipt. Need to move the time? Use the link in the invite or
-          write to <a href={`mailto:${SITE.email}`} class="link-quiet">{SITE.email}</a>.
+          Stripe emails your receipt. Need to move the time? Use the link in the invite, or email
+          the address above.
         </p>
       </div>
     </div>
@@ -84,7 +86,13 @@ const catalog = Object.fromEntries((await getCheckoutCatalog()).map((entry) => [
 </Base>
 
 <script>
-  import { claimPurchase, purchase, takePendingCheckout, type TrackedItem } from '../lib/track';
+  import {
+    claimPurchase,
+    purchase,
+    takePendingCheckout,
+    trackingActive,
+    type TrackedItem,
+  } from '../lib/track';
 
   type Entry = TrackedItem & { link: string };
 
@@ -127,7 +135,14 @@ const catalog = Object.fromEntries((await getCheckoutCatalog()).map((entry) => [
 
   // Only a real Checkout Session id counts, and only once per browser: a
   // refresh, a bookmark or a hand-typed visit to this page reports nothing.
-  if (item && /^cs_(live|test)_[A-Za-z0-9]+$/.test(session) && claimPurchase(session)) {
+  // The session is claimed only when the purchase can actually be sent, so
+  // in opt-in mode a buyer who allows measurement on this page (the banner
+  // is still up) is counted when they click Allow, not lost.
+  const report = () => {
+    if (!item || !/^cs_(live|test)_[A-Za-z0-9]+$/.test(session)) return;
+    if (!trackingActive() || !claimPurchase(session)) return;
     purchase(item, session);
-  }
+  };
+  if (window.aaTrackingLoaded) report();
+  else window.addEventListener('aa:tracking-loaded', report, { once: true });
 </script>

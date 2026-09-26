@@ -240,18 +240,47 @@ redirects to `/thank-you?link=<link id>&session_id={CHECKOUT_SESSION_ID}`.
 Re-run it after creating any new Payment Link. Without this step, customers
 land on Stripe's own confirmation page and no purchase is recorded.
 
+`--apply` first saves each link's previous after-payment setting to
+`stripe-redirects-backup-<time>.json` (git-ignored). The dry run flags any link
+with a custom confirmation message, since the redirect replaces it; move
+anything a buyer needs from that message onto `/thank-you` first.
+
+### Dashboard settings to match
+
+The code handles most of this itself; these keep the platforms consistent
+with what the site and `/privacy` say.
+
+- **Stripe → Settings → Business → Customer emails**: turn on *Successful
+  payments*. `/thank-you` tells buyers Stripe emails their receipt. Under
+  *Public details*, set the support email to `info@abdurastro.com`.
+- **Meta Events Manager → the pixel → Settings**: leave *Automatic advanced
+  matching* off. The site already sets `autoConfig` off before `init`, so
+  email fields aren't read either way; this keeps the setting and the code
+  in agreement.
+- **Google tag settings**: leave *user-provided data collection* and
+  *automatic enhanced conversions* off, for the same reason.
+- **GA4 → Admin → Data streams → web stream → Configure tag settings → List
+  unwanted referrals**: add a "domain ends with" `stripe.com` rule. The site
+  already sends `ignore_referrer` when a visitor comes back from Stripe; the
+  rule covers anything the code can't see.
+
 ### Consent
 
 `consent: 'opt-out'` (the default) loads the tags unless a visitor turns
 measurement off on `/privacy`; `'opt-in'` shows a banner and loads nothing
-until they allow it. Either way, a browser sending Global Privacy Control
-never loads them. `/privacy` describes exactly the tags that are configured.
+until they allow it. Either way, a browser sending Global Privacy Control, or
+blocking site storage (where an opt-out couldn't be saved), never loads them.
+Turning measurement off stops the site's own events at once and silences the
+tags on that page; the Back button can't bring a measured page back after an
+opt-out. `/privacy` describes exactly the tags that are configured.
 
 ### Limits
 
 - Values are list prices. A promotion code used at Stripe's checkout isn't
   visible to a static site, so a discounted sale reports its full price;
-  Stripe's dashboard is the revenue record.
+  Stripe's dashboard is the revenue record. For a sale that runs ads, put
+  the sale price on its own Payment Link (and in the print's frontmatter,
+  then re-run the redirect script) so every event carries the real amount.
 - An ad blocker or a browser that clears storage mid-checkout can hide a sale.
   Expect the ad platforms to show a little less than Stripe does.
 

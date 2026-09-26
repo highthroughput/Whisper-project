@@ -142,12 +142,14 @@ const jsonLd = [localBusiness, ...schema];
     >
       Skip to content
     </a>
+    {/* Fixed to the viewport, so its place in the DOM only sets tab and
+        reading order: early, right after the skip link. */}
+    <ConsentBanner />
     <Header overlay={overlayHeader} />
     <main id="main" class="flex-1">
       <slot />
     </main>
     <Footer />
-    <ConsentBanner />
     <script src="../scripts/enhance.ts"></script>
     <script>
       import { watchContactLinks } from '../lib/track';

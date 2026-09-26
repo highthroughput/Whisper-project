@@ -216,6 +216,9 @@ const freeCopy = `A quick call to see if ${fitSubject} is the right fit. No cost
     if (!form || !submitButton) return;
 
     const currentMode = () => [...radios].find((r) => r.checked)?.value ?? 'free';
+    // A blocked booking tab leaves the form filled for a retry; the retry is
+    // the same lead, so it's reported once until the form is actually reset.
+    let leadSent = false;
 
     const updateUI = () => {
       const isPaid = currentMode() === 'paid';
@@ -281,7 +284,8 @@ const freeCopy = `A quick call to see if ${fitSubject} is the right fit. No cost
       // booking tab stops the hand-off below, so it isn't reported as one.
       const stripeUrl = stripeLinks[hours - 1];
       if (!isPaid) {
-        lead(`Free ${service} intro`, category);
+        if (!leadSent) lead(`Free ${service} intro`, category);
+        leadSent = true;
       } else if (bookingTab && stripeUrl) {
         beginCheckout(
           {
@@ -327,6 +331,7 @@ const freeCopy = `A quick call to see if ${fitSubject} is the right fit. No cost
             return;
           }
           form.reset();
+          leadSent = false;
           updateUI();
           submitButton.disabled = false;
           if (status) status.textContent = "Got it. We'll see you on the call.";

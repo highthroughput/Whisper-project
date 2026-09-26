@@ -14,14 +14,18 @@
  *
  * A restricted key needs only "Payment Links: Write". Links on the account
  * that the site doesn't use are listed and left alone. Re-running is safe:
- * links already pointing at the right URL are skipped.
+ * links already pointing at the right URL are skipped. Before changing
+ * anything, --apply saves every affected link's current after-payment
+ * setting to stripe-redirects-backup-<timestamp>.json, including any custom
+ * confirmation message, which the redirect replaces.
  *
  * Options:
  *   --apply           actually update the links (default is a dry run)
  *   --site <origin>   default https://abdurastro.com
  */
-import { readdir, readFile } from 'node:fs/promises';
+import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const API = process.env.STRIPE_API_BASE ?? 'https://api.stripe.com';
 const KEY = process.env.STRIPE_SECRET_KEY;
@@ -29,7 +33,9 @@ const args = process.argv.slice(2);
 const APPLY = args.includes('--apply');
 const siteArg = args.indexOf('--site');
 const SITE = (siteArg >= 0 ? args[siteArg + 1] : 'https://abdurastro.com').replace(/\/+$/, '');
-const DIST = new URL('../dist/', import.meta.url).pathname;
+// fileURLToPath, not .pathname: a checkout path with a space or a non-ASCII
+// character would otherwise stay percent-encoded and never be found.
+const DIST = fileURLToPath(new URL('../dist/', import.meta.url));
 
 if (!KEY) {
   console.error('Set STRIPE_SECRET_KEY (a restricted key with Payment Links: Write is enough).');
@@ -53,8 +59,8 @@ async function siteLinkIds() {
   let files;
   try {
     files = await htmlFiles(DIST);
-  } catch {
-    console.error(`No build found at ${DIST}. Run \`npm run build\` first.`);
+  } catch (err) {
+    console.error(`No build found at ${DIST} (${err.code ?? err.message}). Run \`npm run build\` first.`);
     process.exit(1);
   }
   const ids = new Set();
@@ -124,14 +130,33 @@ if (untouched.length) {
   console.log(`\n${untouched.length} active link(s) on the account aren't on the site and will be left alone:`);
   for (const l of untouched) console.log(`  ${l.url}`);
 }
+const messageOf = (link) => link.after_completion?.hosted_confirmation?.custom_message ?? null;
+const withMessages = toUpdate.filter((u) => messageOf(u.link));
 for (const u of toUpdate) {
   console.log(`\n${u.link.url}\n  now:  ${u.now ?? `(${u.link.after_completion?.type ?? 'default'} confirmation page)`}\n  new:  ${u.want}`);
+  if (messageOf(u.link)) console.log(`  note: its confirmation message will no longer show: "${messageOf(u.link)}"`);
+}
+if (withMessages.length) {
+  console.log(`\n${withMessages.length} link(s) have a custom confirmation message that the redirect replaces.`);
+  console.log('Anything a buyer needs from it (pickup details, next steps) should be on /thank-you first.');
 }
 
 if (!APPLY) {
   console.log(toUpdate.length ? '\nDry run. Re-run with --apply to make these changes.' : '\nNothing to do.');
   process.exit(0);
 }
+
+// A record of what each link did before, so any of them can be put back.
+const backup = `stripe-redirects-backup-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+await writeFile(
+  backup,
+  JSON.stringify(
+    toUpdate.map((u) => ({ id: u.link.id, url: u.link.url, after_completion: u.link.after_completion })),
+    null,
+    2,
+  ),
+);
+console.log(`\nSaved the current settings of ${toUpdate.length} link(s) to ${backup}`);
 
 let ok = 0;
 for (const u of toUpdate) {

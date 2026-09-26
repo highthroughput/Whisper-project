@@ -7,7 +7,12 @@
  * - `opt-out` mode loads them unless the visitor turned measurement off on
  *   /privacy (stored as aa:tracking = "off");
  * - `opt-in` mode loads them only after the consent banner is accepted;
- * - a browser sending Global Privacy Control never loads them.
+ * - a browser sending Global Privacy Control never loads them;
+ * - a browser that blocks site storage never loads them either, since an
+ *   opt-out couldn't be saved there.
+ * Turning measurement off on /privacy also silences the tags already running
+ * on that page (window.aaStopTracking), and a page restored from the
+ * back/forward cache after an opt-out is reloaded so the gate runs again.
  */
 import { SITE } from '../config';
 
@@ -42,7 +47,14 @@ const enabled = Boolean(aaConfig.metaPixelId || aaConfig.ga4Id || aaConfig.adsId
       window.aaTrackingConsent = aaConfig.consent;
 
       window.aaLoadTracking = function () {
-        if (window.aaTrackingLoaded) return;
+        window.aaTrackingOff = false;
+        if (window.aaTrackingLoaded) {
+          // Already on this page and switched off earlier: switch back on.
+          if (window.fbq) window.fbq('consent', 'grant');
+          if (aaConfig.ga4Id) window['ga-disable-' + aaConfig.ga4Id] = false;
+          if (aaConfig.adsId) window['ga-disable-' + aaConfig.adsId] = false;
+          return;
+        }
         window.aaTrackingLoaded = true;
 
         if (aaConfig.adsId) {
@@ -71,6 +83,11 @@ const enabled = Boolean(aaConfig.metaPixelId || aaConfig.ga4Id || aaConfig.adsId
             s = b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t, s);
           })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+          // autoConfig off, before init: no automatic button-click events and
+          // no automatic advanced matching, which reads email fields on the
+          // page. Only the events this site sends explicitly go to Meta, which
+          // is what /privacy promises.
+          window.fbq('set', 'autoConfig', false, aaConfig.metaPixelId);
           window.fbq('init', aaConfig.metaPixelId);
           window.fbq('track', 'PageView');
         }
@@ -86,18 +103,59 @@ const enabled = Boolean(aaConfig.metaPixelId || aaConfig.ga4Id || aaConfig.adsId
           g.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(tagId);
           document.head.appendChild(g);
           window.gtag('js', new Date());
-          if (aaConfig.ga4Id) window.gtag('config', aaConfig.ga4Id);
+          // Arriving back from Stripe's checkout would otherwise start a new
+          // "checkout.stripe.com / referral" session in GA4 and take the
+          // sale's credit from the ad or post that brought the buyer. The key
+          // is only set when it applies: GA4 treats any value, false
+          // included, as "ignore".
+          var refHost = '';
+          try {
+            refHost = new URL(document.referrer).hostname;
+          } catch (e) {}
+          var gaConfig = /(^|\.)stripe\.com$/.test(refHost) ? { ignore_referrer: true } : {};
+          if (aaConfig.ga4Id) window.gtag('config', aaConfig.ga4Id, gaConfig);
           if (aaConfig.adsId) window.gtag('config', aaConfig.adsId);
         }
+
+        try {
+          window.dispatchEvent(new Event('aa:tracking-loaded'));
+        } catch (e) {}
       };
 
-      var choice = null;
-      try {
-        choice = localStorage.getItem('aa:tracking');
-      } catch (e) {}
-      var gpc = navigator.globalPrivacyControl === true;
-      var allowed = !gpc && (aaConfig.consent === 'opt-in' ? choice === 'on' : choice !== 'off');
-      if (allowed) window.aaLoadTracking();
+      // Turning measurement off mid-page: stop the site's own events and ask
+      // both tags to stand down. Full unloading waits for the next page.
+      window.aaStopTracking = function () {
+        window.aaTrackingOff = true;
+        if (window.fbq) window.fbq('consent', 'revoke');
+        if (aaConfig.ga4Id) window['ga-disable-' + aaConfig.ga4Id] = true;
+        if (aaConfig.adsId) window['ga-disable-' + aaConfig.adsId] = true;
+      };
+
+      var readAllowed = function () {
+        var choice = null;
+        var storageOk = true;
+        try {
+          choice = localStorage.getItem('aa:tracking');
+        } catch (e) {
+          storageOk = false;
+        }
+        window.aaStorageBlocked = !storageOk;
+        var gpc = navigator.globalPrivacyControl === true;
+        return (
+          storageOk && !gpc && (aaConfig.consent === 'opt-in' ? choice === 'on' : choice !== 'off')
+        );
+      };
+
+      // Registered before either tag's library loads, so it runs first: a
+      // page brought back by the Back button after an opt-out is reloaded
+      // (and the gate re-run) before the Pixel can send its restore PageView.
+      addEventListener('pageshow', function (e) {
+        if (!e.persisted || !window.aaTrackingLoaded || readAllowed()) return;
+        e.stopImmediatePropagation();
+        location.reload();
+      });
+
+      if (readAllowed()) window.aaLoadTracking();
     </script>
   )
 }

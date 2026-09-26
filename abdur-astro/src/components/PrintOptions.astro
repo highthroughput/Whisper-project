@@ -153,9 +153,18 @@ const initial = options[0];
 
     // Read the choice at click time, not from update(): the href is what
     // Stripe will actually charge, so the event reports that option.
-    buy.addEventListener('click', () => {
+    const onBuy = () => {
       const chosen = options.find((o) => o.stripeLink === buy.getAttribute('href'));
       if (chosen) beginCheckout(asItem(chosen), chosen.stripeLink);
+    };
+    // detail > 1 is the second click of a double-click: same checkout. A
+    // keyboard Enter has detail 0 and still counts. A middle-click opens
+    // Stripe in a new tab and only fires auxclick.
+    buy.addEventListener('click', (event) => {
+      if (event.detail <= 1) onBuy();
+    });
+    buy.addEventListener('auxclick', (event) => {
+      if (event.button === 1) onBuy();
     });
   });
 </script>
