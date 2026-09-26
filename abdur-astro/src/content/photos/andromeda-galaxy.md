@@ -14,7 +14,7 @@ featured: true
 ---
 
 A collection of about one trillion stars like our Sun, so far away that the light
-in this picture left the galaxy 2.6 million years ago. The Andromeda Galaxy will
+in this picture left the galaxy 2.5 million years ago. The Andromeda Galaxy will
 collide with our own Milky Way in about 5 billion years, but until then, it remains
 our closest large galactic neighbour. You will see great regions of intense star
 formation, intricate dust lanes, and even some individual stars in the Andromeda
