@@ -259,6 +259,13 @@ with what the site and `/privacy` say.
   in agreement.
 - **Google tag settings**: leave *user-provided data collection* and
   *automatic enhanced conversions* off, for the same reason.
+- **Stripe → Settings → Business → Public details**: set the privacy policy
+  URL to `https://abdurastro.com/privacy`, so checkout links to it.
+- **Meta Events Manager → Settings → Traffic permissions**: allow
+  `abdurastro.com`. Preview builds on other domains won't report events, so
+  test on the live domain.
+- **GA4 → Admin → Data retention**: set 14 months (the default is 2);
+  `/privacy` says "up to 14 months".
 - **GA4 → Admin → Data streams → web stream → Configure tag settings → List
   unwanted referrals**: add a "domain ends with" `stripe.com` rule. The site
   already sends `ignore_referrer` when a visitor comes back from Stripe; the
@@ -266,9 +273,20 @@ with what the site and `/privacy` say.
 
 ### Consent
 
-`consent: 'opt-out'` (the default) loads the tags unless a visitor turns
-measurement off on `/privacy`; `'opt-in'` shows a banner and loads nothing
-until they allow it. Either way, a browser sending Global Privacy Control, or
+`consent: 'opt-in'` (the default) shows a banner and loads nothing until the
+visitor allows it. Quebec's Law 25 (s. 8.1) requires ad-profiling tools to be
+off by default, and it likely applies to sellers elsewhere who sell to
+Quebecers. The cost: visitors who ignore the banner aren't measured, so the ad
+platforms will report fewer sales than Stripe does. Stripe stays the record of
+what sold.
+
+`'opt-out'` loads the tags on arrival and shows a first-visit notice with a
+one-click "Turn it off", which is what PIPEDA and Alberta's PIPA ask for when
+ad measurement runs on implied consent (a prominent notice at collection, an
+easy opt-out that sticks). It measures more, but doesn't meet Quebec's rule;
+choose it deliberately, ideally after a short word with a lawyer.
+
+Either way, a browser sending Global Privacy Control, or
 blocking site storage (where an opt-out couldn't be saved), never loads them.
 Turning measurement off stops the site's own events at once and silences the
 tags on that page; the Back button can't bring a measured page back after an

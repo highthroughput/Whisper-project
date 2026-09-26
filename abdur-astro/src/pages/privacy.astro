@@ -14,6 +14,8 @@ const t = SITE.tracking;
 const usesMeta = Boolean(t.metaPixelId.trim());
 const usesGoogle = Boolean(t.ga4Id.trim() || t.googleAdsId.trim());
 const measuring = usesMeta || usesGoogle;
+const usesAds = Boolean(t.googleAdsId.trim());
+const usesGa4 = Boolean(t.ga4Id.trim());
 const tools = [usesMeta && 'the Meta Pixel', usesGoogle && 'the Google tag'].filter(Boolean).join(' and ');
 const optIn = t.consent === 'opt-in';
 // Google is always a processor (Sheets for form copies, Calendar for booking);
@@ -38,7 +40,7 @@ const updated = 'September 26, 2026';
         <p>
           Abdur Astro is a one-person astrophotography business in Southern Alberta. This page
           covers what you share when you use abdurastro.com, why, and the services that handle
-          it. Questions or requests go to{' '}
+          it. Abdur is responsible for how it's handled; questions or requests go to him at{' '}
           <a href={`mailto:${SITE.email}`} class="link-quiet">{SITE.email}</a>.
         </p>
       </section>
@@ -76,7 +78,19 @@ const updated = 'September 26, 2026';
                 {usesMeta && ' Meta may use this to show you Abdur Astro ads on Facebook and Instagram.'}
                 {usesGoogle && ' Google may use it to measure and show Abdur Astro ads in Google Search and on YouTube.'}{' '}
                 No form contents, card details or addresses are sent to either.
+                {usesGa4 && ' Analytics data is kept for up to 14 months.'}
               </p>
+              {usesAds && (
+                <p class="mt-3">
+                  Third-party vendors, including Google, use cookies to serve ads based on your
+                  prior visits to this website or other websites. Google's use of advertising
+                  cookies lets it and its partners serve ads based on those visits. You can opt
+                  out of personalized advertising in{' '}
+                  <a href="https://adssettings.google.com/" class="link-quiet" rel="noopener noreferrer" target="_blank">Google's ad settings</a>, or of other vendors' cookies at{' '}
+                  <a href="https://optout.aboutads.info/" class="link-quiet" rel="noopener noreferrer" target="_blank">aboutads.info</a>. Google explains{' '}
+                  <a href="https://policies.google.com/technologies/partner-sites" class="link-quiet" rel="noopener noreferrer" target="_blank">how it uses information from sites that use its services</a>.
+                </p>
+              )}
               <p class="mt-3">
                 {optIn
                   ? 'Nothing loads unless you turn it on, here or in the banner, and you can turn it back off at any time.'
@@ -107,8 +121,7 @@ const updated = 'September 26, 2026';
                 {usesMeta && usesGoogle && ' · '}
                 {usesGoogle && (
                   <a href="https://myadcenter.google.com/" class="link-quiet" rel="noopener noreferrer" target="_blank">Google My Ad Center</a>
-                )}
-                .
+                )}.
               </p>
             </>
           ) : (

@@ -62,11 +62,15 @@ export const SITE = {
     /** Label for an Ads "Lead" conversion (form sign-ups); optional. */
     googleAdsLeadLabel: '',
     /**
-     * `opt-out`: tags load unless the visitor turns measurement off on the
-     * privacy page (or their browser sends Global Privacy Control).
-     * `opt-in`: nothing loads until the visitor accepts a consent banner.
+     * `opt-in` (default): nothing loads until the visitor allows it in the
+     * banner. Quebec's Law 25 (s. 8.1) requires ad-profiling tools to be off
+     * by default, and it likely reaches out-of-province sellers.
+     * `opt-out`: tags load on arrival with a first-visit notice and a
+     * one-click "Turn it off". PIPEDA and Alberta's PIPA accept this for
+     * ad measurement, but not Quebec. More sales get measured; switch only
+     * as a deliberate choice. See README "Consent".
      */
-    consent: 'opt-out' as 'opt-out' | 'opt-in',
+    consent: 'opt-in' as 'opt-out' | 'opt-in',
   },
 
   /** Google Apps Script Web App that logs every form submission to a lead-capture Google Sheet. */
