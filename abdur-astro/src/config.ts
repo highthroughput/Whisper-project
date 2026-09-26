@@ -44,6 +44,31 @@ export const SITE = {
     guideUrl: '',
   },
 
+  /**
+   * Conversion tracking. Every ID empty = no tag is loaded at all, which is
+   * the state the site ships in. Paste an ID in and rebuild to switch that
+   * tag on; see README "Conversion tracking" for where each comes from and
+   * the one-time Stripe redirect setup that makes purchases reportable.
+   */
+  tracking: {
+    /** Meta Pixel ID, digits only (Events Manager → Data sources). */
+    metaPixelId: '',
+    /** Google Analytics 4 measurement ID, `G-XXXXXXXXXX`. */
+    ga4Id: '',
+    /** Google Ads account tag, `AW-XXXXXXXXXX`. */
+    googleAdsId: '',
+    /** Label half of the Ads "Purchase" conversion's send_to (`AW-…/LABEL`). */
+    googleAdsPurchaseLabel: '',
+    /** Label for an Ads "Lead" conversion (form sign-ups); optional. */
+    googleAdsLeadLabel: '',
+    /**
+     * `opt-out`: tags load unless the visitor turns measurement off on the
+     * privacy page (or their browser sends Global Privacy Control).
+     * `opt-in`: nothing loads until the visitor accepts a consent banner.
+     */
+    consent: 'opt-out' as 'opt-out' | 'opt-in',
+  },
+
   /** Google Apps Script Web App that logs every form submission to a lead-capture Google Sheet. */
   leadSheetWebhook:
     'https://script.google.com/macros/s/AKfycbxL0anvH5TP99RPXLD3oDZYR8-mEF8n1Pg7naXcEzjBdv2GgDngOPv8zvd90rJNBcg/exec',

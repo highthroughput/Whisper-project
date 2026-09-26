@@ -1,0 +1,103 @@
+---
+/**
+ * Loads the Meta Pixel and the Google tag in <head>, and only when an ID is
+ * set in SITE.tracking. With every ID empty this renders nothing at all.
+ *
+ * Whether the tags load is decided in the browser, before either one runs:
+ * - `opt-out` mode loads them unless the visitor turned measurement off on
+ *   /privacy (stored as aa:tracking = "off");
+ * - `opt-in` mode loads them only after the consent banner is accepted;
+ * - a browser sending Global Privacy Control never loads them.
+ */
+import { SITE } from '../config';
+
+const t = SITE.tracking;
+const aaConfig = {
+  metaPixelId: t.metaPixelId.trim(),
+  ga4Id: t.ga4Id.trim(),
+  adsId: t.googleAdsId.trim(),
+  purchaseLabel: t.googleAdsPurchaseLabel.trim(),
+  leadLabel: t.googleAdsLeadLabel.trim(),
+  consent: t.consent,
+};
+const enabled = Boolean(aaConfig.metaPixelId || aaConfig.ga4Id || aaConfig.adsId);
+---
+
+{
+  enabled && (
+    <script is:inline define:vars={{ aaConfig }}>
+      // Stripe returns to /thank-you with ?session_id=cs_…. Keep it for the
+      // purchase event, but take it out of the address bar before either tag
+      // reads the page URL, so it isn't copied into analytics page views.
+      try {
+        var url = new URL(window.location.href);
+        var sid = url.searchParams.get('session_id');
+        if (sid) {
+          window.aaCheckoutSession = sid;
+          url.searchParams.delete('session_id');
+          history.replaceState(history.state, '', url.pathname + url.search + url.hash);
+        }
+      } catch (e) {}
+
+      window.aaTrackingConsent = aaConfig.consent;
+
+      window.aaLoadTracking = function () {
+        if (window.aaTrackingLoaded) return;
+        window.aaTrackingLoaded = true;
+
+        if (aaConfig.adsId) {
+          window.aaAds = {
+            adsId: aaConfig.adsId,
+            purchaseLabel: aaConfig.purchaseLabel,
+            leadLabel: aaConfig.leadLabel,
+          };
+        }
+
+        if (aaConfig.metaPixelId) {
+          // Meta's base code, unchanged apart from formatting.
+          !(function (f, b, e, v, n, t, s) {
+            if (f.fbq) return;
+            n = f.fbq = function () {
+              n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+            };
+            if (!f._fbq) f._fbq = n;
+            n.push = n;
+            n.loaded = !0;
+            n.version = '2.0';
+            n.queue = [];
+            t = b.createElement(e);
+            t.async = !0;
+            t.src = v;
+            s = b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t, s);
+          })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+          window.fbq('init', aaConfig.metaPixelId);
+          window.fbq('track', 'PageView');
+        }
+
+        var tagId = aaConfig.ga4Id || aaConfig.adsId;
+        if (tagId) {
+          window.dataLayer = window.dataLayer || [];
+          window.gtag = function () {
+            window.dataLayer.push(arguments);
+          };
+          var g = document.createElement('script');
+          g.async = true;
+          g.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(tagId);
+          document.head.appendChild(g);
+          window.gtag('js', new Date());
+          if (aaConfig.ga4Id) window.gtag('config', aaConfig.ga4Id);
+          if (aaConfig.adsId) window.gtag('config', aaConfig.adsId);
+        }
+      };
+
+      var choice = null;
+      try {
+        choice = localStorage.getItem('aa:tracking');
+      } catch (e) {}
+      var gpc = navigator.globalPrivacyControl === true;
+      var allowed = !gpc && (aaConfig.consent === 'opt-in' ? choice === 'on' : choice !== 'off');
+      if (allowed) window.aaLoadTracking();
+    </script>
+  )
+}

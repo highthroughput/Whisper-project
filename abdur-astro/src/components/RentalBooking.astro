@@ -199,6 +199,7 @@ const longest = Math.max(...rates.map((r) => r.nights));
 
 <script>
   import { logToLeadSheet } from '../lib/leadSheet';
+  import { beginCheckout } from '../lib/track';
 
   type Rate = { term: string; nights: number; detail: string; price: number; stripeLink: string };
 
@@ -322,6 +323,19 @@ const longest = Math.max(...rates.map((r) => r.nights));
 
       submitButton.disabled = true;
       if (status) status.textContent = 'Taking you to payment…';
+
+      // Fired now, while the lead-sheet and email requests are still in
+      // flight, so the tags have time to send before the page leaves.
+      beginCheckout(
+        {
+          id: 'scope-rental',
+          name: 'Sky-Watcher 10″ Dobsonian rental',
+          variant: rate.term,
+          category: 'rental',
+          value: rate.price,
+        },
+        rate.stripeLink,
+      );
 
       const formData = new FormData(form);
       logToLeadSheet(form);

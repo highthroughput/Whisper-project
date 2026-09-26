@@ -6,6 +6,7 @@
 // success only, so the guide is not simply sitting in the page source for
 // anyone who never gives an address.
 import { logToLeadSheet } from '../lib/leadSheet';
+import { lead } from '../lib/track';
 
 const form = document.getElementById('newsletter-form') as HTMLFormElement | null;
 
@@ -29,6 +30,9 @@ if (form) {
       });
       const result = (await response.json()) as { success?: boolean; message?: string };
       if (response.ok && result.success) {
+        // Read before reset(): the hidden field names which offer this was.
+        const offer = form.querySelector<HTMLInputElement>('input[name="form"]')?.value;
+        lead(offer || 'Newsletter signup', 'newsletter');
         form.reset();
         if (status) {
           status.textContent = status.dataset.success ?? "You're on the list, thank you.";

@@ -1,0 +1,133 @@
+---
+/**
+ * Where Stripe sends a customer after payment. Each Payment Link's redirect is
+ * set (by scripts/stripe-redirects.mjs) to
+ *   /thank-you?link=<payment link id>&session_id={CHECKOUT_SESSION_ID}
+ * so this page can say the right thing for what was bought and report one
+ * purchase per Checkout Session. Without JS, or with an unknown link, the
+ * general message shows and nothing is reported.
+ */
+import Base from '../layouts/Base.astro';
+import { SITE } from '../config';
+import { getCheckoutCatalog } from '../lib/catalog';
+
+const catalog = Object.fromEntries((await getCheckoutCatalog()).map((entry) => [entry.link, entry]));
+---
+
+<Base
+  title="Thank you"
+  description="Your payment to Abdur Astro went through. Your receipt is on its way from Stripe."
+  noindex
+>
+  <section class="mx-auto flex w-full max-w-7xl flex-col items-start px-5 pt-24 sm:px-8 sm:pt-32">
+    <p class="eyebrow">Payment received</p>
+    <h1 class="mt-4 font-display text-4xl sm:text-6xl">Thank you.</h1>
+
+    <p data-item class="mt-4 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-dust-bright" hidden></p>
+
+    {/* One message per kind of purchase; the script reveals the matching one.
+        The general message is the no-JS and unknown-link fallback. */}
+    <div class="mt-6 max-w-xl space-y-4 text-faint">
+      <div data-thanks="general">
+        <p>
+          Your payment went through, and Stripe has emailed your receipt. If anything about the
+          order needs a word, reply to that email or write to{' '}
+          <a href={`mailto:${SITE.email}`} class="link-quiet">{SITE.email}</a>.
+        </p>
+      </div>
+      <div data-thanks="print" hidden>
+        <p>
+          Your print goes into production now. It ships rolled in a rigid tube with its
+          certificate of authenticity, 7 to 10 business days from today, and tracking follows by
+          email when it leaves.
+        </p>
+        <p>
+          Stripe has emailed your receipt. Questions about the order:{' '}
+          <a href={`mailto:${SITE.email}`} class="link-quiet">{SITE.email}</a>.
+        </p>
+      </div>
+      <div data-thanks="rental" hidden>
+        <p>
+          Your scope is booked. Expect an email within a day confirming your dates and where to
+          meet for the pickup walkthrough. Clear skies for the first night out.
+        </p>
+        <p>
+          Stripe has emailed your receipt. Need to change the dates? Write to{' '}
+          <a href={`mailto:${SITE.email}`} class="link-quiet">{SITE.email}</a>.
+        </p>
+      </div>
+      <div data-thanks="session" hidden>
+        <p>
+          Your session is paid. The calendar invite from your booking has the time and the video
+          link; bring your questions, and your data if it's a processing session.
+        </p>
+        <p>
+          Stripe has emailed your receipt. Need to move the time? Use the link in the invite or
+          write to <a href={`mailto:${SITE.email}`} class="link-quiet">{SITE.email}</a>.
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-8 flex flex-wrap gap-4">
+      <a href="/gallery" class="btn">Open the gallery</a>
+      <a href="/" class="btn btn-solid">Return home</a>
+    </div>
+  </section>
+
+  {/* `<` escaped so no product name can close this tag early. */}
+  <script
+    is:inline
+    type="application/json"
+    id="checkout-catalog"
+    set:html={JSON.stringify(catalog).replace(/</g, '\\u003c')}
+  />
+</Base>
+
+<script>
+  import { claimPurchase, purchase, takePendingCheckout, type TrackedItem } from '../lib/track';
+
+  type Entry = TrackedItem & { link: string };
+
+  let catalog: Record<string, Entry> = {};
+  try {
+    catalog = JSON.parse(document.getElementById('checkout-catalog')?.textContent ?? '{}');
+  } catch {
+    catalog = {};
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  // Tracking.astro moves session_id out of the address bar before the tags
+  // read the URL; without tracking configured it's still in the query string.
+  const session =
+    (window as Window & { aaCheckoutSession?: string }).aaCheckoutSession ??
+    params.get('session_id') ??
+    '';
+  const link = params.get('link') ?? '';
+
+  // The link Stripe named wins. The checkout this browser remembers is the
+  // fallback for a redirect set without `link=`, and only if it agrees with
+  // the link when both are present.
+  const pending = takePendingCheckout();
+  const item: Entry | undefined =
+    catalog[link] ?? (pending && (!link || pending.link === link) ? pending : undefined);
+
+  if (item) {
+    const kind = item.category === 'tutorial' || item.category === 'consulting' ? 'session' : item.category;
+    const panel = document.querySelector<HTMLElement>(`[data-thanks="${kind}"]`);
+    if (panel) {
+      document.querySelector<HTMLElement>('[data-thanks="general"]')!.hidden = true;
+      panel.hidden = false;
+    }
+    const label = document.querySelector<HTMLElement>('[data-item]');
+    if (label) {
+      label.textContent = item.variant ? `${item.name} · ${item.variant}` : item.name;
+      label.hidden = false;
+    }
+  }
+
+  // Only a real Checkout Session id counts, and only once per browser: a
+  // refresh, a bookmark or a hand-typed visit to this page reports nothing.
+  if (item && /^cs_(live|test)_[A-Za-z0-9]+$/.test(session) && claimPurchase(session)) {
+    purchase(item, session);
+  }
+</script>

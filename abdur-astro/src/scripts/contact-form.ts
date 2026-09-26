@@ -3,6 +3,7 @@
 // 2. Submit via fetch with inline status instead of leaving the site.
 // Without JS the form still works as a plain POST to Web3Forms.
 import { logToLeadSheet } from '../lib/leadSheet';
+import { lead } from '../lib/track';
 
 const form = document.getElementById('contact-form') as HTMLFormElement | null;
 
@@ -38,6 +39,7 @@ if (form) {
       });
       const result = (await response.json()) as { success?: boolean; message?: string };
       if (response.ok && result.success) {
+        lead('Contact form', select?.value || 'general');
         form.reset();
         if (status) status.textContent = 'Received, thank you. Expect a reply within two days.';
       } else {

@@ -13,7 +13,9 @@ export default defineConfig({
   // the sitemap, and the served URLs all agree.
   trailingSlash: 'never',
   build: { format: 'file' },
-  integrations: [sitemap()],
+  // The post-checkout page is noindex and means nothing without a Stripe
+  // session, so it stays out of the sitemap too.
+  integrations: [sitemap({ filter: (page) => !page.endsWith('/thank-you') })],
   vite: {
     plugins: [tailwindcss()],
   },

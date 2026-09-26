@@ -7,6 +7,8 @@ interface Props {
   id: string;
   /** Lowercase service name, used in the email subject and the sheet. */
   service: string;
+  /** Which catalog entry a paid session reports as. */
+  category: 'tutorial' | 'consulting';
   /** Singular noun phrase for the copy, e.g. "a tutorial". Must read as a
       grammatical subject: "A quick call to see if <fitSubject> is the right fit." */
   fitSubject: string;
@@ -24,6 +26,7 @@ interface Props {
 const {
   id,
   service,
+  category,
   fitSubject,
   heading = 'Book a call',
   hourlyLinks,
@@ -42,6 +45,8 @@ const freeCopy = `A quick call to see if ${fitSubject} is the right fit. No cost
   data-hourly-calendar-links={JSON.stringify(hourlyCalendarLinks)}
   data-stripe-links={JSON.stringify(hourlyLinks)}
   data-service={service}
+  data-category={category}
+  data-rate={ratePerHour}
   data-free-copy={freeCopy}
 >
   {/* Heading and currency on one row, the same way the print and rental panels
@@ -187,12 +192,15 @@ const freeCopy = `A quick call to see if ${fitSubject} is the right fit. No cost
 
 <script>
   import { logToLeadSheet } from '../lib/leadSheet';
+  import { beginCheckout, lead } from '../lib/track';
 
   document.querySelectorAll<HTMLElement>('.consult-booking').forEach((root) => {
     const introCalendarLink = root.dataset.introCalendarLink ?? '';
     const hourlyCalendarLinks = JSON.parse(root.dataset.hourlyCalendarLinks ?? '[]') as string[];
     const stripeLinks = JSON.parse(root.dataset.stripeLinks ?? '[]') as string[];
     const service = root.dataset.service ?? 'this service';
+    const category = root.dataset.category === 'tutorial' ? 'tutorial' : 'consulting';
+    const rate = Number(root.dataset.rate ?? 0);
     const freeCopy = root.dataset.freeCopy ?? '';
 
     const form = root.querySelector<HTMLFormElement>('[data-lead-form]');
@@ -268,6 +276,25 @@ const freeCopy = `A quick call to see if ${fitSubject} is the right fit. No cost
       const formData = new FormData(form);
       logToLeadSheet(form);
 
+      // A free intro is a lead the moment the details are in. A paid session
+      // is a checkout, and only when it will actually reach Stripe: a blocked
+      // booking tab stops the hand-off below, so it isn't reported as one.
+      const stripeUrl = stripeLinks[hours - 1];
+      if (!isPaid) {
+        lead(`Free ${service} intro`, category);
+      } else if (bookingTab && stripeUrl) {
+        beginCheckout(
+          {
+            id: category,
+            name: category === 'tutorial' ? 'One-on-one tutorial' : 'Equipment consulting',
+            variant: `${hours} hour${hours > 1 ? 's' : ''}`,
+            category,
+            value: rate * hours,
+          },
+          stripeUrl,
+        );
+      }
+
       fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { Accept: 'application/json' },
@@ -290,7 +317,6 @@ const freeCopy = `A quick call to see if ${fitSubject} is the right fit. No cost
             return;
           }
           if (isPaid) {
-            const stripeUrl = stripeLinks[hours - 1];
             if (stripeUrl) {
               window.location.href = stripeUrl;
             } else if (status) {

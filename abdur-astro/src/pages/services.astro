@@ -6,22 +6,10 @@ import YouTubeEmbed from '../components/YouTubeEmbed.astro';
 import ConsultBooking from '../components/ConsultBooking.astro';
 import eventPhoto from '../assets/photos/event-photo.jpg';
 import { byDateDesc } from '../lib/photos';
+import { HOURLY_RATE, TUTORIAL_HOUR_LINKS, CONSULTING_HOUR_LINKS } from '../data/checkout';
 
-const HOURLY_RATE = 100;
-const TUTORIAL_HOUR_LINKS: [string, string, string, string, string] = [
-  'https://buy.stripe.com/3cI3cxewu3cFe7v9bu3Nm0E',
-  'https://buy.stripe.com/9B67sN3RQ8wZgfDbjC3Nm0F',
-  'https://buy.stripe.com/7sYfZj5ZY7sVaVj87q3Nm0G',
-  'https://buy.stripe.com/4gMaEZageeVn2oN87q3Nm0H',
-  'https://buy.stripe.com/fZuaEZewudRjbZn87q3Nm0I',
-];
-const CONSULTING_HOUR_LINKS: [string, string, string, string, string] = [
-  'https://buy.stripe.com/cNi28tdsq3cF4wVdrK3Nm0J',
-  'https://buy.stripe.com/14A00l4VU7sVbZn87q3Nm0K',
-  'https://buy.stripe.com/8x28wRage3cF2oNcnG3Nm0L',
-  'https://buy.stripe.com/14A3cx2NM9B39RffzS3Nm0M',
-  'https://buy.stripe.com/cNidRbage9B38Nbafy3Nm0N',
-];
+// Stripe links and the hourly rate live in src/data/checkout.ts, shared with
+// the thank-you page that values a paid session after checkout.
 
 /** Google Calendar Appointment Schedule for the free 15-minute consult intro. */
 const CONSULTING_INTRO_CALENDAR_LINK =
@@ -189,6 +177,7 @@ const services = [
                 <ConsultBooking
                   id="tutorial"
                   service="tutorial"
+                  category="tutorial"
                   fitSubject="a tutorial"
                   heading="Book a tutorial"
                   hourlyLinks={TUTORIAL_HOUR_LINKS}
@@ -202,6 +191,7 @@ const services = [
                 <ConsultBooking
                   id="consult"
                   service="equipment consulting"
+                  category="consulting"
                   fitSubject="equipment consulting"
                   hourlyLinks={CONSULTING_HOUR_LINKS}
                   introCalendarLink={CONSULTING_INTRO_CALENDAR_LINK}

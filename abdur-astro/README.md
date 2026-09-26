@@ -193,6 +193,61 @@ site's "ships across North America" copy), add your shipping rate, and (if
 registered) let Stripe Tax handle GST. Copy the `https://buy.stripe.com/…`
 URL over the matching placeholder token below.
 
+## Conversion tracking
+
+Off until you add an ID. With every ID in `SITE.tracking` (`src/config.ts`)
+empty, no tag code ships at all. Each piece switches on independently:
+
+| Setting | Where to get it | Turns on |
+| --- | --- | --- |
+| `metaPixelId` | Meta Events Manager → Data sources → your pixel (digits only) | Meta Pixel: PageView, ViewContent, InitiateCheckout, Lead, Purchase |
+| `ga4Id` | Google Analytics → Admin → Data streams → web stream (`G-…`) | GA4: view_item, begin_checkout, generate_lead, purchase |
+| `googleAdsId` | Google Ads → Goals → Conversions → Tag setup (`AW-…`) | Google Ads tag |
+| `googleAdsPurchaseLabel` | The "Purchase" conversion's event snippet, the part after `AW-…/` | Ads purchase conversions with value |
+| `googleAdsLeadLabel` | A "Lead" / "Submit lead form" conversion, same place | Ads lead conversions (optional) |
+
+What fires where:
+
+- **Print pages**: view on load (at the "from" price), checkout when Buy is
+  clicked (at the size and paper actually chosen).
+- **Rentals / paid sessions**: checkout at the hand-off to Stripe. A paid
+  session whose booking tab was blocked never reaches Stripe, so it isn't counted.
+- **Free intro call, contact form, email sign-up**: lead, on success.
+- **`/thank-you`**: purchase, once per Stripe Checkout Session. A refresh,
+  a bookmark or a visit without a real session id reports nothing.
+
+### One-time Stripe setup (required for purchases to count)
+
+Stripe has to send customers back to the site after paying. The script sets
+all of the site's Payment Links at once, and leaves any other links alone:
+
+```sh
+npm run build
+STRIPE_SECRET_KEY=rk_live_… node scripts/stripe-redirects.mjs          # dry run, prints the plan
+STRIPE_SECRET_KEY=rk_live_… node scripts/stripe-redirects.mjs --apply  # applies it
+```
+
+Use a **restricted key** (Developers → API keys → Create restricted key) with
+only *Payment Links: Write*, and delete it afterwards. Each link then
+redirects to `/thank-you?link=<link id>&session_id={CHECKOUT_SESSION_ID}`.
+Re-run it after creating any new Payment Link. Without this step, customers
+land on Stripe's own confirmation page and no purchase is recorded.
+
+### Consent
+
+`consent: 'opt-out'` (the default) loads the tags unless a visitor turns
+measurement off on `/privacy`; `'opt-in'` shows a banner and loads nothing
+until they allow it. Either way, a browser sending Global Privacy Control
+never loads them. `/privacy` describes exactly the tags that are configured.
+
+### Limits
+
+- Values are list prices. A promotion code used at Stripe's checkout isn't
+  visible to a static site, so a discounted sale reports its full price;
+  Stripe's dashboard is the revenue record.
+- An ad blocker or a browser that clears storage mid-checkout can hide a sale.
+  Expect the ad platforms to show a little less than Stripe does.
+
 ## Consult call booking
 
 Equipment consulting on `/services` (`ConsultBooking.astro`) offers two paths

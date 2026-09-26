@@ -3,33 +3,11 @@ import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import telescopeImage from '../assets/rentals/skywatcher-dobsonian.webp';
 import RentalBooking from '../components/RentalBooking.astro';
+import { RENTAL_RATES } from '../data/checkout';
 
-// The three published rates, cheapest first. A booking is charged the first
-// rate that covers its length, so the tier follows from the dates rather than
-// being picked. `nights` is the most that rate covers.
-const rates = [
-  {
-    term: 'One night',
-    nights: 1,
-    detail: 'Up to 1 night',
-    price: 20,
-    stripeLink: 'https://buy.stripe.com/5kQ7sN9cabJb0gFgDW3Nm0B',
-  },
-  {
-    term: 'Weekend',
-    nights: 3,
-    detail: 'Up to 3 nights',
-    price: 35,
-    stripeLink: 'https://buy.stripe.com/28E6oJ4VUbJbfbz2N63Nm0C',
-  },
-  {
-    term: 'Weekly',
-    nights: 7,
-    detail: 'Up to 7 nights',
-    price: 70,
-    stripeLink: 'https://buy.stripe.com/dRm28tewu9B3gfD4Ve3Nm0D',
-  },
-];
+// Rates live in src/data/checkout.ts so the thank-you page can value a
+// rental purchase from the same numbers this page charges.
+const rates = RENTAL_RATES;
 
 const included = [
   'Upgraded Baader zoom eyepiece',

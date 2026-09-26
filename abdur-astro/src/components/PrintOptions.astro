@@ -10,10 +10,12 @@ interface Props {
   options: Option[];
   /** Print title, used for the Buy button's accessible label. */
   title: string;
+  /** The print's content id (its slug), reported to ad platforms as the product id. */
+  id: string;
   class?: string;
 }
 
-const { options, title, class: className } = Astro.props;
+const { options, title, id, class: className } = Astro.props;
 
 const sizes = [...new Set(options.map((o) => o.size))];
 const papers = [...new Set(options.map((o) => o.paper))];
@@ -24,6 +26,7 @@ const initial = options[0];
   class:list={['print-options border hairline bg-surface', className]}
   data-options={JSON.stringify(options)}
   data-title={title}
+  data-id={id}
   aria-labelledby="options-heading"
 >
   <header
@@ -91,10 +94,20 @@ const initial = options[0];
 </section>
 
 <script>
+  import { beginCheckout, viewItem, type TrackedItem } from '../lib/track';
+
   document.querySelectorAll<HTMLElement>('.print-options').forEach((root) => {
     type Option = { size: string; paper: string; price: number; stripeLink: string };
     const options = JSON.parse(root.dataset.options ?? '[]') as Option[];
     const title = root.dataset.title ?? 'this print';
+    const printId = root.dataset.id ?? '';
+    const asItem = (o: Option): TrackedItem => ({
+      id: printId,
+      name: `${title} print`,
+      variant: `${o.size} · ${o.paper}`,
+      category: 'print',
+      value: o.price,
+    });
 
     const sizeSelect = root.querySelector<HTMLSelectElement>('[data-size]');
     const paperSelect = root.querySelector<HTMLSelectElement>('[data-paper]');
@@ -133,5 +146,16 @@ const initial = options[0];
     sizeSelect.addEventListener('change', update);
     paperSelect.addEventListener('change', update);
     update();
+
+    // Reported at the price the page opens on: the smallest size, the
+    // "from" price every card and listing quotes.
+    if (options[0]) viewItem(asItem(options[0]));
+
+    // Read the choice at click time, not from update(): the href is what
+    // Stripe will actually charge, so the event reports that option.
+    buy.addEventListener('click', () => {
+      const chosen = options.find((o) => o.stripeLink === buy.getAttribute('href'));
+      if (chosen) beginCheckout(asItem(chosen), chosen.stripeLink);
+    });
   });
 </script>

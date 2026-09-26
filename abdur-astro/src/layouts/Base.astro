@@ -11,6 +11,8 @@ import { SITE } from '../config';
 import { cleanPathname } from '../lib/urls';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import Tracking from '../components/Tracking.astro';
+import ConsentBanner from '../components/ConsentBanner.astro';
 import defaultOgSource from '../assets/photos/andromeda-galaxy.jpg';
 
 interface Props {
@@ -27,6 +29,8 @@ interface Props {
   overlayHeader?: boolean;
   /** Set on the home page so the title reads as the brand, not "Home · Abdur Astro". */
   isHome?: boolean;
+  /** Keep this page out of search results (e.g. the post-checkout thank-you page). */
+  noindex?: boolean;
 }
 
 const {
@@ -37,6 +41,7 @@ const {
   schema = [],
   overlayHeader = false,
   isHome = false,
+  noindex = false,
 } = Astro.props;
 
 const fullTitle = isHome ? title : `${title} · ${SITE.name}`;
@@ -101,6 +106,7 @@ const jsonLd = [localBusiness, ...schema];
     <link rel="sitemap" href="/sitemap-index.xml" />
     <meta name="generator" content={Astro.generator} />
     <meta name="theme-color" content="#0b0a09" />
+    {noindex && <meta name="robots" content="noindex" />}
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE.name} />
@@ -121,6 +127,8 @@ const jsonLd = [localBusiness, ...schema];
 
     {jsonLd.map((block) => <script type="application/ld+json" set:html={JSON.stringify(block)} />)}
 
+    <Tracking />
+
     <script is:inline>
       // Marks JS as available before first paint so reveal styles apply
       // only when the enhancement script will actually run them.
@@ -139,6 +147,7 @@ const jsonLd = [localBusiness, ...schema];
       <slot />
     </main>
     <Footer />
+    <ConsentBanner />
     <script src="../scripts/enhance.ts"></script>
   </body>
 </html>
