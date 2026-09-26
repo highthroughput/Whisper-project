@@ -459,8 +459,8 @@ live pricing.
 
 ### 7. Email, socials, domain
 
-- [ ] www and http redirect to `https://abdurastro.com` (Deploying step 6; as of
-      Sep 2026 neither does)
+- [x] www and http redirect to `https://abdurastro.com` (Deploying step 6; set
+      and verified Sep 26, 2026)
 - [ ] Search Console verified and the sitemap submitted (Deploying step 9)
 - [ ] Merchant Center account with the feed, shipping and returns ("Print SEO
       and Google Merchant Center")
@@ -499,11 +499,13 @@ subdirectory — set the **root directory** accordingly in step 4.
    - Domain on Cloudflare (recommended — transfer or point its nameservers at
      Cloudflare first): the CNAME is created automatically and TLS issues within
      minutes. Add both `abdurastro.com` and `www.abdurastro.com`.
-   - **Then add the redirects yourself; Cloudflare does not.** As of Sep 2026
+   - **Then add the redirects yourself; Cloudflare does not.** Without them,
      both `https://www.abdurastro.com/…` and plain `http://…` answer 200, so
-     every page exists at three addresses, and YouTube, Patreon and X link to
-     the www one. The canonical tags point search engines at the right one,
-     but a redirect is the real fix:
+     every page exists at three addresses (and YouTube, Patreon and X link to
+     the www one). Both redirects below were set on Sep 26, 2026 and checked
+     from outside: http and www each end, with a 301, at the same path and
+     query on `https://abdurastro.com`. Redirect rules run before the Worker,
+     so no code is involved. For a new domain, or if they're ever removed:
      - the domain → **SSL/TLS → Edge Certificates → Always Use HTTPS**: on;
      - the domain → **Rules → Redirect Rules → Create rule → template
        "Redirect from WWW to root"**: request URL `https://www.abdurastro.com/*`
