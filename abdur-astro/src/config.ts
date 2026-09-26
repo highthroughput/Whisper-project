@@ -27,13 +27,15 @@ export const SITE = {
   web3formsKey: '53ec3c86-9b83-4d21-898a-f083a4706887',
 
   /**
-   * Footer signup. Set `guideUrl` to the free Siril + Seestar processing guide
-   * and the footer switches from a general newsletter pitch to offering the
-   * guide in exchange for an email. While it is empty the footer keeps the
-   * newsletter copy, so the site never promises a download that isn't there.
+   * Footer signup. With `guideUrl` set, the footer offers the free Siril
+   * processing guide in exchange for an email; empty, it falls back to a
+   * plain newsletter pitch, so the site never promises a guide that isn't there.
    *
-   * PLACEHOLDER: no guide file exists yet. Drop it in `public/` (or use a
-   * hosted URL) and set the path here.
+   * The guide is Abdur's free Patreon post "FREE Siril Data Processing Guide
+   * V2" (May 2025): a one-page PDF of the 15-step method (Siril 1.4, GraXpert,
+   * StarNet, with an optional Seestar script) and its YouTube walkthrough.
+   * Free to view, no pledge needed. If a newer guide replaces it, change the
+   * URL here and check the footer copy in Footer.astro still describes it.
    *
    * NOTE: submissions currently go to Web3Forms, which emails them, and to the
    * lead sheet below. That is a record of signups, not a mailing list: nothing
@@ -41,7 +43,7 @@ export const SITE = {
    * MailerLite is listed in README "Replace before launch".
    */
   newsletter: {
-    guideUrl: '',
+    guideUrl: 'https://www.patreon.com/AbdurAstro/posts/free-siril-data-128973450',
   },
 
   /**

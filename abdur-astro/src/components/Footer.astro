@@ -6,17 +6,19 @@ const year = new Date().getFullYear();
 
 /**
  * The footer makes one of two offers. With a guide to give away it is a lead
- * magnet; without one it falls back to the plain newsletter, because a
- * download promised in the copy has to exist when the form succeeds.
+ * magnet; without one it falls back to the plain newsletter, because a guide
+ * promised in the copy has to exist when the form succeeds. The copy says
+ * where the guide opens: the success message links to it on the page, and
+ * nothing is emailed automatically.
  */
 const guide = SITE.newsletter.guideUrl;
 const offer = guide
   ? {
-      heading: 'Free guide: processing your first deep-sky image',
-      body: 'A walkthrough of stacking and stretching a Seestar or DSLR set in Siril, from raw subs to a finished frame. Sent to your inbox, plus the occasional new photograph or star party.',
+      heading: 'Free guide: processing deep-sky images in Siril',
+      body: "Abdur's 15-step method, from stacked data to a finished image, with free software only: Siril, GraXpert and StarNet. It works for Seestar data too. Sign up and the guide opens on Patreon, plus an occasional email when a new photograph or star party is announced.",
       label: 'Processing guide request',
-      cta: 'Send it',
-      success: 'Thank you. Your guide is ready below.',
+      cta: 'Get the guide',
+      success: 'Thank you. Here it is:',
     }
   : {
       heading: 'New image released. Next dark-sky weekend.',

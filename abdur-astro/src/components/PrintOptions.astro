@@ -95,6 +95,7 @@ const initial = options[0];
 
 <script>
   import { beginCheckout, viewItem, type TrackedItem } from '../lib/track';
+  import { paperKey, sizeKey } from '../lib/prints';
 
   document.querySelectorAll<HTMLElement>('.print-options').forEach((root) => {
     type Option = { size: string; paper: string; price: number; stripeLink: string };
@@ -143,13 +144,41 @@ const initial = options[0];
       note.textContent = '';
     };
 
-    sizeSelect.addEventListener('change', update);
-    paperSelect.addEventListener('change', update);
+    // ?size=16x24&paper=baryta-fibre opens the page on that option: the links
+    // in the structured data, the Merchant Center feed, ads and posts all
+    // point at one exact print. Values that match nothing are ignored.
+    const params = new URLSearchParams(window.location.search);
+    const wantedSize = options.find((o) => sizeKey(o.size) === params.get('size'))?.size;
+    const wantedPaper = options.find((o) => paperKey(o.paper) === params.get('paper'))?.paper;
+    if (wantedSize) sizeSelect.value = wantedSize;
+    if (wantedPaper) paperSelect.value = wantedPaper;
+
+    // Changing the option rewrites the address to match, so a copied link
+    // opens on what the visitor was looking at. Other parameters (utm_*, a
+    // prefilled promo code) are kept. A page opened without parameters keeps
+    // its clean URL until someone actually picks something.
+    const syncUrl = () => {
+      const url = new URL(window.location.href);
+      url.searchParams.set('size', sizeKey(sizeSelect.value));
+      url.searchParams.set('paper', paperKey(paperSelect.value));
+      history.replaceState(history.state, '', url.pathname + url.search + url.hash);
+    };
+
+    sizeSelect.addEventListener('change', () => {
+      update();
+      syncUrl();
+    });
+    paperSelect.addEventListener('change', () => {
+      update();
+      syncUrl();
+    });
     update();
 
-    // Reported at the price the page opens on: the smallest size, the
-    // "from" price every card and listing quotes.
-    if (options[0]) viewItem(asItem(options[0]));
+    // Reported at the option the page opened on: the one a link named, or
+    // else the smallest size, the "from" price every card and listing quotes.
+    const opened =
+      options.find((o) => o.size === sizeSelect.value && o.paper === paperSelect.value) ?? options[0];
+    if (opened) viewItem(asItem(opened));
 
     // Read the choice at click time, not from update(): the href is what
     // Stripe will actually charge, so the event reports that option.

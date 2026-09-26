@@ -4,6 +4,8 @@ import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { cleanPathname } from '../../lib/urls';
 import PrintOptions from '../../components/PrintOptions.astro';
+import { printVariants, sizeInInches } from '../../lib/prints';
+import { PRINT_SLIDE_IMAGE, photoCredit } from '../../lib/imageMeta';
 
 export async function getStaticPaths() {
   const prints = await getCollection('prints');
@@ -38,27 +40,54 @@ const slides = [
 const canonical = new URL(cleanPathname(Astro.url.pathname), Astro.site).href;
 const description = `${data.title} fine art print: archival giclée astrophotography from Alberta on matte or baryta cotton papers, ${data.options[0].size} to ${data.options[data.options.length - 1].size}, from $${from} CAD. Ships across North America.`;
 
-const schemaImage = await getImage({ src: data.image, width: 1200, format: 'jpeg', quality: 80 });
+// Google's merchant listings ask for the product image at 1:1, 4:3 and 16:9.
+// The master is 3:2, so each is a centred crop of the full-resolution file.
+const productImages = await Promise.all(
+  [
+    [1200, 1200],
+    [1200, 900],
+    [1200, 675],
+  ].map(async ([width, height]) => {
+    const image = await getImage({ src: data.image, width, height, fit: 'cover', format: 'jpeg', quality: 80 });
+    return new URL(image.src, Astro.site).href;
+  }),
+);
 
-const productSchema = {
+// One product group, one variant per size and paper. Each variant's offer
+// links to the page with that option preselected (?size=…&paper=…), which is
+// what Google's variant guidance requires of a page where options are picked
+// with a script; the group keeps the page's one canonical URL.
+const productGroup = {
   '@context': 'https://schema.org',
-  '@type': 'Product',
+  '@type': 'ProductGroup',
   name: `${data.title} · Fine Art Astrophotography Print`,
   description: data.tagline,
-  image: new URL(schemaImage.src, Astro.site).href,
+  url: canonical,
+  image: productImages,
   brand: { '@type': 'Brand', name: 'Abdur Astro' },
   category: 'Fine art print',
-  offers: data.options.map((option) => ({
-    '@type': 'Offer',
-    name: `${option.size} · ${option.paper}`,
-    price: option.price.toFixed(2),
-    priceCurrency: 'CAD',
-    availability: 'https://schema.org/InStock',
-    itemCondition: 'https://schema.org/NewCondition',
-    url: canonical,
-    areaServed: ['CA', 'US'],
+  productGroupID: print.id,
+  variesBy: ['https://schema.org/size', 'https://schema.org/material'],
+  hasVariant: printVariants(print.id, data.options).map(({ option, sku, query }) => ({
+    '@type': 'Product',
+    sku,
+    name: `${data.title} print · ${option.size} · ${option.paper}`,
+    image: productImages,
+    size: sizeInInches(option.size),
+    material: option.paper,
+    offers: {
+      '@type': 'Offer',
+      url: `${canonical}?${query}`,
+      price: option.price.toFixed(2),
+      priceCurrency: 'CAD',
+      availability: 'https://schema.org/InStock',
+      itemCondition: 'https://schema.org/NewCondition',
+    },
   })),
 };
+
+// Credit for each photograph shown on this page, framed view and artwork.
+const credits = await Promise.all(slides.map((slide) => photoCredit(slide.src, PRINT_SLIDE_IMAGE, Astro.site)));
 ---
 
 <Base
@@ -66,7 +95,7 @@ const productSchema = {
   description={description}
   ogImage={data.image}
   ogImageAlt={data.alt}
-  schema={[productSchema]}
+  schema={[productGroup, ...credits]}
 >
   <article class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
     <div class="grid gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(22rem,5fr)] lg:gap-16">
@@ -89,9 +118,9 @@ const productSchema = {
                     <Image
                       src={slide.src}
                       alt={slide.alt}
-                      widths={[640, 1080, 1600, 2200]}
-                      sizes="(min-width: 1024px) 55vw, 100vw"
-                      quality={80}
+                      widths={PRINT_SLIDE_IMAGE.widths}
+                      sizes={PRINT_SLIDE_IMAGE.sizes}
+                      quality={PRINT_SLIDE_IMAGE.quality}
                       loading={i === 0 ? 'eager' : 'lazy'}
                       fetchpriority={i === 0 ? 'high' : undefined}
                       class="w-full object-contain"

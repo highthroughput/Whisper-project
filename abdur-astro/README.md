@@ -134,7 +134,10 @@ closeupImage: '../../assets/prints/rosette-nebula-closeup.jpg'       # product p
 Both are optional and fall back to `image` (the raw astrophoto) when omitted.
 
 The page's prices are display-only; **the amount charged is whatever the Stripe
-Payment Link says**, so keep them in sync.
+Payment Link says**, so keep them in sync. The print's structured data, its
+per-option URLs and its Merchant Center feed items follow automatically (see
+"Print SEO and Google Merchant Center"); run the Stripe redirect script for
+the new links (see "Conversion tracking").
 
 ## Adding a new event (under 2 minutes)
 
@@ -183,6 +186,50 @@ The grid follows the count: one quote runs on its own, two sit side by side,
 three or more fill three columns. Keep quotes about the teaching or the
 photographs. A review of the transaction ("packaged well", "fast shipping")
 belongs on the marketplace listing, since here it reads as a used-gear ad.
+
+## Print SEO and Google Merchant Center
+
+All of this is generated from `src/content/prints/*.md` at build time; adding
+or repricing a print updates every piece of it.
+
+- **One URL per option.** `/prints/<slug>?size=16x24&paper=baryta-fibre` opens
+  the page with that size and paper selected, and choosing another option
+  rewrites the address to match (other parameters such as `utm_*` or
+  `prefilled_promo_code` are kept). Link ads and posts to the exact option.
+  The page's canonical URL stays `/prints/<slug>`.
+- **Structured data** on each print page is a `ProductGroup` (varies by size
+  and material) with one `Product` per option: its SKU, price in CAD and that
+  option's URL, following Google's product-variant guidance. Images are given at
+  1:1, 4:3 and 16:9, as Google's merchant listings ask.
+- **Photo credit.** Print and gallery pages carry an `ImageObject` per photograph
+  (creator Abdur, credit "Abdur Astro", copyright notice). Its `contentUrl` is
+  the largest file in the srcset the page actually renders; the image settings
+  live in `src/lib/imageMeta.ts` so the two can't drift apart.
+- **SKUs** are `<slug>-<size>-<paper>`, e.g. `andromeda-galaxy-16x24-baryta-fibre`.
+  The build fails if two options of a print share a size and paper, or if a SKU
+  passes Merchant Center's 50-character limit.
+
+### Merchant Center feed
+
+`https://abdurastro.com/google-merchant-feed.xml` lists every option of every
+print (36 today): title, description, option URL, square image plus the 4:3
+and 16:9 crops, CAD price, brand, condition, category 500044 ("Posters, Prints,
+& Visual Artwork"), size, paper, and `identifier_exists: no` (original art has
+no GTIN). One-time setup, in the business owner's Google account:
+
+1. [merchants.google.com](https://merchants.google.com): create the account,
+   business name Abdur Astro, website abdurastro.com, and claim the website
+   (easiest once Search Console is verified with the same Google account).
+2. **Shipping and returns** are account settings there, not in the feed. Add
+   the real shipping rates and the return policy, and publish the same return
+   policy on the site; Merchant Center checks that the site states one.
+3. **Products → Add products → Add products from a file → Enter a link to your
+   file**: the feed URL above, fetched daily. Country Canada, language English,
+   currency CAD. Leave the US for later (it needs USD prices or Merchant
+   Center's currency conversion).
+4. Opt in to **free listings**. Items appear in the Shopping tab and image
+   results once reviewed; Merchant Center's Diagnostics page lists anything it
+   rejects.
 
 ## Stripe Payment Links
 
@@ -393,10 +440,10 @@ live pricing.
 
 ### 5. Footer signup
 
-- [ ] The free Siril + Seestar processing guide itself. Put the file in
-      `public/` and set `newsletter.guideUrl` in `src/config.ts`. Until that is
-      set the footer shows the old newsletter pitch instead, so the site never
-      offers a download that does not exist.
+- [x] The free Siril processing guide: `newsletter.guideUrl` in `src/config.ts`
+      points at Abdur's free Patreon post "FREE Siril Data Processing Guide
+      V2" (PDF + video). The footer offers it and links to it after sign-up.
+      If a newer guide replaces it, update the URL and the footer copy.
 - [ ] A real mailing list. Signups currently POST to Web3Forms, which emails
       them, and to the lead sheet. Neither can send a broadcast or deliver the
       guide automatically, so today this is a list of addresses that someone
@@ -411,6 +458,12 @@ live pricing.
       sale rather than the work, and one was about a used microscope.
 
 ### 7. Email, socials, domain
+
+- [ ] www and http redirect to `https://abdurastro.com` (Deploying step 6; as of
+      Sep 2026 neither does)
+- [ ] Search Console verified and the sitemap submitted (Deploying step 9)
+- [ ] Merchant Center account with the feed, shipping and returns ("Print SEO
+      and Google Merchant Center")
 
 - [x] Domain: `site` in `astro.config.mjs` and the `Sitemap:` line in
       `public/robots.txt` are set to `https://abdurastro.com` — change only if
@@ -445,8 +498,19 @@ subdirectory — set the **root directory** accordingly in step 4.
    domain** → enter the domain (e.g. `abdurastro.com`).
    - Domain on Cloudflare (recommended — transfer or point its nameservers at
      Cloudflare first): the CNAME is created automatically and TLS issues within
-     minutes. Add both `abdurastro.com` and `www.abdurastro.com`; Cloudflare
-     redirects the alternate automatically.
+     minutes. Add both `abdurastro.com` and `www.abdurastro.com`.
+   - **Then add the redirects yourself; Cloudflare does not.** As of Sep 2026
+     both `https://www.abdurastro.com/…` and plain `http://…` answer 200, so
+     every page exists at three addresses, and YouTube, Patreon and X link to
+     the www one. The canonical tags point search engines at the right one,
+     but a redirect is the real fix:
+     - the domain → **SSL/TLS → Edge Certificates → Always Use HTTPS**: on;
+     - the domain → **Rules → Redirect Rules → Create rule → template
+       "Redirect from WWW to root"**: request URL `https://www.abdurastro.com/*`
+       → target `https://abdurastro.com/${1}`, 301, preserve query string
+       (plain http is upgraded first by Always Use HTTPS, then redirected).
+     - Check: `curl -sI https://www.abdurastro.com/prints` should say `301`
+       with `location: https://abdurastro.com/prints`.
    - Domain elsewhere: add the CNAME record Cloudflare shows you at your DNS host.
 7. **Code's domain is already set** to `https://abdurastro.com`
    (`astro.config.mjs` `site` + `robots.txt`) — nothing to change unless the
@@ -461,8 +525,13 @@ subdirectory — set the **root directory** accordingly in step 4.
      verified destination. Send a test email.
    - Note: Email Routing forwards inbound mail only. To *send* as
      `info@abdurastro.com`, add it as a send-as alias in your mail provider.
-9. **Submit the sitemap** (optional, day one): Google Search Console → add the
-   domain → submit `https://abdurastro.com/sitemap-index.xml`.
+9. **Search Console and the sitemap** (day one, not optional: in Sep 2026 a
+   `site:abdurastro.com` search found none of the site's own pages).
+   Google Search Console → **Add property → Domain** → `abdurastro.com`; with
+   the DNS on Cloudflare the verification record can be added in one click.
+   Then **Sitemaps** → submit `https://abdurastro.com/sitemap-index.xml`.
+   Bing Webmaster Tools can import the property from Search Console, which
+   also covers DuckDuckGo and others that use Bing's index.
 
 ## Placeholder image credits
 
