@@ -80,6 +80,14 @@ export const SITE = {
     'https://script.google.com/macros/s/AKfycbxL0anvH5TP99RPXLD3oDZYR8-mEF8n1Pg7naXcEzjBdv2GgDngOPv8zvd90rJNBcg/exec',
 } as const;
 
+/**
+ * Who pays import charges on a shipped print. Shown on the print pages and the
+ * prints index; scripts/stripe-print-pages.mjs copies it from the built prints
+ * index onto every print's Stripe checkout page, so edit it here only.
+ */
+export const DUTIES_NOTE =
+  "Any customs duties, import taxes or brokerage fees charged on delivery are the customer's responsibility and aren't included in the price.";
+
 /** Subjects offered on the contact form; services link here with ?topic=<key>. */
 export const INQUIRY_TOPICS = {
   general: 'General inquiry',

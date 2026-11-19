@@ -107,11 +107,10 @@ confirmed.
    image: '../../assets/photos/rosette-nebula.jpg'
    alt: 'One sentence describing the print.'
    tagline: 'One line shown under the title on the product page.'
-   edition: 'Open edition · signed'
    options:
      - { size: '12 × 18″', paper: 'Archival matte', price: 145, stripeLink: 'https://buy.stripe.com/…' }
      - { size: '16 × 24″', paper: 'Archival matte', price: 210, stripeLink: 'https://buy.stripe.com/…' }
-     - { size: '24 × 36″', paper: 'Baryta fibre',   price: 410, stripeLink: 'https://buy.stripe.com/…' }
+     - { size: '24 × 36″', paper: 'Hahnemühle FineArt Pearl (gloss)', price: 410, stripeLink: 'https://buy.stripe.com/…' }
    featured: false
    order: 6                            # position in the shop grid
    ---
@@ -207,7 +206,7 @@ button goes straight to Stripe, then rerun `scripts/stripe-redirects.mjs`.
 All of this is generated from `src/content/prints/*.md` at build time; adding
 or repricing a print updates every piece of it.
 
-- **One URL per option.** `/prints/<slug>?size=16x24&paper=baryta-fibre` opens
+- **One URL per option.** `/prints/<slug>?size=16x24&paper=fineart-pearl` opens
   the page with that size and paper selected, and choosing another option
   rewrites the address to match (other parameters such as `utm_*` or
   `prefilled_promo_code` are kept). Link ads and posts to the exact option.
@@ -220,7 +219,10 @@ or repricing a print updates every piece of it.
   (creator Abdur, credit "Abdur Astro", copyright notice). Its `contentUrl` is
   the largest file in the srcset the page actually renders; the image settings
   live in `src/lib/imageMeta.ts` so the two can't drift apart.
-- **SKUs** are `<slug>-<size>-<paper>`, e.g. `andromeda-galaxy-16x24-baryta-fibre`.
+- **SKUs** are `<slug>-<size>-<paper>`, e.g. `andromeda-galaxy-16x24-fineart-pearl`.
+  A paper whose name is long gets a short key in `PAPER_KEYS` (`src/lib/prints.ts`).
+  Old links that say `paper=baryta-fibre`, from before the Pearl replaced
+  baryta, still open on the Pearl option.
   The build fails if two options of a print share a size and paper, or if a SKU
   passes Merchant Center's 50-character limit.
 
@@ -254,6 +256,31 @@ one-time. Enable **shipping address collection** (Canada and the US, per the
 site's "ships across North America" copy), add your shipping rate, and (if
 registered) let Stripe Tax handle GST. Copy the `https://buy.stripe.com/…`
 URL over the matching placeholder token below.
+
+### Keeping the print checkout pages in line with the site
+
+The checkout page shows the Stripe product's name and description, so a
+paper change or a dropped claim on the site has to reach Stripe too.
+`scripts/stripe-print-pages.mjs` does that for every print link the site uses:
+
+- In product names and descriptions, "Baryta fibre" becomes "Hahnemühle
+  FineArt Pearl (gloss)" on the Pearl options, and "Open edition · signed"
+  (and close variants) comes out. Nothing else in a name changes, and
+  anything still mentioning baryta, an edition or signing is listed for a
+  hand edit instead of guessed at.
+- It adds the duties note (`DUTIES_NOTE` in `src/config.ts`) to each print
+  checkout, under the shipping address, after any text already there.
+
+```sh
+npm run build
+STRIPE_SECRET_KEY=rk_live_… node scripts/stripe-print-pages.mjs          # dry run, prints every change
+STRIPE_SECRET_KEY=rk_live_… node scripts/stripe-print-pages.mjs --apply  # applies them
+```
+
+Use a restricted key with *Payment Links: Write*, *Products: Write* and
+*Prices: Read*, and delete it afterwards. `--apply` first saves what it
+changes to `stripe-print-pages-backup-<time>.json` (git-ignored). Re-run it
+after adding a print or changing the duties note; it skips what's already right.
 
 ## Conversion tracking
 
@@ -438,9 +465,9 @@ of them in place — but do not launch until each box is checked.
       `scripts/stripe-redirects.mjs --apply` so they return to `/thank-you`.
       Until then the 8″ books by email: the form sends Abdur the dates and
       reference, and he replies with a way to pay.
-- [ ] Orion 8″ photo: drop it in `src/assets/rentals/`, import it in
-      `src/data/rentals.ts` and set `image` and `imageAlt`. Without one, the
-      page skips the photo and its card on `/rentals` shows the aperture.
+- [x] Orion 8″ photo is in `src/assets/rentals/orion-8-dobsonian.jpg`
+      (a stand-in until a better one is taken). A scope with no `image`
+      skips the photo and its card on `/rentals` shows the aperture.
 - [ ] Orion 8″ setup video: once it has a public YouTube link, set
       `setupVideoUrl` on the scope and the page links it.
 - [x] Hourly booking links for one-on-one tutorials and equipment consulting
@@ -449,6 +476,10 @@ of them in place — but do not launch until each box is checked.
       service).
 - [ ] Page prices match the amounts configured in Stripe (spot-check against
       the live dashboard before launch)
+- [ ] Print checkout pages renamed from Baryta fibre to Hahnemühle FineArt
+      Pearl (gloss), edition wording removed, duties note added: run
+      `scripts/stripe-print-pages.mjs --apply` (see "Keeping the print
+      checkout pages in line with the site").
 - [x] All six consult-call Appointment Schedule links (free intro, 1 to 5
       hours) are real and live in `src/pages/services.astro` (see "Consult
       call booking" above).

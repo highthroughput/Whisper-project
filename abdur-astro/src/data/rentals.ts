@@ -10,6 +10,7 @@
 import type { ImageMetadata } from 'astro';
 import type { RentalRate } from './checkout';
 import skywatcherImage from '../assets/rentals/skywatcher-dobsonian.webp';
+import orionImage from '../assets/rentals/orion-8-dobsonian.jpg';
 
 export interface RentalScope {
   /** URL segment, and the product id reported to ad platforms. */
@@ -112,6 +113,9 @@ export const RENTAL_SCOPES: RentalScope[] = [
       "Two eyepieces come with it. The 25 mm Plössl gives a wide, low-power view that makes things easy to find, and the Celestron 7 mm X-Cel takes over for close-ups of the Moon and planets once you have them centred. A setup video walks through assembly and using the scope: scan the QR code that comes with it to open it.",
       "Rent it for a weekend before deciding whether to buy one, or for a week of clear nights at the cabin.",
     ],
+    image: orionImage,
+    imageAlt:
+      'The Orion 8″ Dobsonian telescope on its black rocker base, set up on concrete outdoors, its dark blue tube angled up with the red dot finder and eyepiece near the top, and a spruce tree and lawn behind.',
     included: [
       '25 mm Orion Plössl eyepiece',
       'Celestron 7 mm X-Cel eyepiece',

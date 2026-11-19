@@ -3,6 +3,7 @@ import { Image, getImage } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { cleanPathname } from '../../lib/urls';
+import { DUTIES_NOTE } from '../../config';
 import PrintOptions from '../../components/PrintOptions.astro';
 import { printVariants, sizeInInches } from '../../lib/prints';
 import { PRINT_SLIDE_IMAGE, photoCredit } from '../../lib/imageMeta';
@@ -38,7 +39,7 @@ const slides = [
 
 
 const canonical = new URL(cleanPathname(Astro.url.pathname), Astro.site).href;
-const description = `${data.title} fine art print: archival giclée astrophotography from Alberta on matte or baryta cotton papers, ${data.options[0].size} to ${data.options[data.options.length - 1].size}, from $${from} CAD. Ships across North America.`;
+const description = `${data.title} fine art print: archival giclée astrophotography from Alberta on archival matte or Hahnemühle FineArt Pearl gloss paper, ${data.options[0].size} to ${data.options[data.options.length - 1].size}, from $${from} CAD. Ships across North America.`;
 
 // Google's merchant listings ask for the product image at 1:1, 4:3 and 16:9.
 // The master is 3:2, so each is a centred crop of the full-resolution file.
@@ -182,13 +183,9 @@ const credits = await Promise.all(slides.map((slide) => photoCredit(slide.src, P
         <p class="eyebrow">Fine art print</p>
         <h1 class="mt-3 font-display text-4xl sm:text-5xl">{data.title}</h1>
         <p class="mt-4 text-faint">{data.tagline}</p>
-        {/* The price belongs above the fold, and the edition drops to faint so the
-            title is not sandwiched between two identical dust-orange labels. */}
+        {/* The price belongs above the fold. */}
         <div class="mt-5 flex flex-wrap items-baseline gap-x-4 gap-y-1">
           <p class="font-display text-2xl tabular-nums text-star">From ${from} CAD</p>
-          <p class="font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
-            {data.edition}
-          </p>
         </div>
 
         <div class="reveal mt-8 max-w-prose text-sm leading-relaxed text-star/85 [&_p]:mb-4 [&_p:last-child]:mb-0">
@@ -198,14 +195,10 @@ const credits = await Promise.all(slides.map((slide) => photoCredit(slide.src, P
         <PrintOptions options={data.options} title={data.title} id={print.id} class="mt-10" />
 
         <div class="mt-6 space-y-2 text-xs leading-relaxed text-faint">
-          <p>
-            Archival pigment giclée · 100% cotton papers · signed
-            {data.edition.toLowerCase().includes('limited') && ' and numbered'} · certificate of
-            authenticity included.
-          </p>
+          <p>Archival pigment giclée · certificate of authenticity included.</p>
           <p>
             Ships across North America in a rigid tube. Turnaround currently 7–10 business days.
-            Shipping and taxes calculated at Stripe checkout.{' '}
+            Shipping and taxes calculated at Stripe checkout. <span data-duties-note>{DUTIES_NOTE}</span>{' '}
             <a href="/contact?topic=prints" class="link-quiet">Questions?</a>
           </p>
         </div>

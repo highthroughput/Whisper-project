@@ -25,6 +25,11 @@ const xml = (text: string) =>
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;');
 
+// "Archival matte" reads as "archival matte" mid-sentence; a brand name such
+// as "Hahnemühle FineArt Pearl (gloss)" keeps its capitals.
+const inSentence = (paper: string) =>
+  /^[A-Z][a-z]+ [a-z]/.test(paper) ? paper[0].toLowerCase() + paper.slice(1) : paper;
+
 export const GET: APIRoute = async ({ site }) => {
   const prints = (await getCollection('prints')).sort((a, b) => a.data.order - b.data.order);
   const items: string[] = [];
@@ -48,11 +53,10 @@ export const GET: APIRoute = async ({ site }) => {
 
     for (const { option, sku, query } of printVariants(print.id, data.options)) {
       const [w, h] = sizeKey(option.size).split('x');
-      const paper = option.paper.toLowerCase();
       const title = `${data.title} Astrophotography Print, ${w}x${h} in, ${option.paper}`;
       const description =
-        `${data.tagline} Archival pigment giclée on ${paper} cotton paper, ${w} × ${h} inches, ` +
-        'signed, with a certificate of authenticity. Ships rolled in a rigid tube.';
+        `${data.tagline} Archival pigment giclée on ${inSentence(option.paper)} paper, ${w} × ${h} inches, ` +
+        'with a certificate of authenticity. Ships rolled in a rigid tube.';
 
       items.push(
         [

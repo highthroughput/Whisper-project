@@ -10,6 +10,9 @@ interface Props {
 const { print, eager = false } = Astro.props;
 const { data } = print;
 const from = Math.min(...data.options.map((o) => o.price));
+const sizeCount = new Set(data.options.map((o) => o.size)).size;
+const paperCount = new Set(data.options.map((o) => o.paper)).size;
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 ---
 
 <a href={`/prints/${print.id}`} class="group block">
@@ -41,6 +44,6 @@ const from = Math.min(...data.options.map((o) => o.price));
     </span>
   </div>
   <p class="mt-1 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
-    {data.edition} · CAD
+    {plural(sizeCount, 'size')} · {plural(paperCount, 'paper')} · CAD
   </p>
 </a>

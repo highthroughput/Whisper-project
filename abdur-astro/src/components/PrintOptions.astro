@@ -95,7 +95,7 @@ const initial = options[0];
 
 <script>
   import { beginCheckout, viewItem, type TrackedItem } from '../lib/track';
-  import { paperKey, sizeKey } from '../lib/prints';
+  import { RETIRED_PAPER_KEYS, paperKey, sizeKey } from '../lib/prints';
 
   document.querySelectorAll<HTMLElement>('.print-options').forEach((root) => {
     type Option = { size: string; paper: string; price: number; stripeLink: string };
@@ -144,12 +144,14 @@ const initial = options[0];
       note.textContent = '';
     };
 
-    // ?size=16x24&paper=baryta-fibre opens the page on that option: the links
+    // ?size=16x24&paper=fineart-pearl opens the page on that option: the links
     // in the structured data, the Merchant Center feed, ads and posts all
     // point at one exact print. Values that match nothing are ignored.
     const params = new URLSearchParams(window.location.search);
     const wantedSize = options.find((o) => sizeKey(o.size) === params.get('size'))?.size;
-    const wantedPaper = options.find((o) => paperKey(o.paper) === params.get('paper'))?.paper;
+    const paperParam = params.get('paper') ?? '';
+    const paperWanted = RETIRED_PAPER_KEYS[paperParam] ?? paperParam;
+    const wantedPaper = options.find((o) => paperKey(o.paper) === paperWanted)?.paper;
     if (wantedSize) sizeSelect.value = wantedSize;
     if (wantedPaper) paperSelect.value = wantedPaper;
 

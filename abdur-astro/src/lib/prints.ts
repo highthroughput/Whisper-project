@@ -1,6 +1,6 @@
 /**
  * Stable, URL-safe names for a print's size and paper options. The print page
- * (preselecting an option from `?size=16x24&paper=baryta-fibre`), its
+ * (preselecting an option from `?size=16x24&paper=fineart-pearl`), its
  * structured data and the Merchant Center feed all build on these, so a link
  * in any of them opens the page on exactly that option.
  *
@@ -28,9 +28,27 @@ export function sizeKey(size: string): string {
   return numbers && numbers.length >= 2 ? numbers.join('x') : slugify(size);
 }
 
-/** "Baryta fibre" → "baryta-fibre". */
+/**
+ * Short keys for papers whose full names would make SKUs too long for
+ * Merchant Center's 50 characters ("north-america-pelican-nebula-24x36-…"
+ * leaves 15). Any paper not listed gets its name slugified.
+ */
+const PAPER_KEYS: Record<string, string> = {
+  'Hahnemühle FineArt Pearl (gloss)': 'fineart-pearl',
+};
+
+/**
+ * Keys that links already in circulation may carry for a paper the shop no
+ * longer offers, mapped to the paper that took its place, so an old ad or
+ * post still opens the page on the option at that price.
+ */
+export const RETIRED_PAPER_KEYS: Record<string, string> = {
+  'baryta-fibre': 'fineart-pearl',
+};
+
+/** "Archival matte" → "archival-matte"; "Hahnemühle FineArt Pearl (gloss)" → "fineart-pearl". */
 export function paperKey(paper: string): string {
-  return slugify(paper);
+  return PAPER_KEYS[paper] ?? slugify(paper);
 }
 
 /** "16 × 24″" → "16 × 24 in": the same size, spelled out for machines. */
@@ -39,7 +57,7 @@ export function sizeInInches(size: string): string {
   return numbers && numbers.length >= 2 ? `${numbers[0]} × ${numbers[1]} in` : size;
 }
 
-/** The query string that preselects this option: "size=16x24&paper=baryta-fibre". */
+/** The query string that preselects this option: "size=16x24&paper=fineart-pearl". */
 export function variantQuery(option: Pick<PrintOption, 'size' | 'paper'>): string {
   return `size=${sizeKey(option.size)}&paper=${paperKey(option.paper)}`;
 }
@@ -49,7 +67,7 @@ const MAX_ID_LENGTH = 50;
 
 export interface PrintVariant {
   option: PrintOption;
-  /** Unique per print option, e.g. "andromeda-galaxy-16x24-baryta-fibre". */
+  /** Unique per print option, e.g. "andromeda-galaxy-16x24-fineart-pearl". */
   sku: string;
   query: string;
 }

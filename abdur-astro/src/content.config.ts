@@ -68,7 +68,6 @@ const prints = defineCollection({
       lifestyleAlt: z.string().min(10).optional(),
       /** One line under the title on the product page. */
       tagline: z.string(),
-      edition: z.string().default('Open edition, signed'),
       options: z
         .array(
           z.object({
