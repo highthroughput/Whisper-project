@@ -109,7 +109,7 @@ export const RENTAL_SCOPES: RentalScope[] = [
     intro:
       "An 8-inch reflector on a simple rocker base, and the telescope people most often get pointed to when they ask what to buy first. It shows the craters along the Moon's terminator, Saturn's rings, Jupiter's cloud bands and moons, and the brighter star clusters and nebulae. It comes apart into a tube and a base for the trip out the door.",
     body: [
-      "Two eyepieces come with it. The 25 mm Plössl gives a wide, low-power view that makes things easy to find, and the Celestron 7 mm X-Cel takes over for close-ups of the Moon and planets once you have them centred. A short setup video walks through assembly and the first night out: scan the QR code on the scope to open it.",
+      "Two eyepieces come with it. The 25 mm Plössl gives a wide, low-power view that makes things easy to find, and the Celestron 7 mm X-Cel takes over for close-ups of the Moon and planets once you have them centred. A setup video walks through assembly and using the scope: scan the QR code that comes with it to open it.",
       "Rent it for a weekend before deciding whether to buy one, or for a week of clear nights at the cabin.",
     ],
     included: [
@@ -117,7 +117,7 @@ export const RENTAL_SCOPES: RentalScope[] = [
       'Celestron 7 mm X-Cel eyepiece',
       'Red dot finder',
       'Curated observing guide',
-      'Setup and first-use video (QR code on the scope)',
+      'Setup video for assembly and use (QR code included)',
     ],
     eyepieces: '25 mm Plössl and 7 mm X-Cel',
     extras: 'Setup video',

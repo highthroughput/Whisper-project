@@ -270,7 +270,7 @@ empty, no tag code ships at all. Each piece switches on independently:
 
 What fires where:
 
-- **Every page** (all 13 templates share `Base.astro`, and there is no
+- **Every page** (all 14 templates share `Base.astro`, and there is no
   client-side routing): one page view to each configured tag, plus a Meta
   Contact / GA4 `contact` event whenever the email address is clicked.
 - **Print pages**: view on load (at the "from" price), checkout when Buy is

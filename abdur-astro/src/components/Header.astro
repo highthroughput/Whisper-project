@@ -1,4 +1,5 @@
 ---
+import { cleanPathname } from '../lib/urls';
 import SocialLinks from './SocialLinks.astro';
 
 interface Props {
@@ -15,7 +16,9 @@ const links = [
   { href: '/about', label: 'About' },
 ];
 
-const path = Astro.url.pathname;
+// cleanPathname: under build.format 'file' the hub pages are /rentals.html,
+// /gallery.html…, which would never match their own nav link.
+const path = cleanPathname(Astro.url.pathname);
 const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`);
 ---
 
