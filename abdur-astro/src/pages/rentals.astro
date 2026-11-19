@@ -1,100 +1,198 @@
 ---
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import telescopeImage from '../assets/rentals/skywatcher-dobsonian.webp';
-import RentalBooking from '../components/RentalBooking.astro';
-import { RENTAL_RATES } from '../data/checkout';
+import { RENTAL_SCOPES, lowestRentalRate } from '../data/rentals';
 
-// Rates live in src/data/checkout.ts so the thank-you page can value a
-// rental purchase from the same numbers this page charges.
-const rates = RENTAL_RATES;
-
-const included = [
-  'Upgraded Baader zoom eyepiece',
-  'Red dot finder',
-  'Laser collimator',
-  'Dew heater',
-  'Red headlamp',
-  'Curated observing guide',
-  'Setup and assembly directions',
-];
+// Every scope, with its own page under /rentals/<slug>. The rates and what's
+// in the case come from src/data/rentals.ts, so this page can't disagree
+// with the booking panels.
+const scopes = RENTAL_SCOPES;
+const keyScope = scopes.find((scope) => scope.image);
+const priceOf = (slug: string, term: string) =>
+  scopes.find((s) => s.slug === slug)?.rates.find((r) => r.term === term)?.price;
+const terms = [...new Set(scopes.flatMap((scope) => scope.rates.map((r) => r.term)))];
 ---
 
 <Base
-  title="Sky-Watcher 10″ Dobsonian Rental"
-  description="Rent a Sky-Watcher 10-inch 250P Flextube Dobsonian telescope in Southern Alberta. One night, weekend, and weekly rates, with eyepiece, finder, and accessories included."
+  title="Telescope Rentals Southern Alberta"
+  description="Rent a Dobsonian telescope in Southern Alberta: a Sky-Watcher 10-inch or an Orion 8-inch, by the night, weekend, or week, with eyepieces, a finder, and an observing guide included."
+  ogImage={keyScope?.image}
+  ogImageAlt={keyScope?.imageAlt}
 >
-  <article class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
-    <div class="grid gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(22rem,5fr)] lg:gap-16">
-      <div>
-        <p class="eyebrow">Telescope rental</p>
-        <h1 class="mt-3 font-display text-4xl sm:text-5xl">
-          Sky-Watcher 10″ 250P Flextube Dobsonian
-        </h1>
-        <p class="mt-6 max-w-2xl text-faint">
-          A 10-inch reflector big enough to hold Saturn's rings, Jupiter's cloud bands, star
-          clusters, and galaxies steady in the eyepiece, without the cost or the storage of
-          owning one. The collapsible Flextube design sets up in minutes and breaks back down
-          for the drive home.
-        </p>
+  <section class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
+    <p class="eyebrow">Telescope rentals</p>
+    <h1 class="mt-3 font-display text-4xl sm:text-5xl">Rent a telescope</h1>
+    <p class="mt-6 max-w-2xl text-faint">
+      Two Dobsonian reflectors, ready for a backyard, a campsite, or a dark-sky drive out of the
+      city. Both come with eyepieces, a finder, and the observing guide, and every pickup
+      includes a walkthrough. Book by the night, the weekend, or the week; rates are in CAD.
+    </p>
 
-        <div class="reveal mt-8 border hairline bg-surface p-4 sm:p-5">
-          <Image
-            src={telescopeImage}
-            alt="The Sky-Watcher 10″ 250P Flextube Dobsonian telescope set up on its rocker base in a living room, showing the primary mirror, focuser with eyepiece, and collapsible truss tube."
-            widths={[480, 768, 1080, 1440]}
-            sizes="(min-width: 1024px) 55vw, 100vw"
-            quality={80}
-            loading="eager"
-            fetchpriority="high"
-            class="w-full object-cover"
-          />
-        </div>
+    <div class="mt-12 grid gap-6 md:grid-cols-2">
+      {
+        scopes.map((scope, i) => (
+          <article
+            class="reveal flex flex-col border hairline bg-surface"
+            style={`--reveal-delay:${i * 80}ms`}
+            aria-labelledby={`${scope.slug}-card-heading`}
+          >
+            <a href={`/rentals/${scope.slug}`} class="block border-b hairline" tabindex="-1" aria-hidden="true">
+              {scope.image ? (
+                <Image
+                  src={scope.image}
+                  alt=""
+                  widths={[480, 768, 1080]}
+                  sizes="(min-width: 768px) 45vw, 100vw"
+                  quality={80}
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  class="aspect-[4/3] w-full object-cover"
+                />
+              ) : (
+                <div class="flex aspect-[4/3] w-full flex-col items-center justify-center gap-3">
+                  <span class="font-display text-7xl text-star sm:text-8xl">{scope.aperture}</span>
+                  <span class="eyebrow text-faint">Dobsonian reflector</span>
+                </div>
+              )}
+            </a>
 
-        <div class="reveal mt-8 max-w-prose space-y-4 text-sm leading-relaxed text-star/85">
+            <div class="flex flex-1 flex-col px-5 py-5 sm:px-6">
+              <h2 id={`${scope.slug}-card-heading`} class="font-display text-2xl">
+                <a href={`/rentals/${scope.slug}`} class="hover:text-dust-bright">
+                  {scope.name}
+                </a>
+              </h2>
+              <p class="mt-3 text-sm leading-relaxed text-star/85">{scope.pitch}</p>
+
+              <ul class="mt-5 font-mono text-[0.8125rem]">
+                {scope.rates.map((rate, j) => (
+                  <li class:list={['flex items-baseline py-2', j > 0 && 'border-t hairline']}>
+                    <span class="shrink-0 text-star">{rate.term}</span>
+                    <span class="log-leader" aria-hidden="true" />
+                    <span class="shrink-0 text-xs text-faint">{rate.detail}</span>
+                    <span class="ml-3 shrink-0 tabular-nums text-star">${rate.price}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div class="mt-auto pt-6">
+                <a
+                  href={`/rentals/${scope.slug}`}
+                  class="btn btn-solid btn-sm w-full"
+                  aria-label={`Details and booking for the ${scope.name}`}
+                >
+                  Details and booking →
+                </a>
+              </div>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section
+    class="mx-auto mt-20 w-full max-w-7xl px-5 sm:px-8"
+    aria-labelledby="compare-heading"
+  >
+    <div class="reveal border-t hairline pt-12">
+      <p class="eyebrow">Side by side</p>
+      <h2 id="compare-heading" class="mt-3 font-display text-3xl sm:text-4xl">Which one to rent</h2>
+      <div class="mt-8 grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+        <div class="max-w-prose space-y-4 text-sm leading-relaxed text-star/85">
           <p>
-            The Dobsonian mount is push-to and point-and-look simple, so tracking an object down
-            is no harder on your first night than your hundredth. It's the same scope for a
-            backyard session, a camping trip, or a dark-sky drive out of the city, and it comes
-            back with you no matter how the night went.
+            The 10″ mirror collects about half again as much light as the 8″, which you notice
+            most on faint galaxies and nebulae from a dark site. Its case also carries a zoom
+            eyepiece, a dew heater for cold, damp nights, and a laser collimator.
+          </p>
+          <p>
+            The 8″ is lighter to carry, and on the Moon, the planets, and bright clusters the
+            difference is small. For a first night out, or to keep the cost
+            down, start there.
           </p>
         </div>
 
-        {/* What you get, then the handoff terms: both answer questions the
-            booking form would otherwise raise, so they read before it. The
-            wrapper is what sets the width: left to themselves these two would
-            each resolve `max-w-prose` against their own font size and stop
-            short of the photograph's edge at two different places. */}
-        <div class="mt-10">
-          <section class="reveal border hairline bg-surface" aria-labelledby="included-heading">
-            <header class="border-b hairline px-5 py-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
-              <h2 id="included-heading">Included with every rental</h2>
-            </header>
-            {/* Two columns from tablet width up: seven short entries stacked
-                single-file left most of the panel empty. */}
-            <ul class="px-5 py-4 text-sm text-star/85 sm:columns-2 sm:gap-x-8">
+        {/* A real table: two scopes compared row by row reads better to a
+            screen reader as a table than as two separate lists. */}
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse text-left font-mono text-[0.8125rem]">
+            <caption class="sr-only">Rental scopes compared, rates in CAD</caption>
+            <thead>
+              <tr class="border-b hairline">
+                <th scope="col" class="py-2 pr-4 font-normal text-faint"><span class="sr-only">Feature</span></th>
+                {
+                  scopes.map((scope) => (
+                    <th scope="col" class="py-2 pr-4 font-normal text-star">
+                      {scope.shortName}
+                    </th>
+                  ))
+                }
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b hairline">
+                <th scope="row" class="py-2 pr-4 align-top font-normal text-faint">Mirror</th>
+                {scopes.map((scope) => <td class="py-2 pr-4 align-top text-star">{scope.aperture}</td>)}
+              </tr>
+              <tr class="border-b hairline">
+                <th scope="row" class="py-2 pr-4 align-top font-normal text-faint">Eyepieces</th>
+                {scopes.map((scope) => <td class="py-2 pr-4 align-top text-star/85">{scope.eyepieces}</td>)}
+              </tr>
+              <tr class="border-b hairline">
+                <th scope="row" class="py-2 pr-4 align-top font-normal text-faint">Also in the case</th>
+                {scopes.map((scope) => <td class="py-2 pr-4 align-top text-star/85">{scope.extras}</td>)}
+              </tr>
               {
-                included.map((item) => (
-                  <li class="flex break-inside-avoid items-baseline gap-2 py-1">
-                    <span class="text-dust" aria-hidden="true">·</span>
-                    {item}
-                  </li>
+                terms.map((term) => (
+                  <tr class="border-b hairline">
+                    <th scope="row" class="py-2 pr-4 align-top font-normal text-faint">
+                      {term}
+                    </th>
+                    {scopes.map((scope) => {
+                      const price = priceOf(scope.slug, term);
+                      return (
+                        <td class="py-2 pr-4 align-top tabular-nums text-star">
+                          {price === undefined ? '·' : `$${price}`}
+                        </td>
+                      );
+                    })}
+                  </tr>
                 ))
               }
-            </ul>
-          </section>
-
-          <p class="mt-6 text-xs leading-relaxed text-faint">
-            Pickup and return around Southern Alberta. Every handoff includes a walkthrough of
-            the scope and accessories.{' '}
-            <a href="/contact?topic=rentals" class="link-quiet">Questions or a custom date range?</a>
-          </p>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <div class="lg:sticky lg:top-24 lg:self-start">
-        <RentalBooking rates={rates} />
-      </div>
+      <p class="mt-10 max-w-prose text-xs leading-relaxed text-faint">
+        Pickup and return around Southern Alberta. Every handoff includes a walkthrough of the
+        scope and accessories.{' '}
+        <a href="/contact?topic=rentals" class="link-quiet">Questions or a custom date range?</a>
+      </p>
     </div>
-  </article>
+  </section>
+
+  <div
+    hidden
+    data-rental-list={JSON.stringify(
+      scopes.map((scope) => ({
+        id: scope.slug,
+        name: `${scope.name} rental`,
+        category: 'rental',
+        value: lowestRentalRate(scope),
+      })),
+    )}
+  />
 </Base>
+
+<script>
+  import { viewItemList, type TrackedItem } from '../lib/track';
+
+  // An index, like the prints page: GA4 gets the list, and each scope's own
+  // page sends the product view.
+  const el = document.querySelector<HTMLElement>('[data-rental-list]');
+  try {
+    viewItemList('Rentals', JSON.parse(el?.dataset.rentalList ?? '[]') as TrackedItem[]);
+  } catch {
+    /* malformed data: skip the event rather than break the page */
+  }
+</script>

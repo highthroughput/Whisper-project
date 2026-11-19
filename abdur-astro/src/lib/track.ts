@@ -14,7 +14,7 @@
 export type CheckoutCategory = 'print' | 'rental' | 'tutorial' | 'consulting';
 
 export interface TrackedItem {
-  /** Stable product id, e.g. "andromeda-galaxy" or "scope-rental". */
+  /** Stable product id, e.g. "andromeda-galaxy" or "orion-8-dobsonian". */
   id: string;
   name: string;
   /** e.g. "16 × 24″ · Archival matte", "Weekend", "2 hours". */

@@ -1,39 +1,38 @@
 ---
 import { SITE } from '../config';
-
-interface Rate {
-  term: string;
-  /** The most nights this rate covers. */
-  nights: number;
-  detail: string;
-  price: number;
-  stripeLink: string;
-}
+import { isPayable, type RentalScope } from '../data/rentals';
 
 interface Props {
-  rates: Rate[];
+  scope: RentalScope;
   class?: string;
 }
 
-const { rates, class: className } = Astro.props;
+const { scope, class: className } = Astro.props;
+const { rates, slug } = scope;
 const longest = Math.max(...rates.map((r) => r.nights));
+const payable = isPayable(scope);
+// Element ids carry the scope so two booking panels could never collide.
+const id = (name: string) => `${slug}-${name}`;
 ---
 
 {/* Instant payment from a static page means the browser needs the Stripe URLs,
     so they are in the markup by necessity. A payment link can always be opened
     directly, so the dates a booking covers come from the emailed record and its
-    reference, never from Stripe. */}
+    reference, never from Stripe. A rate with no link yet sends the same record
+    as a request, and Abdur replies with a way to pay. */}
 <section
   class:list={['rental-booking border hairline bg-surface', className]}
   data-rates={JSON.stringify(rates)}
   data-email={SITE.email}
   data-longest={longest}
-  aria-labelledby="rental-booking-heading"
+  data-slug={slug}
+  data-name={scope.name}
+  aria-labelledby={id('booking-heading')}
 >
   <header
     class="flex items-baseline justify-between border-b hairline px-5 py-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)]"
   >
-    <h2 id="rental-booking-heading" class="text-faint">Book the scope</h2>
+    <h2 id={id('booking-heading')} class="text-faint">Book the {scope.shortName}</h2>
     <span class="text-dust">CAD</span>
   </header>
 
@@ -56,11 +55,13 @@ const longest = Math.max(...rates.map((r) => r.nights));
       }
     </ul>
 
-    <form id="rental-form" class="mt-5 space-y-4" action="https://api.web3forms.com/submit" method="POST">
+    <form data-rental-form class="mt-5 space-y-4" action="https://api.web3forms.com/submit" method="POST">
       <input type="hidden" name="access_key" value={SITE.web3formsKey} />
-      <input type="hidden" name="subject" value="Telescope rental · Abdur Astro" />
+      <input type="hidden" name="subject" value={`Telescope rental · ${scope.name} · Abdur Astro`} />
       <input type="hidden" name="from_name" value="Abdur Astro rental" />
       <input type="hidden" name="form" value="Rental booking" />
+      <input type="hidden" name="scope" value={scope.name} />
+      <input type="hidden" name="booking" data-field-booking />
       <input type="hidden" name="rental_rate" data-field-rate />
       <input type="hidden" name="pickup" data-field-pickup />
       <input type="hidden" name="dropoff" data-field-dropoff />
@@ -79,9 +80,9 @@ const longest = Math.max(...rates.map((r) => r.nights));
 
       <div class="grid grid-cols-2 gap-3">
         <div class="flex flex-col gap-1.5">
-          <label for="rental-pickup-date" class="eyebrow text-faint">Pick up</label>
+          <label for={id('pickup-date')} class="eyebrow text-faint">Pick up</label>
           <input
-            id="rental-pickup-date"
+            id={id('pickup-date')}
             type="date"
             required
             data-pickup-date
@@ -89,9 +90,9 @@ const longest = Math.max(...rates.map((r) => r.nights));
           />
         </div>
         <div class="flex flex-col gap-1.5">
-          <label for="rental-pickup-time" class="eyebrow text-faint">Time</label>
+          <label for={id('pickup-time')} class="eyebrow text-faint">Time</label>
           <input
-            id="rental-pickup-time"
+            id={id('pickup-time')}
             type="time"
             required
             value="18:00"
@@ -100,9 +101,9 @@ const longest = Math.max(...rates.map((r) => r.nights));
           />
         </div>
         <div class="flex flex-col gap-1.5">
-          <label for="rental-return-date" class="eyebrow text-faint">Return</label>
+          <label for={id('return-date')} class="eyebrow text-faint">Return</label>
           <input
-            id="rental-return-date"
+            id={id('return-date')}
             type="date"
             required
             data-return-date
@@ -110,9 +111,9 @@ const longest = Math.max(...rates.map((r) => r.nights));
           />
         </div>
         <div class="flex flex-col gap-1.5">
-          <label for="rental-return-time" class="eyebrow text-faint">Time</label>
+          <label for={id('return-time')} class="eyebrow text-faint">Time</label>
           <input
-            id="rental-return-time"
+            id={id('return-time')}
             type="time"
             required
             value="12:00"
@@ -147,9 +148,9 @@ const longest = Math.max(...rates.map((r) => r.nights));
       </div>
 
       <div class="flex flex-col gap-1.5">
-        <label for="rental-name" class="sr-only">Name</label>
+        <label for={id('name')} class="sr-only">Name</label>
         <input
-          id="rental-name"
+          id={id('name')}
           name="name"
           type="text"
           required
@@ -159,11 +160,12 @@ const longest = Math.max(...rates.map((r) => r.nights));
         />
       </div>
       <div class="flex flex-col gap-1.5">
-        <label for="rental-email" class="sr-only">Email</label>
+        <label for={id('email')} class="sr-only">Email</label>
         <input
-          id="rental-email"
+          id={id('email')}
           name="email"
           type="email"
+          data-email-input
           required
           autocomplete="email"
           placeholder="you@example.com"
@@ -182,8 +184,11 @@ const longest = Math.max(...rates.map((r) => r.nights));
       >
       </p>
       <p class="text-xs leading-relaxed text-faint">
-        We allow a day between rentals to check the scope over, and confirm your dates by email
-        after payment.
+        {
+          payable
+            ? 'We allow a day between rentals to check the scope over, and confirm your dates by email after payment.'
+            : 'We allow a day between rentals to check the scope over. Send the request and we confirm your dates by email, with a link to pay.'
+        }
       </p>
     </form>
   </div>
@@ -199,7 +204,7 @@ const longest = Math.max(...rates.map((r) => r.nights));
 
 <script>
   import { logToLeadSheet } from '../lib/leadSheet';
-  import { beginCheckout, viewItem } from '../lib/track';
+  import { beginCheckout, lead, viewItem, type TrackedItem } from '../lib/track';
 
   type Rate = { term: string; nights: number; detail: string; price: number; stripeLink: string };
 
@@ -207,8 +212,17 @@ const longest = Math.max(...rates.map((r) => r.nights));
     const rates = JSON.parse(root.dataset.rates ?? '[]') as Rate[];
     const contactEmail = root.dataset.email ?? '';
     const longest = Number(root.dataset.longest ?? 0);
+    const slug = root.dataset.slug ?? '';
+    const scopeName = root.dataset.name ?? 'Telescope';
+    const asItem = (rate: Rate): TrackedItem => ({
+      id: slug,
+      name: `${scopeName} rental`,
+      variant: rate.term,
+      category: 'rental',
+      value: rate.price,
+    });
 
-    const form = root.querySelector<HTMLFormElement>('#rental-form');
+    const form = root.querySelector<HTMLFormElement>('[data-rental-form]');
     const pickupDate = root.querySelector<HTMLInputElement>('[data-pickup-date]');
     const pickupTime = root.querySelector<HTMLInputElement>('[data-pickup-time]');
     const returnDate = root.querySelector<HTMLInputElement>('[data-return-date]');
@@ -294,7 +308,10 @@ const longest = Math.max(...rates.map((r) => r.nights));
         totalLabel.textContent = `$${rate.price}`;
         summary.hidden = false;
       }
-      if (submitLabel) submitLabel.textContent = `Pay $${rate.price} · ${rate.term.toLowerCase()} →`;
+      if (submitLabel)
+        submitLabel.textContent = rate.stripeLink
+          ? `Pay $${rate.price} · ${rate.term.toLowerCase()} →`
+          : `Request $${rate.price} · ${rate.term.toLowerCase()} →`;
       submitButton.disabled = false;
       if (status) status.textContent = '';
     };
@@ -308,13 +325,7 @@ const longest = Math.max(...rates.map((r) => r.nights));
     // The rental's product view, at the cheapest rate: the "from" price, the
     // same convention the print pages use.
     if (rates[0]) {
-      viewItem({
-        id: 'scope-rental',
-        name: 'Sky-Watcher 10″ Dobsonian rental',
-        variant: rates[0].term,
-        category: 'rental',
-        value: rates[0].price,
-      });
+      viewItem(asItem(rates[0]));
     }
 
     form.addEventListener('submit', (event) => {
@@ -334,20 +345,41 @@ const longest = Math.max(...rates.map((r) => r.nights));
       field('reference')!.value = reference;
 
       submitButton.disabled = true;
+      const email = (form.querySelector<HTMLInputElement>('[data-email-input]')?.value ?? '').trim();
+
+      if (!rate.stripeLink) {
+        // No Payment Link for this rate yet: the emailed request is the whole
+        // booking, so it has to arrive, and the visitor has to know it did.
+        field('booking')!.value = 'Request: reply with a payment link';
+        if (status) status.textContent = 'Sending your request…';
+        logToLeadSheet(form);
+        fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { Accept: 'application/json' },
+          body: new FormData(form),
+        })
+          .then(async (response) => {
+            const result = (await response.json()) as { success?: boolean };
+            if (!response.ok || !result.success) throw new Error('not sent');
+            lead('Rental request', 'rental');
+            if (submitLabel) submitLabel.textContent = 'Request sent';
+            if (status)
+              status.textContent = `Request sent, reference ${reference}. Expect an email within a day confirming your dates, with a link to pay.`;
+          })
+          .catch(() => {
+            submitButton.disabled = false;
+            if (status)
+              status.textContent = `That didn't go through. Try again, or email ${contactEmail} with your dates.`;
+          });
+        return;
+      }
+
+      field('booking')!.value = 'Paying now through Stripe';
       if (status) status.textContent = 'Taking you to payment…';
 
       // Fired now, while the lead-sheet and email requests are still in
       // flight, so the tags have time to send before the page leaves.
-      beginCheckout(
-        {
-          id: 'scope-rental',
-          name: 'Sky-Watcher 10″ Dobsonian rental',
-          variant: rate.term,
-          category: 'rental',
-          value: rate.price,
-        },
-        rate.stripeLink,
-      );
+      beginCheckout(asItem(rate), rate.stripeLink);
 
       const formData = new FormData(form);
       logToLeadSheet(form);
@@ -361,7 +393,6 @@ const longest = Math.max(...rates.map((r) => r.nights));
         .finally(() => {
           const checkout = new URL(rate.stripeLink);
           checkout.searchParams.set('client_reference_id', reference);
-          const email = (form.querySelector<HTMLInputElement>('#rental-email')?.value ?? '').trim();
           if (email) checkout.searchParams.set('prefilled_email', email);
           window.location.href = checkout.toString();
         });

@@ -4,12 +4,8 @@
  * it so a returning checkout (`?link=<id>`) can be named and valued.
  */
 import { getCollection } from 'astro:content';
-import {
-  CONSULTING_HOUR_LINKS,
-  HOURLY_RATE,
-  RENTAL_RATES,
-  TUTORIAL_HOUR_LINKS,
-} from '../data/checkout';
+import { CONSULTING_HOUR_LINKS, HOURLY_RATE, TUTORIAL_HOUR_LINKS } from '../data/checkout';
+import { RENTAL_SCOPES } from '../data/rentals';
 import { linkId, type TrackedItem } from './track';
 
 export type CatalogEntry = TrackedItem & { link: string };
@@ -30,14 +26,20 @@ export async function getCheckoutCatalog(): Promise<CatalogEntry[]> {
         value: option.price,
       })),
     ),
-    ...RENTAL_RATES.map((rate) => ({
-      link: linkId(rate.stripeLink),
-      id: 'scope-rental',
-      name: 'Sky-Watcher 10″ Dobsonian rental',
-      variant: rate.term,
-      category: 'rental' as const,
-      value: rate.price,
-    })),
+    // A rate without a Payment Link yet is booked by email, so nothing
+    // comes back from Stripe for it to name.
+    ...RENTAL_SCOPES.flatMap((scope) =>
+      scope.rates
+        .filter((rate) => rate.stripeLink)
+        .map((rate) => ({
+          link: linkId(rate.stripeLink),
+          id: scope.slug,
+          name: `${scope.name} rental`,
+          variant: rate.term,
+          category: 'rental' as const,
+          value: rate.price,
+        })),
+    ),
     ...TUTORIAL_HOUR_LINKS.map((url, i) => ({
       link: linkId(url),
       id: 'tutorial',

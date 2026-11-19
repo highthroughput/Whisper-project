@@ -1,0 +1,114 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import RentalBooking from '../../components/RentalBooking.astro';
+import { RENTAL_SCOPES, lowestRentalRate, type RentalScope } from '../../data/rentals';
+
+export function getStaticPaths() {
+  return RENTAL_SCOPES.map((scope) => ({ params: { slug: scope.slug }, props: { scope } }));
+}
+
+interface Props {
+  scope: RentalScope;
+}
+
+const { scope } = Astro.props;
+const others = RENTAL_SCOPES.filter((other) => other.slug !== scope.slug);
+---
+
+<Base
+  title={scope.metaTitle}
+  description={scope.metaDescription}
+  ogImage={scope.image}
+  ogImageAlt={scope.imageAlt}
+>
+  <article class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
+    <div class="grid gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(22rem,5fr)] lg:gap-16">
+      <div>
+        <p class="eyebrow">
+          <a href="/rentals" class="hover:text-star">Telescope rental</a>
+        </p>
+        <h1 class="mt-3 font-display text-4xl sm:text-5xl">{scope.name}</h1>
+        <p class="mt-6 max-w-2xl text-faint">{scope.intro}</p>
+
+        {
+          scope.image && (
+            <div class="reveal mt-8 border hairline bg-surface p-4 sm:p-5">
+              <Image
+                src={scope.image}
+                alt={scope.imageAlt ?? scope.name}
+                widths={[480, 768, 1080, 1440]}
+                sizes="(min-width: 1024px) 55vw, 100vw"
+                quality={80}
+                loading="eager"
+                fetchpriority="high"
+                class="w-full object-cover"
+              />
+            </div>
+          )
+        }
+
+        <div class="reveal mt-8 max-w-prose space-y-4 text-sm leading-relaxed text-star/85">
+          {scope.body.map((paragraph) => <p>{paragraph}</p>)}
+        </div>
+
+        {/* What you get, then the handoff terms: both answer questions the
+            booking form would otherwise raise, so they read before it. The
+            wrapper is what sets the width: left to themselves these two would
+            each resolve `max-w-prose` against their own font size and stop
+            short of the photograph's edge at two different places. */}
+        <div class="mt-10">
+          <section
+            class="reveal border hairline bg-surface"
+            aria-labelledby="included-heading"
+          >
+            <header class="border-b hairline px-5 py-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+              <h2 id="included-heading">Included with every rental</h2>
+            </header>
+            {/* Two columns from tablet width up: a handful of short entries
+                stacked single-file left most of the panel empty. */}
+            <ul class="px-5 py-4 text-sm text-star/85 sm:columns-2 sm:gap-x-8">
+              {
+                scope.included.map((item) => (
+                  <li class="flex break-inside-avoid items-baseline gap-2 py-1">
+                    <span class="text-dust" aria-hidden="true">·</span>
+                    {item}
+                  </li>
+                ))
+              }
+            </ul>
+            {
+              scope.setupVideoUrl && (
+                <p class="border-t hairline px-5 py-3 text-sm">
+                  <a href={scope.setupVideoUrl} class="link-quiet" target="_blank" rel="noopener">
+                    Watch the setup video on YouTube
+                  </a>
+                </p>
+              )
+            }
+          </section>
+
+          <p class="mt-6 text-xs leading-relaxed text-faint">
+            Pickup and return around Southern Alberta. Every handoff includes a walkthrough of
+            the scope and accessories.{' '}
+            <a href="/contact?topic=rentals" class="link-quiet">Questions or a custom date range?</a>
+          </p>
+
+          {
+            others.map((other) => (
+              <p class="mt-3 text-xs leading-relaxed text-faint">
+                Also for rent:{' '}
+                <a href={`/rentals/${other.slug}`} class="link-quiet">the {other.shortName} Dobsonian, from ${lowestRentalRate(other)} a night</a>.{' '}
+                <a href="/rentals" class="link-quiet">Compare them side by side</a>
+              </p>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="lg:sticky lg:top-24 lg:self-start">
+        <RentalBooking scope={scope} />
+      </div>
+    </div>
+  </article>
+</Base>

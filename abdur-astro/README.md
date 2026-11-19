@@ -187,6 +187,21 @@ three or more fill three columns. Keep quotes about the teaching or the
 photographs. A review of the transaction ("packaged well", "fast shipping")
 belongs on the marketplace listing, since here it reads as a used-gear ad.
 
+## Rental scopes
+
+Each telescope for rent is one entry in `src/data/rentals.ts`: its name,
+copy, photo, what's in the case, and three rates (one night, weekend,
+weekly). That one entry builds its page at `/rentals/<slug>`, its card and
+column on the `/rentals` comparison page, and its line in the checkout
+catalog the `/thank-you` page reads. To add a scope, copy an entry, give it a
+new `slug`, and fill it in.
+
+The rate charged follows from the dates: a booking pays the cheapest rate
+whose `nights` covers its length. A rate whose `stripeLink` is empty still
+books, as an emailed request with a reference, and the panel tells the
+visitor a payment link will follow. Paste the Payment Link in and the same
+button goes straight to Stripe, then rerun `scripts/stripe-redirects.mjs`.
+
 ## Print SEO and Google Merchant Center
 
 All of this is generated from `src/content/prints/*.md` at build time; adding
@@ -262,9 +277,13 @@ What fires where:
   clicked (at the size and paper actually chosen).
 - **Prints index**: a GA4 item list of every print. No Meta product view,
   since nothing is bought there; each print page sends its own.
-- **Rentals** and **Services**: a product view on load (from $20; tutorials and
-  consulting at one hour), since that's where they are bought.
-- **Rentals / paid sessions**: checkout at the hand-off to Stripe. A paid
+- **Each rental scope's page** and **Services**: a product view on load (at
+  the scope's one-night rate; tutorials and consulting at one hour), since
+  that's where they are bought. The `/rentals` comparison page sends a GA4
+  item list, like the prints index.
+- **Rentals / paid sessions**: checkout at the hand-off to Stripe. A rental
+  rate with no Payment Link yet is sent as an emailed request instead, and
+  counts as a lead when it arrives. A paid
   session whose booking tab was blocked never reaches Stripe, so it isn't counted.
 - **Free intro call, contact form, email sign-up**: lead, on success.
 - **`/thank-you`**: purchase, once per Stripe Checkout Session. A refresh,
@@ -411,8 +430,19 @@ of them in place — but do not launch until each box is checked.
       America/Pelican Nebulae) have real, live `https://buy.stripe.com/…`
       links for all 3 sizes × 2 papers, from the live Stripe account
       ("Buymeacoffee"). 36 links total, no shared URLs.
-- [x] Scope rental rates (one night $20, weekend $35, weekly $70) have real
-      live Payment Links in `src/pages/rentals.astro`.
+- [x] Sky-Watcher 10″ rental rates (one night $20, weekend $35, weekly $70)
+      have real live Payment Links in `src/data/rentals.ts`.
+- [ ] Orion 8″ rental rates (one night $15, weekend $30, weekly $60) need
+      three Payment Links, set up like the 10″ ones. Paste each into its
+      empty `stripeLink` in `src/data/rentals.ts`, deploy, then rerun
+      `scripts/stripe-redirects.mjs --apply` so they return to `/thank-you`.
+      Until then the 8″ books by email: the form sends Abdur the dates and
+      reference, and he replies with a way to pay.
+- [ ] Orion 8″ photo: drop it in `src/assets/rentals/`, import it in
+      `src/data/rentals.ts` and set `image` and `imageAlt`. Without one, the
+      page skips the photo and its card on `/rentals` shows the aperture.
+- [ ] Orion 8″ setup video: once it has a public YouTube link, set
+      `setupVideoUrl` on the scope and the page links it.
 - [x] Hourly booking links for one-on-one tutorials and equipment consulting
       (`src/pages/services.astro`, `HourlyBooking.astro` component) have real,
       live Payment Links: $100/hour, 1 to 5 hours, ten links total (five per

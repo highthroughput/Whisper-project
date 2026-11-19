@@ -30,6 +30,7 @@ export const CONSULTING_HOUR_LINKS: [string, string, string, string, string] = [
   'https://buy.stripe.com/cNidRbage9B38Nbafy3Nm0N',
 ];
 
+/** One rate on a rental scope. The scopes themselves are in ./rentals.ts. */
 export interface RentalRate {
   term: string;
   /** The most nights this rate covers. */
@@ -37,34 +38,6 @@ export interface RentalRate {
   detail: string;
   /** CAD. Must match the amount on the Stripe Payment Link. */
   price: number;
+  /** Empty until the Payment Link exists; the booking then goes by email. */
   stripeLink: string;
 }
-
-/**
- * The three published scope-rental rates, cheapest first. A booking is
- * charged the first rate that covers its length, so the tier follows from the
- * dates rather than being picked.
- */
-export const RENTAL_RATES: RentalRate[] = [
-  {
-    term: 'One night',
-    nights: 1,
-    detail: 'Up to 1 night',
-    price: 20,
-    stripeLink: 'https://buy.stripe.com/5kQ7sN9cabJb0gFgDW3Nm0B',
-  },
-  {
-    term: 'Weekend',
-    nights: 3,
-    detail: 'Up to 3 nights',
-    price: 35,
-    stripeLink: 'https://buy.stripe.com/28E6oJ4VUbJbfbz2N63Nm0C',
-  },
-  {
-    term: 'Weekly',
-    nights: 7,
-    detail: 'Up to 7 nights',
-    price: 70,
-    stripeLink: 'https://buy.stripe.com/dRm28tewu9B3gfD4Ve3Nm0D',
-  },
-];
