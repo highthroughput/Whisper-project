@@ -1,0 +1,60 @@
+---
+/**
+ * A quiet "what next" card that points at another part of the site: from a
+ * print to the telescopes, from a rental to the prints and star parties, and
+ * from a gallery photo to the rentals. Text links only, so it never competes
+ * with the page's own Buy or Book button.
+ */
+interface Props {
+  variant: 'print' | 'rental' | 'gallery';
+  class?: string;
+}
+
+const { variant, class: className } = Astro.props;
+
+const content = {
+  print: {
+    heading: 'See it for yourself',
+    text: 'This photograph was made from Alberta skies. See the real thing through a telescope: rent a Dobsonian for a clear weekend, or book a private star party for your group.',
+    links: [
+      { label: 'Telescope rentals →', href: '/rentals' },
+      { label: 'Star parties →', href: '/star-parties' },
+    ],
+  },
+  rental: {
+    heading: 'After your night out',
+    text: 'Found something you loved in the eyepiece? The print shop has the photographs, hours deep, of galaxies and nebulae you can find with this scope. Planning a birthday or team night? I can bring the telescopes and run the tour.',
+    links: [
+      { label: 'Prints →', href: '/prints' },
+      { label: 'Private star parties →', href: '/star-parties' },
+    ],
+  },
+}[variant === 'gallery' ? 'print' : variant];
+---
+
+{
+  variant === 'gallery' ? (
+    <p class:list={['text-sm text-faint', className]}>
+      Near Calgary?{' '}
+      <a href="/rentals" class="link-quiet">
+        See it through a telescope →
+      </a>
+    </p>
+  ) : (
+    <aside class:list={['cross-sell border hairline bg-surface p-5 sm:p-6', className]} aria-labelledby={`cross-sell-${variant}`}>
+      <h2 id={`cross-sell-${variant}`} class="eyebrow">
+        {content.heading}
+      </h2>
+      <p class="mt-3 text-sm leading-relaxed text-star/85">{content.text}</p>
+      <ul class="mt-4 flex flex-wrap gap-x-6 text-sm">
+        {content.links.map((link) => (
+          <li>
+            <a href={link.href} class="link-quiet inline-flex min-h-11 items-center">
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </aside>
+  )
+}

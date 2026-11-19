@@ -1,7 +1,19 @@
 ---
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import { RENTAL_SCOPES, lowestRentalRate } from '../data/rentals';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import CrossSell from '../components/CrossSell.astro';
+import FaqList from '../components/FaqList.astro';
+import { PICKUP_TERMS, RENTAL_SCOPES, lowestRentalRate } from '../data/rentals';
+import { LESSON_RENTAL_NIGHT } from '../data/star-parties';
+import { faqPageJsonLd, getFaqGroups } from '../data/faq';
+import { cleanPathname } from '../lib/urls';
+import { breadcrumbJsonLd, type Crumb } from '../lib/breadcrumbs';
+
+const canonical = new URL(cleanPathname(Astro.url.pathname), Astro.site).href;
+const crumbs: Crumb[] = [{ label: 'Rentals' }];
+const faq = (await getFaqGroups()).find((group) => group.id === 'rentals')!;
+const lessonCard = `New to telescopes? Book an observing lesson + rental night ($${LESSON_RENTAL_NIGHT.price}): an evening with me and the scope, at least two hours of observing, rental included.`;
 
 // Every scope, with its own page under /rentals/<slug>. The rates and what's
 // in the case come from src/data/rentals.ts, so this page can't disagree
@@ -14,18 +26,24 @@ const terms = [...new Set(scopes.flatMap((scope) => scope.rates.map((r) => r.ter
 ---
 
 <Base
-  title="Telescope Rentals Southern Alberta"
-  description="Rent a Dobsonian telescope in Southern Alberta: a Sky-Watcher 10-inch or an Orion 8-inch, by the night, weekend, or week, with eyepieces, a finder, and an observing guide included."
+  title="Telescope Rental Calgary & Cochrane"
+  description="Rent a Sky-Watcher 10″ or Orion 8″ Dobsonian near Calgary and Cochrane by the night, weekend, or week. No membership. Eyepieces, finder and guide included."
   ogImage={keyScope?.image}
   ogImageAlt={keyScope?.imageAlt}
+  schema={[faqPageJsonLd(faq.items), breadcrumbJsonLd(crumbs, Astro.site, canonical)]}
 >
   <section class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
+    <Breadcrumbs crumbs={crumbs} class="mb-6" />
     <p class="eyebrow">Telescope rentals</p>
     <h1 class="mt-3 font-display text-4xl sm:text-5xl">Rent a telescope</h1>
     <p class="mt-6 max-w-2xl text-faint">
       Two Dobsonian reflectors, ready for a backyard, a campsite, or a dark-sky drive out of the
       city. Both come with eyepieces, a finder, and the observing guide, and every pickup
       includes a walkthrough. Book by the night, the weekend, or the week; rates are in CAD.
+    </p>
+    <p class="mt-4 max-w-2xl text-faint">
+      No membership needed, and you rent by the night instead of by the month. Pickup is in
+      Cochrane, an easy drive from Calgary.
     </p>
 
     <div class="mt-12 grid gap-6 md:grid-cols-2">
@@ -36,15 +54,19 @@ const terms = [...new Set(scopes.flatMap((scope) => scope.rates.map((r) => r.ter
             style={`--reveal-delay:${i * 80}ms`}
             aria-labelledby={`${scope.slug}-card-heading`}
           >
-            <a href={`/rentals/${scope.slug}`} class="block border-b hairline" tabindex="-1" aria-hidden="true">
+            {/* The photo links to the scope's page too, but out of the tab
+                order: the heading and button below are the same link. */}
+            <a href={`/rentals/${scope.slug}`} class="block border-b hairline" tabindex="-1">
               {scope.image ? (
                 <Image
                   src={scope.image}
-                  alt=""
+                  alt={scope.cardAlt ?? scope.imageAlt ?? scope.name}
                   widths={[480, 768, 1080]}
                   sizes="(min-width: 768px) 45vw, 100vw"
                   quality={80}
                   loading={i === 0 ? 'eager' : 'lazy'}
+                  decoding={i === 0 ? undefined : 'async'}
+                  fetchpriority={i === 0 ? 'high' : undefined}
                   class="aspect-[4/3] w-full object-cover"
                 />
               ) : (
@@ -88,6 +110,14 @@ const terms = [...new Set(scopes.flatMap((scope) => scope.rates.map((r) => r.ter
         ))
       }
     </div>
+
+    {/* Secondary to the two Book buttons above: a text link, not a button. */}
+    <aside class="reveal mt-6 flex flex-col gap-2 border hairline border-l-2 border-l-dust bg-surface p-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+      <p class="text-sm text-star/85">{lessonCard}</p>
+      <a href="/contact?topic=rentals" class="link-quiet inline-flex min-h-11 shrink-0 items-center text-sm">
+        Ask about a lesson →
+      </a>
+    </aside>
   </section>
 
   <section
@@ -164,9 +194,21 @@ const terms = [...new Set(scopes.flatMap((scope) => scope.rates.map((r) => r.ter
       </div>
 
       <p class="mt-10 max-w-prose text-xs leading-relaxed text-faint">
-        Pickup and return around Southern Alberta. Every handoff includes a walkthrough of the
-        scope and accessories.{' '}
+        {PICKUP_TERMS}{' '}
         <a href="/contact?topic=rentals" class="link-quiet">Questions or a custom date range?</a>
+      </p>
+
+      <CrossSell variant="rental" class="mt-10 max-w-3xl" />
+    </div>
+  </section>
+
+  <section class="mx-auto mt-20 w-full max-w-7xl px-5 sm:px-8" aria-labelledby="rental-faq-heading">
+    <div class="reveal max-w-3xl border-t hairline pt-12">
+      <p class="eyebrow">Before you book</p>
+      <h2 id="rental-faq-heading" class="mt-3 font-display text-3xl sm:text-4xl">Rental questions</h2>
+      <FaqList items={faq.items} class="mt-6" />
+      <p class="mt-6 text-sm text-faint">
+        Star parties and prints are in the <a href="/faq" class="link-quiet">full FAQ</a>.
       </p>
     </div>
   </section>

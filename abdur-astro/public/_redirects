@@ -1,0 +1,5 @@
+# Cloudflare Workers static assets reads this file (the same format as Pages)
+# and answers these before looking for a file. Astro's `redirects` option
+# can't do this job: on a static build it writes an HTML meta-refresh page,
+# which a crawler asking for /sitemap.xml won't treat as a redirect.
+/sitemap.xml /sitemap-index.xml 301

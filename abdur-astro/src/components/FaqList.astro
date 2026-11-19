@@ -1,0 +1,41 @@
+---
+import type { FaqItem } from '../data/faq';
+
+interface Props {
+  items: FaqItem[];
+  class?: string;
+}
+
+const { items, class: className } = Astro.props;
+---
+
+{/* Native <details>: opens and closes without JS, is keyboard operable, and
+    find-in-page reaches the answers. */}
+<div class:list={['faq-list border-t hairline', className]}>
+  {
+    items.map((item) => (
+      <details class="faq-item group border-b hairline">
+        <summary class="flex min-h-11 cursor-pointer list-none items-baseline justify-between gap-6 py-4 text-star [&::-webkit-details-marker]:hidden">
+          <span class="leading-snug">{item.q}</span>
+          <span
+            class="shrink-0 font-mono text-sm text-dust transition-transform duration-200 group-open:rotate-45"
+            aria-hidden="true"
+          >
+            +
+          </span>
+        </summary>
+        <p class="max-w-prose pb-5 text-sm leading-relaxed text-star/85">
+          {item.a.map((part) =>
+            typeof part === 'string' ? (
+              part
+            ) : (
+              <a href={part.href} class="link-quiet">
+                {part.text}
+              </a>
+            ),
+          )}
+        </p>
+      </details>
+    ))
+  }
+</div>

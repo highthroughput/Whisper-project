@@ -1,0 +1,313 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import FaqList from '../components/FaqList.astro';
+import eventPhoto from '../assets/photos/event-photo.jpg';
+import { cleanPathname } from '../lib/urls';
+import { breadcrumbJsonLd, type Crumb } from '../lib/breadcrumbs';
+import { faqPageJsonLd, getFaqGroups } from '../data/faq';
+import { LESSON_RENTAL_NIGHT, STAR_PARTY, starPartyTotal } from '../data/star-parties';
+import { darkWeekend, darkWeekendLabel, mountainToday, upcomingSkyEvents } from '../data/sky-events';
+
+const sp = STAR_PARTY;
+const [small, large] = sp.examples;
+const ask = `/contact?topic=${sp.topic}`;
+const canonical = new URL(cleanPathname(Astro.url.pathname), Astro.site).href;
+
+const crumbs: Crumb[] = [{ label: 'Star parties' }];
+const faq = (await getFaqGroups()).find((group) => group.id === 'star-parties')!;
+
+// The next four dark weekends: New Moon rows whose derived Saturday hasn't
+// passed yet on the day the site was built.
+const today = mountainToday();
+const darkWeekends = upcomingSkyEvents()
+  .filter((e) => e.type === 'Moon' && e.title === 'New Moon')
+  .filter((e) => (darkWeekend(e)?.sat ?? '') >= today)
+  .slice(0, 4)
+  .map((e) => darkWeekendLabel(e)!);
+
+const eventAlt =
+  'Abdur in a red jacket talking with his hands at an outdoor public astronomy event on a sunny day, beside a solar telescope on a tracking mount, with a white refractor and a small crowd of families on the grass behind him.';
+
+const night: [string, string][] = [
+  ['Where', 'Your acreage, campground, lodge or venue, or a dark site near Big Hill Springs, about 40 minutes from downtown Calgary'],
+  ['Good for', 'Birthdays, family gatherings, camps, team retreats and weddings'],
+  ['I bring', 'My largest telescopes, eyepieces, and a guided tour of at least two hours'],
+  ['Weather', "If it's cloudy, we move to the next clear night or you get a full refund"],
+];
+
+const service = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  '@id': 'https://abdurastro.com/star-parties#service',
+  name: 'Private star party',
+  serviceType: 'Private stargazing event',
+  description:
+    'A private star party at your acreage, campground, lodge or venue near Calgary and Cochrane: telescopes, eyepieces and a guided tour of the night sky of at least two hours, with a clear-night guarantee.',
+  provider: { '@id': 'https://abdurastro.com/#business' },
+  areaServed: [
+    { '@type': 'City', name: 'Calgary' },
+    { '@type': 'City', name: 'Cochrane' },
+    { '@type': 'AdministrativeArea', name: 'Southern Alberta' },
+  ],
+  url: 'https://abdurastro.com/star-parties',
+  offers: {
+    '@type': 'Offer',
+    price: sp.bookingFee.toFixed(2),
+    priceCurrency: 'CAD',
+    description: `Booking fee; plus $${sp.perGuest} CAD per guest`,
+    url: 'https://abdurastro.com/star-parties',
+  },
+};
+
+const cards = [
+  {
+    title: 'Take the sky home',
+    text: 'The photographs in the print shop come from the same Alberta skies.',
+    links: [{ label: 'Prints →', href: '/prints' }],
+  },
+  {
+    title: 'Rent the telescope',
+    text: 'Want another night with it? Rent a Sky-Watcher 10″ or Orion 8″ Dobsonian for a night, a weekend or a week.',
+    links: [{ label: 'Telescope rentals →', href: '/rentals' }],
+  },
+  {
+    title: 'Learn to find things yourself',
+    text: `An observing lesson + rental night is $${LESSON_RENTAL_NIGHT.price}: an evening with me and a rental Dobsonian, at least two hours of observing, rental included. Online and in-person astrophotography tutorials are on the services page.`,
+    links: [
+      { label: 'Ask about a lesson →', href: '/contact?topic=tutorials' },
+      { label: 'Services →', href: '/services' },
+    ],
+  },
+];
+
+const sectionHead = 'font-display text-3xl';
+
+// Built here as whole sentences: prices and numbers mid-sentence in markup are
+// one stray line break away from "up to20".
+const priceLine = `$${sp.bookingFee} booking fee + $${sp.perGuest} per guest (CAD). ${small} guests is $${starPartyTotal(small)}; ${large} guests is $${starPartyTotal(large)}. Groups of up to ${sp.maxGuests}; ask about larger groups.`;
+const termsLine = `The $${sp.bookingFee} booking fee holds your date and is fully refundable if you cancel at least ${sp.refundWindowHours} hours before. The guest fee is due ${sp.guestFeeDueHours} hours before the party.`;
+---
+
+<Base
+  title="Private Star Parties near Calgary & Cochrane"
+  description="A private star party at your acreage, campground, lodge or venue near Calgary and Cochrane. Telescopes, a 2-hour guided sky tour, and a clear-night guarantee."
+  ogImage={eventPhoto}
+  ogImageAlt={eventAlt}
+  schema={[service, faqPageJsonLd(faq.items), breadcrumbJsonLd(crumbs, Astro.site, canonical)]}
+>
+  <section class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
+    <Breadcrumbs crumbs={crumbs} class="mb-6" />
+    <p class="eyebrow">On location</p>
+    <h1 class="mt-3 max-w-4xl font-display text-4xl sm:text-5xl">Private star parties near Calgary &amp; Cochrane</h1>
+    <p class="mt-6 max-w-2xl text-faint">
+      Some of the best skies in Canada are an easy drive from Calgary, and a telescope changes what
+      an evening outdoors can be. I bring the telescopes, the eyepieces and the sky-knowledge to
+      your acreage, campground, lodge or venue, and give your group a guided tour of the night sky
+      by eye and by telescope.
+    </p>
+    <div class="mt-8 flex flex-wrap gap-4">
+      <a href={ask} class="btn btn-solid">Ask about a date →</a>
+      <a href="/events" class="btn">See the sky calendar →</a>
+    </div>
+
+    <ol class="mt-16">
+      {/* 01 · What you'll see */}
+      <li class="reveal border-b hairline first:border-t">
+        <section
+          class="grid gap-x-12 gap-y-8 py-14 lg:grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,26rem)] xl:grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,30rem)]"
+          aria-labelledby="see-heading"
+        >
+          <span class="font-mono text-[0.6875rem] text-dust" aria-hidden="true">01</span>
+          <div class="max-w-prose">
+            <h2 id="see-heading" class={sectionHead}>What you'll see</h2>
+            <p class="mt-5 leading-relaxed text-star/85">
+              The Moon's terminator, planets, bright star clusters, and the same nebulae and galaxies
+              that hang in the <a href="/gallery" class="link-quiet">gallery</a>. What's up depends on
+              the season and the Moon; the <a href="/events" class="link-quiet">sky calendar</a> shows
+              the darkest weekends and the planet nights for the year ahead.
+            </p>
+          </div>
+          <div class="lg:col-start-3">
+            <div class="border hairline bg-surface p-4 sm:p-5">
+              <Image
+                src={eventPhoto}
+                alt={eventAlt}
+                widths={[420, 640, 960]}
+                sizes="(min-width: 1280px) 30rem, (min-width: 1024px) 26rem, 92vw"
+                class="aspect-[3/2] w-full object-cover"
+                loading="lazy"
+                decoding="async"
+                quality={80}
+              />
+            </div>
+          </div>
+        </section>
+      </li>
+
+      {/* 02 · What a night looks like */}
+      <li class="reveal border-b hairline">
+        <section
+          class="grid gap-x-12 gap-y-8 py-14 lg:grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,26rem)] xl:grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,30rem)]"
+          aria-labelledby="night-heading"
+        >
+          <span class="font-mono text-[0.6875rem] text-dust" aria-hidden="true">02</span>
+          <div class="max-w-prose">
+            <h2 id="night-heading" class={sectionHead}>What a night looks like</h2>
+            <p class="mt-5 leading-relaxed text-star/85">
+              I arrive early and set up my largest telescopes. Once your group is there, we observe
+              for at least two hours, and the best dates are the weeks around the new moon.
+            </p>
+          </div>
+          {/* The same spec panel as the star-party block on /services. */}
+          <section class="border hairline bg-surface lg:col-start-3" aria-label="What a star party includes">
+            <dl class="py-2 font-mono text-[0.8125rem]">
+              {
+                night.map(([label, value], row) => (
+                  <div class:list={['px-5 py-3', row > 0 && 'border-t hairline']}>
+                    <dt class="text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">{label}</dt>
+                    <dd class="mt-1.5 leading-relaxed text-star">{value}</dd>
+                  </div>
+                ))
+              }
+            </dl>
+          </section>
+        </section>
+      </li>
+
+      {/* 03 · Price */}
+      <li class="reveal border-b hairline">
+        <section
+          class="grid gap-x-12 gap-y-8 py-14 lg:grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,26rem)] xl:grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,30rem)]"
+          aria-labelledby="price-heading"
+        >
+          <span class="font-mono text-[0.6875rem] text-dust" aria-hidden="true">03</span>
+          <div class="max-w-prose">
+            <h2 id="price-heading" class={sectionHead}>Price</h2>
+            <p class="mt-5 leading-relaxed text-star/85">{priceLine}</p>
+            <p class="mt-4 text-xs leading-relaxed text-faint">{termsLine}</p>
+            <a href={ask} class="btn btn-solid mt-7">Ask about a date →</a>
+          </div>
+          <section class="border hairline bg-surface lg:col-start-3" aria-labelledby="examples-heading">
+            <header class="flex items-baseline justify-between border-b hairline px-5 py-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)]">
+              <h3 id="examples-heading" class="text-faint">Worked out</h3>
+              <span class="text-dust">CAD</span>
+            </header>
+            <ul class="px-5 py-3 font-mono text-[0.8125rem]">
+              <li class="flex items-baseline py-2">
+                <span class="shrink-0 text-star">Booking fee</span>
+                <span class="log-leader" aria-hidden="true"></span>
+                <span class="tabular-nums text-star">${sp.bookingFee}</span>
+              </li>
+              <li class="flex items-baseline border-t hairline py-2">
+                <span class="shrink-0 text-star">Per guest</span>
+                <span class="log-leader" aria-hidden="true"></span>
+                <span class="tabular-nums text-star">${sp.perGuest}</span>
+              </li>
+              {
+                sp.examples.map((guests) => (
+                  <li class="flex items-baseline border-t hairline py-2">
+                    <span class="shrink-0 text-faint">{guests} guests</span>
+                    <span class="log-leader" aria-hidden="true" />
+                    <span class="tabular-nums text-star">${starPartyTotal(guests)}</span>
+                  </li>
+                ))
+              }
+            </ul>
+          </section>
+        </section>
+      </li>
+
+      {/* 04 · Picking a date */}
+      <li class="reveal border-b hairline">
+        <section
+          class="grid gap-x-12 gap-y-8 py-14 lg:grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,26rem)] xl:grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,30rem)]"
+          aria-labelledby="date-heading"
+        >
+          <span class="font-mono text-[0.6875rem] text-dust" aria-hidden="true">04</span>
+          <div class="max-w-prose">
+            <h2 id="date-heading" class={sectionHead}>Picking a date</h2>
+            <p class="mt-5 leading-relaxed text-star/85">
+              For galaxies and nebulae, pick a weekend near the new moon. For the Moon and planets, a
+              bright-moon night is great, and it's the easiest night for kids and first-timers. In June
+              the sky never gets fully dark in Alberta, so summer star parties start late; from
+              September to April darkness comes early and evenings work well for families.
+            </p>
+          </div>
+          {
+            darkWeekends.length > 0 && (
+              <section class="border hairline bg-surface lg:col-start-3" aria-labelledby="weekends-heading">
+                <header class="border-b hairline px-5 py-3 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)]">
+                  <h3 id="weekends-heading" class="text-faint">Next dark weekends</h3>
+                </header>
+                <ul class="px-5 py-2 font-mono text-[0.8125rem]">
+                  {darkWeekends.map((label, i) => (
+                    <li class:list={[i > 0 && 'border-t hairline']}>
+                      <a href={ask} class="flex min-h-11 items-center justify-between gap-4 py-2 text-star hover:text-dust-bright">
+                        <span>{label}</span>
+                        <span class="text-dust" aria-hidden="true">
+                          →
+                        </span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )
+          }
+        </section>
+      </li>
+
+      {/* 05 · Keep the night going */}
+      <li class="reveal border-b hairline">
+        <section class="grid gap-x-12 gap-y-8 py-14 lg:grid-cols-[3.5rem_minmax(0,1fr)]" aria-labelledby="more-heading">
+          <span class="font-mono text-[0.6875rem] text-dust" aria-hidden="true">05</span>
+          <div>
+            <h2 id="more-heading" class={sectionHead}>Keep the night going</h2>
+            <div class="mt-8 grid gap-6 md:grid-cols-3">
+              {
+                cards.map((card) => (
+                  <article class="flex flex-col border hairline bg-surface p-5 sm:p-6">
+                    <h3 class="font-display text-xl">{card.title}</h3>
+                    <p class="mt-3 text-sm leading-relaxed text-star/85">{card.text}</p>
+                    <ul class="mt-auto flex flex-wrap gap-x-6 pt-4 text-sm">
+                      {card.links.map((link) => (
+                        <li>
+                          <a href={link.href} class="link-quiet inline-flex min-h-11 items-center">
+                            {link.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </article>
+                ))
+              }
+            </div>
+          </div>
+        </section>
+      </li>
+
+      {/* 06 · Questions */}
+      <li class="reveal border-b hairline">
+        <section class="grid gap-x-12 gap-y-8 py-14 lg:grid-cols-[3.5rem_minmax(0,1fr)]" aria-labelledby="faq-heading">
+          <span class="font-mono text-[0.6875rem] text-dust" aria-hidden="true">06</span>
+          <div class="max-w-3xl">
+            <h2 id="faq-heading" class={sectionHead}>Questions</h2>
+            <FaqList items={faq.items} class="mt-6" />
+            <p class="mt-6 text-sm text-faint">
+              More on rentals and prints in the <a href="/faq" class="link-quiet">FAQ</a>.
+            </p>
+          </div>
+        </section>
+      </li>
+    </ol>
+
+    <div class="reveal mt-14 flex flex-col items-start gap-6 border hairline border-l-2 border-l-dust bg-surface p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+      <p class="max-w-xl text-star/85">
+        Tell me the date, the place and how many people. A two-line message is plenty.
+      </p>
+      <a href={ask} class="btn btn-solid shrink-0">Ask about a star party →</a>
+    </div>
+  </section>
+</Base>

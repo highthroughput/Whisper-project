@@ -42,14 +42,20 @@ const entries = [
     title: 'Events',
     text: 'Star parties near Southern Alberta, plus meteor showers and other sky events worth planning around.',
   },
+  {
+    n: '06',
+    href: '/star-parties',
+    title: 'Star parties',
+    text: 'Private star parties near Calgary and Cochrane: telescopes, a two-hour guided sky tour, and a clear-night guarantee.',
+  },
 ];
 ---
 
 <Base
   isHome
   overlayHeader
-  title="Abdur Astro · Deep-Sky Astrophotography from Southern Alberta"
-  description="Deep-sky astrophotography from the dark skies of Southern Alberta: fine art galaxy and nebula prints, one-on-one astrophotography tutorials, equipment consulting, and private star parties across Alberta, Canada."
+  title="Abdur Astro · Astrophotography Prints, Telescope Rentals & Star Parties · Alberta"
+  description="Deep-sky astrophotography from Cochrane, Alberta: fine art galaxy and nebula prints, telescope rentals near Calgary, private star parties, and tutorials."
   ogImage={heroImage}
   ogImageAlt={heroPhoto?.data.alt}
 >
@@ -103,7 +109,7 @@ const entries = [
     </div>
   </section>
 
-  {/* Five entry points */}
+  {/* Entry points, one per section of the site */}
   <section class="mx-auto mt-16 w-full max-w-7xl px-5 sm:mt-20 sm:px-8" aria-label="Explore the site">
     <ul>
       {

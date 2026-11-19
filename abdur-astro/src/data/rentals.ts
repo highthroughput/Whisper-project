@@ -21,9 +21,15 @@ export interface RentalScope {
   shortName: string;
   /** The mirror, as the hub card shows it on a scope with no photo yet. */
   aperture: string;
-  /** Page <title> and meta description. */
+  /**
+   * Page <title> (the site name is added after it) and meta description.
+   * `{prices}` in the description becomes "$15 a night, $30 a weekend, $60 a
+   * week (CAD)" from `rates`, so the description can't quote an old price.
+   */
   metaTitle: string;
   metaDescription: string;
+  /** Alt text for the photo as it appears on the /rentals card. */
+  cardAlt?: string;
   /** One line for the card on /rentals. */
   pitch: string;
   /** Opening paragraph, under the heading. */
@@ -49,9 +55,10 @@ export const RENTAL_SCOPES: RentalScope[] = [
     name: 'Sky-Watcher 10″ 250P Flextube Dobsonian',
     shortName: 'Sky-Watcher 10″',
     aperture: '10″',
-    metaTitle: 'Sky-Watcher 10″ Dobsonian Rental',
+    metaTitle: 'Sky-Watcher 10″ Dobsonian Rental · Calgary & Cochrane',
     metaDescription:
-      'Rent a Sky-Watcher 10-inch 250P Flextube Dobsonian telescope in Southern Alberta. One night, weekend, and weekly rates, with eyepiece, finder, and accessories included.',
+      'Rent a Sky-Watcher 10-inch Flextube Dobsonian near Calgary and Cochrane: {prices}, with zoom eyepiece and dew heater.',
+    cardAlt: 'Sky-Watcher 10-inch Flextube Dobsonian telescope on its rocker base',
     pitch:
       'The bigger mirror, with a zoom eyepiece, dew heater and laser collimator in the case. Built for faint galaxies and nebulae from a dark site.',
     intro:
@@ -102,9 +109,10 @@ export const RENTAL_SCOPES: RentalScope[] = [
     name: 'Orion 8″ Dobsonian',
     shortName: 'Orion 8″',
     aperture: '8″',
-    metaTitle: 'Orion 8″ Dobsonian Rental',
+    metaTitle: 'Orion 8″ Dobsonian Rental · Calgary & Cochrane',
     metaDescription:
-      'Rent an Orion 8-inch (200 mm) Dobsonian telescope in Southern Alberta by the night, weekend, or week, with two eyepieces, a red dot finder, an observing guide, and a setup video.',
+      'Rent an Orion 8-inch Dobsonian near Calgary and Cochrane: {prices}. Two eyepieces, red dot finder and setup video.',
+    cardAlt: 'Orion 8-inch Dobsonian telescope on its rocker base',
     pitch:
       'The classic first telescope: an 8-inch reflector with two eyepieces, lighter to carry and simple to set up, at the lower rate.',
     intro:
@@ -150,6 +158,22 @@ export const RENTAL_SCOPES: RentalScope[] = [
     ],
   },
 ];
+
+const TERM_PHRASE: Record<string, string> = { 'One night': 'a night', Weekend: 'a weekend', Weekly: 'a week' };
+
+/** "$15 a night, $30 a weekend, $60 a week (CAD)". */
+export const priceSummary = (scope: RentalScope) =>
+  `${scope.rates.map((r) => `$${r.price} ${TERM_PHRASE[r.term] ?? r.term.toLowerCase()}`).join(', ')} (CAD)`;
+
+/** The scope's meta description with its prices filled in. */
+export const metaDescriptionOf = (scope: RentalScope) => scope.metaDescription.replace('{prices}', priceSummary(scope));
+
+/**
+ * Where and when the handoff happens, as /rentals and each scope page say it.
+ * The exact address goes out with the booking confirmation, never on the site.
+ */
+export const PICKUP_TERMS =
+  'Pickup and return in Cochrane (address sent with your confirmation). One night: same-day pickup, next-day return. Weekend: Friday to Sunday or Monday. Week: day 1 to day 8. Every handoff includes a walkthrough.';
 
 /** The "from" price: this scope's cheapest rate. */
 export const lowestRentalRate = (scope: RentalScope) => Math.min(...scope.rates.map((r) => r.price));

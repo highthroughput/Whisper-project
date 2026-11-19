@@ -229,7 +229,9 @@
     outline-offset: 3px;
   }
 
-  input:checked + .chip {
+  /* The same "on" state for a chip that is itself a toggle button. */
+  input:checked + .chip,
+  .chip[aria-pressed='true'] {
     border-color: var(--color-dust);
     color: var(--color-star);
     background-color: color-mix(in srgb, var(--color-dust) 14%, transparent);

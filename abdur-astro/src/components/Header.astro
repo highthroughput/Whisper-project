@@ -12,6 +12,7 @@ const links = [
   { href: '/gallery', label: 'Gallery' },
   { href: '/services', label: 'Services' },
   { href: '/rentals', label: 'Rentals' },
+  { href: '/star-parties', label: 'Star parties' },
   { href: '/events', label: 'Events' },
   { href: '/about', label: 'About' },
 ];
@@ -65,7 +66,7 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
     </a>
 
     <nav aria-label="Main" class="hidden lg:block">
-      <ul class="flex items-center gap-6">
+      <ul class="flex items-center gap-5 xl:gap-6">
         {
           links.map(({ href, label }) => (
             <li>
@@ -73,7 +74,7 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
                 href={href}
                 aria-current={isCurrent(href) ? 'page' : undefined}
                 class:list={[
-                  'font-mono text-sm uppercase [letter-spacing:var(--tracking-log)] transition-colors duration-150',
+                  'whitespace-nowrap font-mono text-sm uppercase [letter-spacing:var(--tracking-log)] transition-colors duration-150',
                   isCurrent(href) ? 'text-star' : 'text-star/75 hover:text-star',
                 ]}
               >
@@ -87,15 +88,17 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
     </nav>
 
     <div class="hidden items-center gap-5 lg:flex">
-      {/* Socials only once there is room for them; they are in the footer
-          on every page and on the contact page regardless. */}
-      <div class="hidden xl:block">
+      {/* Socials only on wide screens, where six nav links still leave room;
+          they are in the footer on every page and on the contact page. */}
+      <div class="hidden 2xl:block">
         <SocialLinks platforms={['youtube', 'instagram', 'x']} />
       </div>
       {/* A matched pair: equal width and weight, and closer to each other than
-          to the socials, so they read as one set of actions. */}
+          to the socials, so they read as one set of actions. Between lg and
+          xl six nav links leave room for one: Book consult goes (Services is
+          in the nav), Shop prints stays (Prints is not). */}
       <div class="flex items-center gap-2.5">
-        <a href="/services" class="btn btn-solid btn-sm w-[8.25rem]">Book consult</a>
+        <a href="/services" class="btn btn-solid btn-sm hidden w-[8.25rem] xl:inline-flex">Book consult</a>
         <a href="/prints" class="btn btn-solid btn-sm w-[8.25rem]">Shop prints</a>
       </div>
     </div>

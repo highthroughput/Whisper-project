@@ -1,6 +1,9 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { breadcrumbJsonLd, type Crumb } from '../../lib/breadcrumbs';
+import { cleanPathname } from '../../lib/urls';
 import PhotoCard from '../../components/PhotoCard.astro';
 import YouTubeEmbed from '../../components/YouTubeEmbed.astro';
 import { SITE } from '../../config';
@@ -9,6 +12,8 @@ import { byDateDesc, formatHours, totalHours } from '../../lib/photos';
 const photos = (await getCollection('photos')).sort(byDateDesc);
 const archiveHours = photos.reduce((sum, p) => sum + totalHours(p.data.filters), 0);
 const keyImage = photos[0]?.data.image;
+const crumbs: Crumb[] = [{ label: 'Gallery' }];
+const breadcrumbLd = breadcrumbJsonLd(crumbs, Astro.site, new URL(cleanPathname(Astro.url.pathname), Astro.site).href);
 ---
 
 <Base
@@ -16,8 +21,10 @@ const keyImage = photos[0]?.data.image;
   description={`The deep-sky archive: ${photos.length} galaxies and nebulae photographed from Southern Alberta across ${formatHours(archiveHours)} hours of integration. Acquisition data for every frame.`}
   ogImage={keyImage}
   ogImageAlt={photos[0]?.data.alt}
+  schema={[breadcrumbLd]}
 >
   <section class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
+    <Breadcrumbs crumbs={crumbs} class="mb-6" />
     <p class="eyebrow">The archive</p>
     <div class="mt-3 flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
       <h1 class="font-display text-4xl sm:text-5xl">Gallery</h1>

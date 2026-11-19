@@ -3,6 +3,10 @@ import { Image } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ObservationLog from '../../components/ObservationLog.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import CrossSell from '../../components/CrossSell.astro';
+import { cleanPathname } from '../../lib/urls';
+import { breadcrumbJsonLd, type Crumb } from '../../lib/breadcrumbs';
 import { GALLERY_PHOTO_IMAGE, photoCredit } from '../../lib/imageMeta';
 import {
   byDateDesc,
@@ -47,6 +51,8 @@ const integrationPart =
 const description = `${data.title} (${data.target}) photographed from ${locationPart}. ${integrationPart}Full acquisition log: telescope, camera, mount, filters and capture dates.`;
 
 const credit = await photoCredit(data.image, GALLERY_PHOTO_IMAGE, Astro.site);
+const canonical = new URL(cleanPathname(Astro.url.pathname), Astro.site).href;
+const crumbs: Crumb[] = [{ label: 'Gallery', href: '/gallery' }, { label: data.title }];
 
 const captionParts = [data.target];
 if (total > 0) captionParts.push(`${hours} h`);
@@ -59,9 +65,10 @@ if (data.captured) captionParts.push(data.captured);
   description={description}
   ogImage={data.image}
   ogImageAlt={data.alt}
-  schema={[credit]}
+  schema={[credit, breadcrumbJsonLd(crumbs, Astro.site, canonical)]}
 >
   <article class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
+    <Breadcrumbs crumbs={crumbs} class="mb-6" />
     <header>
       <p class="eyebrow">
         Observation № {String(number).padStart(2, '0')} · {data.constellation}
@@ -120,6 +127,7 @@ if (data.captured) captionParts.push(data.captured);
             <a href={`/prints/${print.id}`} class="btn mt-5">
               View print options
             </a>
+            <CrossSell variant="gallery" class="mt-5" />
           </aside>
         )
       }

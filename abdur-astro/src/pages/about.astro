@@ -1,6 +1,9 @@
 ---
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { breadcrumbJsonLd, type Crumb } from '../lib/breadcrumbs';
+import { cleanPathname } from '../lib/urls';
 import portrait from '../assets/photos/portrait.jpg';
 
 // Affiliate referral suffix, defined once so the inventory links and the
@@ -70,6 +73,8 @@ const retailers = [
   { name: 'Dwarflab', url: 'https://dwarflab.com?aff=132', note: 'Smart telescopes' },
   { name: 'MoveShootMove', url: 'https://www.moveshootmove.com?aff=354', note: 'Portable star trackers' },
 ];
+const crumbs: Crumb[] = [{ label: 'About' }];
+const breadcrumbLd = breadcrumbJsonLd(crumbs, Astro.site, new URL(cleanPathname(Astro.url.pathname), Astro.site).href);
 ---
 
 <Base
@@ -77,8 +82,10 @@ const retailers = [
   description="Abdur is an astrophotographer in Southern Alberta, Canada, photographing galaxies and nebulae from backyard and dark-sky sites, and teaching astrophotography through tutorials, talks, and star parties."
   ogImage={portrait}
   ogImageAlt="Abdur standing beside his Celestron EdgeHD and refractor telescopes on tracking mounts in a field."
+  schema={[breadcrumbLd]}
 >
   <section class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
+    <Breadcrumbs crumbs={crumbs} class="mb-6" />
     <p class="eyebrow">The observer</p>
     <h1 class="mt-3 font-display text-4xl sm:text-5xl">About Abdur</h1>
 

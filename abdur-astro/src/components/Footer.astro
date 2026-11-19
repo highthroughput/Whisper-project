@@ -93,28 +93,35 @@ const offer = guide
     <div class="mt-10 grid grid-cols-2 gap-10 sm:grid-cols-3">
       <nav aria-label="Footer, explore">
         <h2 class="eyebrow">Explore</h2>
-        <ul class="mt-4 space-y-2.5 text-sm">
-          <li><a class="text-star/80 hover:text-star transition-colors" href="/gallery">Gallery</a></li>
-          <li><a class="text-star/80 hover:text-star transition-colors" href="/prints">Prints</a></li>
+        <ul class="mt-2 text-sm sm:mt-4 sm:space-y-2.5">
+          <li><a class="inline-flex min-h-11 items-center text-star/80 transition-colors hover:text-star sm:min-h-0" href="/gallery">Gallery</a></li>
+          <li><a class="inline-flex min-h-11 items-center text-star/80 transition-colors hover:text-star sm:min-h-0" href="/prints">Prints</a></li>
           <li>
-            <a class="text-star/80 hover:text-star transition-colors" href="/services">Services</a>
+            <a class="inline-flex min-h-11 items-center text-star/80 transition-colors hover:text-star sm:min-h-0" href="/services">Services</a>
           </li>
-          <li><a class="text-star/80 hover:text-star transition-colors" href="/events">Events</a></li>
+          <li>
+            <a class="inline-flex min-h-11 items-center text-star/80 transition-colors hover:text-star sm:min-h-0" href="/rentals">Rentals</a>
+          </li>
+          <li>
+            <a class="inline-flex min-h-11 items-center text-star/80 transition-colors hover:text-star sm:min-h-0" href="/star-parties">Star parties</a>
+          </li>
+          <li><a class="inline-flex min-h-11 items-center text-star/80 transition-colors hover:text-star sm:min-h-0" href="/events">Events</a></li>
+          <li><a class="inline-flex min-h-11 items-center text-star/80 transition-colors hover:text-star sm:min-h-0" href="/faq">FAQ</a></li>
         </ul>
       </nav>
       <nav aria-label="Footer, studio">
         <h2 class="eyebrow">Studio</h2>
-        <ul class="mt-4 space-y-2.5 text-sm">
-          <li><a class="text-star/80 hover:text-star transition-colors" href="/about">About</a></li>
+        <ul class="mt-2 text-sm sm:mt-4 sm:space-y-2.5">
+          <li><a class="inline-flex min-h-11 items-center text-star/80 transition-colors hover:text-star sm:min-h-0" href="/about">About</a></li>
           <li>
-            <a class="text-star/80 hover:text-star transition-colors" href="/contact">Contact</a>
+            <a class="inline-flex min-h-11 items-center text-star/80 transition-colors hover:text-star sm:min-h-0" href="/contact">Contact</a>
           </li>
           <li>
-            <a class="text-star/80 hover:text-star transition-colors" href={`mailto:${SITE.email}`}>
+            <a class="inline-flex min-h-11 items-center text-star/80 transition-colors hover:text-star sm:min-h-0" href={`mailto:${SITE.email}`}>
               {SITE.email}
             </a>
           </li>
-          <li><a class="text-star/80 hover:text-star transition-colors" href="/privacy">Privacy</a></li>
+          <li><a class="inline-flex min-h-11 items-center text-star/80 transition-colors hover:text-star sm:min-h-0" href="/privacy">Privacy</a></li>
         </ul>
       </nav>
       <div class="col-span-2 sm:col-span-1">

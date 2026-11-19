@@ -14,8 +14,15 @@ export default defineConfig({
   trailingSlash: 'never',
   build: { format: 'file' },
   // The post-checkout page is noindex and means nothing without a Stripe
-  // session, so it stays out of the sitemap too.
-  integrations: [sitemap({ filter: (page) => !page.endsWith('/thank-you') })],
+  // session, and /404 isn't a page anyone should land on from search, so
+  // both stay out. lastmod is the build time: every deploy rebuilds every
+  // page (the sky calendar drops past dates), so it is honest for all of them.
+  integrations: [
+    sitemap({
+      filter: (page) => !/\/(thank-you|404)$/.test(page),
+      lastmod: new Date(),
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },

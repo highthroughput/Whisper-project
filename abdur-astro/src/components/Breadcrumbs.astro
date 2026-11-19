@@ -1,0 +1,42 @@
+---
+import { trail, type Crumb } from '../lib/breadcrumbs';
+
+interface Props {
+  /** Everything after Home; the last item is this page. */
+  crumbs: Crumb[];
+  class?: string;
+}
+
+const { crumbs, class: className } = Astro.props;
+const items = trail(crumbs);
+---
+
+{/* Same register as the eyebrows: mono, tracked caps, faint. The links get a
+    44 px tall hit area on phones without making the row look any taller. */}
+<nav aria-label="Breadcrumb" class:list={['breadcrumbs', className]}>
+  <ol class="flex flex-wrap items-center font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+    {
+      items.map((crumb, i) => {
+        const last = i === items.length - 1;
+        return (
+          <li class="flex items-center">
+            {last ? (
+              <span aria-current="page" class="text-star/75">
+                {crumb.label}
+              </span>
+            ) : (
+              <a href={crumb.href} class="-my-3 inline-flex min-h-11 items-center hover:text-star sm:my-0 sm:min-h-0">
+                {crumb.label}
+              </a>
+            )}
+            {!last && (
+              <span class="px-2 text-dust" aria-hidden="true">
+                ›
+              </span>
+            )}
+          </li>
+        );
+      })
+    }
+  </ol>
+</nav>

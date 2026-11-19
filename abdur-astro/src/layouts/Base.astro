@@ -64,17 +64,33 @@ const localBusiness = {
   '@id': new URL('/#business', Astro.site).href,
   name: SITE.name,
   description:
-    'Deep-sky astrophotography from Southern Alberta, Canada: fine art prints, one-on-one astrophotography tutorials, equipment consulting and rentals, public speaking, and private star parties.',
+    'Astrophotographer in Cochrane, Alberta: fine art galaxy and nebula prints, telescope rentals near Calgary and Cochrane, private star parties, one-on-one astrophotography tutorials, equipment consulting and public speaking.',
   url: Astro.site?.href,
   email: SITE.email,
   image: ogUrl.href,
+  // Town only: a service-area business, so no street address, geo or hours.
   address: {
     '@type': 'PostalAddress',
-    addressLocality: 'Southern Alberta',
+    addressLocality: 'Cochrane',
     addressRegion: 'AB',
     addressCountry: 'CA',
   },
-  areaServed: ['Southern Alberta', 'Alberta', 'Canada'],
+  areaServed: [
+    { '@type': 'City', name: 'Cochrane' },
+    { '@type': 'City', name: 'Calgary' },
+    { '@type': 'AdministrativeArea', name: 'Southern Alberta' },
+    { '@type': 'Country', name: 'Canada' },
+  ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Abdur Astro',
+    itemListElement: [
+      ['Telescope rentals', '/rentals'],
+      ['Private star parties', '/star-parties'],
+      ['Astrophotography prints', '/prints'],
+      ['Tutorials and consulting', '/services'],
+    ].map(([name, path]) => ({ '@type': 'OfferCatalog', name, url: new URL(path, Astro.site).href })),
+  },
   sameAs: [
     SITE.social.youtube,
     SITE.social.instagram,
@@ -88,6 +104,7 @@ const localBusiness = {
     'Fine art astronomy prints',
     'Astronomy education',
     'Telescope rentals',
+    'Star parties',
   ],
 };
 

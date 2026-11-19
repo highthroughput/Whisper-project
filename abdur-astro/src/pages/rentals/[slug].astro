@@ -1,8 +1,19 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import CrossSell from '../../components/CrossSell.astro';
 import RentalBooking from '../../components/RentalBooking.astro';
-import { RENTAL_SCOPES, lowestRentalRate, type RentalScope } from '../../data/rentals';
+import StickyBookBar from '../../components/StickyBookBar.astro';
+import {
+  PICKUP_TERMS,
+  RENTAL_SCOPES,
+  lowestRentalRate,
+  metaDescriptionOf,
+  type RentalScope,
+} from '../../data/rentals';
+import { cleanPathname } from '../../lib/urls';
+import { breadcrumbJsonLd, type Crumb } from '../../lib/breadcrumbs';
 
 export function getStaticPaths() {
   return RENTAL_SCOPES.map((scope) => ({ params: { slug: scope.slug }, props: { scope } }));
@@ -14,15 +25,46 @@ interface Props {
 
 const { scope } = Astro.props;
 const others = RENTAL_SCOPES.filter((other) => other.slug !== scope.slug);
+const canonical = new URL(cleanPathname(Astro.url.pathname), Astro.site).href;
+const crumbs: Crumb[] = [{ label: 'Rentals', href: '/rentals' }, { label: scope.name }];
+
+// The photo the page shows, as a full URL for the structured data.
+const productImage = scope.image
+  ? new URL((await getImage({ src: scope.image, width: 1200, format: 'jpeg', quality: 80 })).src, Astro.site).href
+  : undefined;
+
+// One Product per scope, one Offer per rental term, priced from the same
+// rates the booking panel charges.
+const product = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: `${scope.name} rental`,
+  description: scope.intro,
+  category: 'Telescope rental',
+  brand: { '@type': 'Brand', name: 'Abdur Astro' },
+  ...(productImage ? { image: productImage } : {}),
+  url: canonical,
+  offers: scope.rates.map((rate) => ({
+    '@type': 'Offer',
+    name: `${rate.term} (${rate.detail.toLowerCase()})`,
+    price: rate.price.toFixed(2),
+    priceCurrency: 'CAD',
+    availability: 'https://schema.org/InStock',
+    url: canonical,
+    seller: { '@id': 'https://abdurastro.com/#business' },
+  })),
+};
 ---
 
 <Base
   title={scope.metaTitle}
-  description={scope.metaDescription}
+  description={metaDescriptionOf(scope)}
   ogImage={scope.image}
   ogImageAlt={scope.imageAlt}
+  schema={[product, breadcrumbJsonLd(crumbs, Astro.site, canonical)]}
 >
   <article class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
+    <Breadcrumbs crumbs={crumbs} class="mb-6" />
     <div class="grid gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(22rem,5fr)] lg:gap-16">
       <div>
         <p class="eyebrow">
@@ -89,8 +131,7 @@ const others = RENTAL_SCOPES.filter((other) => other.slug !== scope.slug);
           </section>
 
           <p class="mt-6 text-xs leading-relaxed text-faint">
-            Pickup and return around Southern Alberta. Every handoff includes a walkthrough of
-            the scope and accessories.{' '}
+            {PICKUP_TERMS}{' '}
             <a href="/contact?topic=rentals" class="link-quiet">Questions or a custom date range?</a>
           </p>
 
@@ -106,9 +147,14 @@ const others = RENTAL_SCOPES.filter((other) => other.slug !== scope.slug);
         </div>
       </div>
 
-      <div class="lg:sticky lg:top-24 lg:self-start">
+      {/* `book` is where the phone-only bar below jumps to. */}
+      <div id="book" class="scroll-mt-24 lg:sticky lg:top-24 lg:self-start">
         <RentalBooking scope={scope} />
       </div>
     </div>
+
+    <CrossSell variant="rental" class="reveal mt-14 max-w-3xl" />
   </article>
+
+  <StickyBookBar label={`Book the ${scope.shortName} · from $${lowestRentalRate(scope)}`} target="book" />
 </Base>

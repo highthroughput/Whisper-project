@@ -9,6 +9,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
+    "check:jsonld": "node scripts/check-jsonld.mjs",
     "astro": "astro"
   },
   "dependencies": {

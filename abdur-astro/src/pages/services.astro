@@ -2,11 +2,15 @@
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { breadcrumbJsonLd, type Crumb } from '../lib/breadcrumbs';
+import { cleanPathname } from '../lib/urls';
 import YouTubeEmbed from '../components/YouTubeEmbed.astro';
 import ConsultBooking from '../components/ConsultBooking.astro';
 import eventPhoto from '../assets/photos/event-photo.jpg';
 import { byDateDesc } from '../lib/photos';
 import { HOURLY_RATE, TUTORIAL_HOUR_LINKS, CONSULTING_HOUR_LINKS } from '../data/checkout';
+import { LESSON_RENTAL_NIGHT, STAR_PARTY } from '../data/star-parties';
 
 // Stripe links and the hourly rate live in src/data/checkout.ts, shared with
 // the thank-you page that values a paid session after checkout.
@@ -72,21 +76,65 @@ const services = [
     body: `Some of the best skies in Canada are an easy drive from Calgary, and a telescope changes what an evening outdoors can be. I bring the equipment and the sky-knowledge to your acreage, campground, lodge, or event for a guided tour of the night sky by eye and by telescope: the Moon's terminator, planets, star clusters, and the same nebulae that hang in this gallery. Star parties in Southern Alberta work for family gatherings, camps, team retreats, and weddings; every booking includes a weather call the day before and a backup date, because Alberta.`,
   },
 ];
+const crumbs: Crumb[] = [{ label: 'Services' }];
+const breadcrumbLd = breadcrumbJsonLd(crumbs, Astro.site, new URL(cleanPathname(Astro.url.pathname), Astro.site).href);
+
+const lessonHeading = `Observing lesson + rental night: $${LESSON_RENTAL_NIGHT.price}.`;
+const lessonText =
+  'An evening with me and a rental Dobsonian at your place or a semi-dark site: at least two hours of observing, a curated list, and how to find things yourself. The rental for that night is included.';
+const starPartyPrice = `$${STAR_PARTY.bookingFee} booking fee + $${STAR_PARTY.perGuest} per guest.`;
+
+// Tutorials and consulting as Services, each at the hourly rate the booking
+// panels charge.
+const hourlyService = (name: string, serviceType: string, description: string) => ({
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name,
+  serviceType,
+  description,
+  provider: { '@id': 'https://abdurastro.com/#business' },
+  url: 'https://abdurastro.com/services',
+  offers: {
+    '@type': 'Offer',
+    priceCurrency: 'CAD',
+    url: 'https://abdurastro.com/services',
+    priceSpecification: {
+      '@type': 'UnitPriceSpecification',
+      price: HOURLY_RATE.toFixed(2),
+      priceCurrency: 'CAD',
+      unitText: 'hour',
+    },
+  },
+});
+const serviceLd = [
+  hourlyService(
+    'One-on-one astrophotography tutorial',
+    'Astrophotography tutoring',
+    'One-on-one astrophotography tutorials online across Canada or in person around Southern Alberta, built around your gear and your goals.',
+  ),
+  hourlyService(
+    'Equipment consulting',
+    'Telescope and astrophotography equipment consulting',
+    'Telescope, mount and camera buying advice, setup help, and remote observatory design for observers, lodges and venues.',
+  ),
+];
 ---
 
 <Base
-  title="Astrophotography Tutorials & Star Parties"
-  description="Astronomy services from Southern Alberta: one-on-one astrophotography tutorials online or in person, telescope and equipment consulting, public speaking for astronomy events, and private star parties across Southern Alberta."
+  title="Astrophotography Tutorials, Consulting & Star Parties · Calgary"
+  description="Astronomy services from Southern Alberta: one-on-one astrophotography tutorials online or in person, equipment consulting, talks and private star parties."
   ogImage={keyImage}
+  schema={[...serviceLd, breadcrumbLd]}
 >
   <section class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
+    <Breadcrumbs crumbs={crumbs} class="mb-6" />
     <p class="eyebrow">Beyond the archive</p>
     <h1 class="mt-3 font-display text-4xl sm:text-5xl">Services</h1>
     <p class="mt-6 max-w-2xl text-faint">
       The photographs are one output of years spent learning this sky. The rest is teaching it,
       speccing gear for it, and sharing it in person: astronomy tutorials Canada-wide, and
-      dark-sky experiences rooted in Southern Alberta. Looking to try a telescope before you buy
-      one? See <a href="/rentals" class="link-quiet">scope rentals</a>.
+      <a href="/star-parties" class="link-quiet">dark-sky experiences</a> rooted in Southern Alberta.
+      Looking to try a telescope before you buy one? See <a href="/rentals" class="link-quiet">scope rentals</a>.
     </p>
 
     <ul class="mt-14">
@@ -103,16 +151,36 @@ const services = [
                   {service.mode}
                 </p>
                 <p class="mt-5 leading-relaxed text-star/85">{service.body}</p>
+                {service.id === 'tutorials' && (
+                  <div class="mt-6 border-l-2 border-l-dust pl-4">
+                    <p class="text-sm leading-relaxed text-star/85">
+                      <strong class="font-normal text-star">{lessonHeading}</strong>{' '}{lessonText}
+                    </p>
+                    <a href="/contact?topic=tutorials" class="link-quiet inline-flex min-h-11 items-center text-sm">
+                      Ask about a lesson →
+                    </a>
+                  </div>
+                )}
                 {/* Tutorials and consulting carry their own booking panel, so a
-                    second general-enquiry CTA would compete with the real action. */}
-                {!service.booking && (
-                  <a
-                    href={`/contact?topic=${service.topic}`}
-                    class="btn mt-7"
-                    aria-label={`Inquire about ${service.title.toLowerCase()}`}
-                  >
-                    Inquire →
-                  </a>
+                    second general-enquiry CTA would compete with the real action.
+                    Star parties have their own page with the price and terms. */}
+                {service.id === 'star-parties' ? (
+                  <>
+                    <p class="mt-5 font-mono text-[0.8125rem] text-star">{starPartyPrice}</p>
+                    <a href="/star-parties" class="btn mt-5">
+                      Details &amp; pricing →
+                    </a>
+                  </>
+                ) : (
+                  !service.booking && (
+                    <a
+                      href={`/contact?topic=${service.topic}`}
+                      class="btn mt-7"
+                      aria-label={`Inquire about ${service.title.toLowerCase()}`}
+                    >
+                      Inquire →
+                    </a>
+                  )
                 )}
               </div>
 

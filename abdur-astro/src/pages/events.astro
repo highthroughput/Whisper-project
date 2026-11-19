@@ -1,118 +1,265 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { cleanPathname } from '../lib/urls';
+import { breadcrumbJsonLd, type Crumb } from '../lib/breadcrumbs';
+import {
+  darkWeekendLabel,
+  mountainToday,
+  starPartyEventJsonLd,
+  upcomingSkyEvents,
+  type SkyEvent,
+} from '../data/sky-events';
 
-const startOfToday = new Date();
-startOfToday.setHours(0, 0, 0, 0);
-
-const upcoming = (await getCollection('events'))
-  .filter((event) => event.data.date >= startOfToday)
+// Star parties and talks Abdur hosts stay in the events collection (one
+// markdown file each); the sky calendar comes from src/data/sky-events.ts.
+// Both show only what's still to come on the day the site was built, so the
+// site has to be rebuilt at least monthly for past dates to drop off.
+const today = mountainToday();
+// Asking an empty collection for its entries logs a warning on every build,
+// and no hosted event on the calendar is the usual state.
+const hasEventFiles = Object.keys(import.meta.glob('../content/events/**/*.md')).length > 0;
+const hosted = (hasEventFiles ? await getCollection('events') : [])
+  .filter((event) => event.data.kind === 'hosted')
+  .filter((event) => event.data.date.toISOString().slice(0, 10) >= today)
   .sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
-
-const entries = await Promise.all(
-  upcoming.map(async (event) => ({ event, Content: (await render(event)).Content })),
+const hostedEntries = await Promise.all(
+  hosted.map(async (event) => ({ event, Content: (await render(event)).Content })),
 );
 
-const hasHosted = upcoming.some((event) => event.data.kind === 'hosted');
+const sky = upcomingSkyEvents();
+const canonical = new URL(cleanPathname(Astro.url.pathname), Astro.site).href;
+const crumbs: Crumb[] = [{ label: 'Events' }];
 
-const monthDay = (date: Date) =>
+/** Which filter chip a row belongs to. */
+const filterOf = (e: SkyEvent) =>
+  e.type === 'Moon' ? (e.title === 'New Moon' ? 'new-moon' : 'moon') : e.type === 'Meteor shower' ? 'meteors' : e.type === 'Planet' || e.type === 'Eclipse' ? 'planets' : 'season';
+
+const isFullMoon = (e: SkyEvent) => e.type === 'Moon' && e.title === 'Full Moon';
+const typeLabel: Record<string, string> = {
+  Moon: 'Moon',
+  'Meteor shower': 'Meteor shower',
+  Planet: 'Planet',
+  Eclipse: 'Eclipse',
+  Season: 'Season',
+  'Star party': 'Star party',
+};
+
+const parts = (iso: string) => {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d));
+};
+const monthDay = (iso: string) =>
+  parts(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }).toUpperCase();
+const monthKey = (iso: string) => iso.slice(0, 7);
+const monthName = (iso: string) =>
+  parts(iso).toLocaleDateString('en-CA', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+
+/** A New Moon note without its derived weekend: that has its own line. */
+const noteText = (e: SkyEvent) => e.note.replace(/\s*Nearest weekend \(derived\):.*$/, '');
+
+const months = [...new Set(sky.map((e) => monthKey(e.date)))].map((key) => ({
+  key,
+  name: monthName(`${key}-01`),
+  events: sky.filter((e) => monthKey(e.date) === key),
+}));
+
+const filters = [
+  { key: 'all', label: 'All' },
+  { key: 'new-moon', label: 'New moons' },
+  { key: 'meteors', label: 'Meteor showers' },
+  { key: 'planets', label: 'Planets & eclipses' },
+];
+
+const legacyMonthDay = (date: Date) =>
   date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
 ---
 
 <Base
-  title="Events Calendar"
-  description="Upcoming star parties near Southern Alberta, plus meteor showers, solstices, and other astronomical events worth planning a night around."
+  title="Stargazing Calendar for Calgary & Alberta 2026–27"
+  description="New moons, meteor showers, eclipses and planet nights for Calgary and Southern Alberta in 2026–27, plus star parties and the best weekends to rent a telescope."
+  schema={[...starPartyEventJsonLd(), breadcrumbJsonLd(crumbs, Astro.site, canonical)]}
 >
   <section class="mx-auto w-full max-w-5xl px-5 pt-14 sm:px-8 sm:pt-20">
+    <Breadcrumbs crumbs={crumbs} class="mb-6" />
     <p class="eyebrow">What's coming up</p>
     <h1 class="mt-3 font-display text-4xl sm:text-5xl">Events</h1>
     <p class="mt-6 max-w-2xl text-faint">
-      Star parties and talks happening in and around Southern Alberta, alongside the meteor
-      showers, solstices, and other sky events worth planning a night around.
+      New moons, meteor showers, eclipses and planet nights for Calgary and Southern Alberta, with
+      the best weekends for a star party or a rental. Times are Mountain Time.
     </p>
 
     {
-      !hasHosted && (
+      hostedEntries.length === 0 ? (
         <div class="reveal mt-8 max-w-2xl border border-l-2 hairline border-l-dust bg-surface p-5">
           <p class="eyebrow text-faint">Calendar status</p>
-          <p class="mt-2 text-sm text-star/85">
-            No public star parties on the calendar right now.{' '}
-            <a href="/contact?topic=starparty" class="link-quiet">
-              Ask about booking a private one →
-            </a>
-          </p>
+          <p class="mt-2 text-sm text-star/85">No public star parties on the calendar right now.</p>
+          <ul class="mt-3 space-y-1 text-sm text-star/85">
+            <li>
+              Want one for your group on one of the dark weekends below?{' '}
+              <a href="/star-parties" class="link-quiet">
+                Book a private star party →
+              </a>
+            </li>
+            <li>
+              Want a scope for a meteor shower?{' '}
+              <a href="/rentals" class="link-quiet">
+                Rent a telescope →
+              </a>
+            </li>
+          </ul>
         </div>
+      ) : (
+        <section class="mt-12" aria-labelledby="hosted-heading">
+          <h2 id="hosted-heading" class="eyebrow">
+            Star parties and talks
+          </h2>
+          <ul class="mt-4">
+            {hostedEntries.map(({ event, Content }) => (
+              <li id={event.id} class="reveal border-b hairline first:border-t">
+                <article class="grid gap-x-8 gap-y-3 py-10 sm:grid-cols-[6.5rem_minmax(0,1fr)_9rem] sm:items-start">
+                  <div class="flex items-baseline gap-2 font-mono sm:block">
+                    <p class="text-2xl tabular-nums text-star">{legacyMonthDay(event.data.date)}</p>
+                    <p class="text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint sm:mt-1">
+                      {event.data.date.getFullYear()}
+                    </p>
+                  </div>
+                  <div>
+                    <p class="font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-ha">Hosted</p>
+                    <h3 class="mt-1.5 font-display text-2xl">{event.data.title}</h3>
+                    <p class="mt-1.5 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
+                      {event.data.when}
+                    </p>
+                    {event.data.location && <p class="mt-1 text-sm text-faint">{event.data.location}</p>}
+                    <div class="mt-3 max-w-prose text-sm leading-relaxed text-star/85 [&_p]:mb-3 [&_p:last-child]:mb-0">
+                      <Content />
+                    </div>
+                  </div>
+                  <div class="sm:self-end">
+                    <a href={event.data.rsvpLink ?? '/contact?topic=starparty'} class="btn btn-solid btn-sm">
+                      RSVP →
+                    </a>
+                  </div>
+                </article>
+              </li>
+            ))}
+          </ul>
+        </section>
       )
     }
 
-    <ul class="mt-12">
+    <section class="mt-14" aria-labelledby="sky-heading">
+      <h2 id="sky-heading" class="sr-only">Sky calendar</h2>
+
+      {/* Filters are an enhancement: without JS every row shows and the chips
+          stay hidden. */}
+      <div class="sky-filters js-only flex flex-wrap gap-2" role="group" aria-label="Show">
+        {
+          filters.map((filter, i) => (
+            <button type="button" class="chip min-h-11" data-filter={filter.key} aria-pressed={i === 0 ? 'true' : 'false'}>
+              {filter.label}
+            </button>
+          ))
+        }
+      </div>
+
       {
-        entries.length === 0 ? (
-          <p class="text-faint">Nothing on the calendar yet. Check back soon.</p>
+        months.length === 0 ? (
+          <p class="mt-10 text-faint">The sky calendar runs out here. New dates are coming soon.</p>
         ) : (
-          entries.map(({ event, Content }) => (
-            <li id={event.id} class="reveal border-b hairline first:border-t">
-              <article class="grid gap-x-8 gap-y-3 py-10 sm:grid-cols-[6.5rem_minmax(0,1fr)_9rem] sm:items-start">
-                {/* On phones the date is one inline row; stacking it put four
-                    micro-labels above the title before any real content. */}
-                <div class="flex items-baseline gap-2 font-mono sm:block">
-                  <p class="text-2xl tabular-nums text-star">{monthDay(event.data.date)}</p>
-                  <p class="text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint sm:mt-1">
-                    {event.data.date.getFullYear()}
-                  </p>
-                </div>
-
-                <div>
-                  <p
-                    class:list={[
-                      'font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)]',
-                      event.data.kind === 'hosted' ? 'text-ha' : 'text-dust',
-                    ]}
-                  >
-                    {event.data.kind === 'hosted' ? 'Hosted' : 'Sky event'}
-                  </p>
-                  <h2 class="mt-1.5 font-display text-2xl">{event.data.title}</h2>
-                  {/* The timing token stays in the log register; the viewing note
-                      is a sentence and reads as one, not as a tracked caps banner. */}
-                  <p class="mt-1.5 font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-faint">
-                    {event.data.when}
-                  </p>
-                  {event.data.location && (
-                    <p class="mt-1 text-sm text-faint">{event.data.location}</p>
-                  )}
-                  <div class="reveal mt-3 max-w-prose text-sm leading-relaxed text-star/85 [&_p]:mb-3 [&_p:last-child]:mb-0">
-                    <Content />
-                  </div>
-                </div>
-
-                <div class="sm:self-end">
-                  {
-                    event.data.kind === 'hosted' ? (
-                      <a
-                        href={event.data.rsvpLink ?? '/contact?topic=starparty'}
-                        class="btn btn-solid btn-sm"
-                      >
-                        RSVP →
-                      </a>
-                    ) : (
-                      event.data.infoUrl && (
-                        <a
-                          href={event.data.infoUrl}
-                          class="btn btn-sm"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Learn more →
-                        </a>
-                      )
-                    )
-                  }
-                </div>
-              </article>
-            </li>
+          months.map((month) => (
+            <section class="sky-month mt-12" aria-labelledby={`m-${month.key}`}>
+              <h3 id={`m-${month.key}`} class="eyebrow">
+                {month.name}
+              </h3>
+              <ul class="mt-4">
+                {month.events.map((e) =>
+                  isFullMoon(e) ? (
+                    <li
+                      class="sky-row flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b hairline py-3 font-mono text-[0.8125rem] first:border-t"
+                      data-filter={filterOf(e)}
+                    >
+                      <span class="w-[6.5rem] shrink-0 tabular-nums text-star">{monthDay(e.date)}</span>
+                      <span class="text-star">Full Moon</span>
+                      <span class="text-faint">{e.time}</span>
+                      <span class="text-faint">· Bright Moon: Moon and planet nights, beginner rentals</span>
+                    </li>
+                  ) : (
+                    <li class="sky-row border-b hairline first:border-t" data-filter={filterOf(e)}>
+                      <article class="grid gap-x-8 gap-y-2 py-6 sm:grid-cols-[6.5rem_minmax(0,1fr)]">
+                        <p class="font-mono text-xl tabular-nums text-star">{monthDay(e.date)}</p>
+                        <div>
+                          <p class="font-mono text-[0.6875rem] uppercase [letter-spacing:var(--tracking-log)] text-dust">
+                            {typeLabel[e.type]}
+                            {e.time && <span class="text-faint"> · {e.time}</span>}
+                          </p>
+                          <h4 class="mt-1.5 font-display text-xl">{e.title}</h4>
+                          <p class="mt-1.5 max-w-prose text-sm leading-relaxed text-star/85">{noteText(e)}</p>
+                          {darkWeekendLabel(e) && (
+                            <p class="mt-2 flex flex-wrap items-baseline gap-x-4 text-sm">
+                              <span class="font-mono text-[0.75rem] text-star">{darkWeekendLabel(e)}</span>
+                              <a href="/star-parties" class="link-quiet inline-flex min-h-11 items-center">
+                                Book a star party
+                              </a>
+                            </p>
+                          )}
+                          {e.type === 'Meteor shower' && (
+                            <a href="/rentals" class="link-quiet mt-1 inline-flex min-h-11 items-center text-sm">
+                              Rent a scope for it
+                            </a>
+                          )}
+                        </div>
+                      </article>
+                    </li>
+                  ),
+                )}
+              </ul>
+            </section>
           ))
         )
       }
-    </ul>
+
+      <p class="mt-10 max-w-3xl text-xs leading-relaxed text-faint">
+        Moon phases: US Naval Observatory. Meteor showers: American Meteor Society. Planet
+        oppositions: Hong Kong Observatory. Eclipse visibility for Calgary: timeanddate.com.
+      </p>
+    </section>
+
+    <section class="reveal mt-16 border-t hairline pt-12" aria-labelledby="rasc-heading">
+      <h2 id="rasc-heading" class="font-display text-3xl">Other star parties near Calgary</h2>
+      <p class="mt-4 max-w-2xl leading-relaxed text-star/85">
+        The Royal Astronomical Society of Canada, Calgary Centre runs public observing nights at the
+        Wilson Coulee Observatory and events through the year.
+      </p>
+      <a
+        href="https://calgary.rasc.ca"
+        class="link-quiet mt-3 inline-flex min-h-11 items-center text-sm"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        RASC Calgary Centre →
+      </a>
+    </section>
   </section>
 </Base>
+
+<script>
+  // Filter chips: hide rows (and months left empty) outside the chosen type.
+  // "All" shows everything, full moons and seasons included.
+  const chips = [...document.querySelectorAll<HTMLButtonElement>('.sky-filters [data-filter]')];
+  const rows = [...document.querySelectorAll<HTMLElement>('.sky-row')];
+  const months = [...document.querySelectorAll<HTMLElement>('.sky-month')];
+
+  const apply = (key: string) => {
+    chips.forEach((chip) => chip.setAttribute('aria-pressed', String(chip.dataset.filter === key)));
+    rows.forEach((row) => {
+      row.hidden = key !== 'all' && row.dataset.filter !== key;
+    });
+    months.forEach((month) => {
+      month.hidden = ![...month.querySelectorAll<HTMLElement>('.sky-row')].some((row) => !row.hidden);
+    });
+  };
+
+  chips.forEach((chip) => chip.addEventListener('click', () => apply(chip.dataset.filter ?? 'all')));
+</script>

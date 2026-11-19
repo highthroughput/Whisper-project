@@ -140,28 +140,56 @@ the new links (see "Conversion tracking").
 
 ## Adding a new event (under 2 minutes)
 
-The `/events` page lists two kinds of entries, sorted together by date; past
-events drop off automatically.
+`/events` has two parts: star parties and talks Abdur hosts, and the sky
+calendar (Moon phases, meteor showers, eclipses, planets, seasons). Both show
+only dates on or after the day the site was built, so **rebuild at least
+monthly** (every deploy does it) or past dates stay up.
 
-1. Create `src/content/events/some-slug.md`:
+**A hosted event** is one markdown file, `src/content/events/some-slug.md`:
 
-   ```markdown
-   ---
-   title: 'Private star party · Sylvan Lake'
-   kind: 'hosted'                      # 'hosted' (you're running it) or 'astronomical' (a sky event)
-   date: 2026-11-14                    # drives sorting and the drop-off-when-past behaviour
-   when: 'Sat, Nov 14 · 7–10pm'        # human-readable, shown as-is
-   location: 'Sylvan Lake, weather permitting'
-   rsvpLink: 'https://buy.stripe.com/…' # optional — falls back to /contact?topic=starparty
-   ---
+```markdown
+---
+title: 'Public star party · Big Hill Springs'
+kind: 'hosted'
+date: 2027-01-09                    # drives sorting and the drop-off-when-past behaviour
+when: 'Sat, Jan 9 · 7 to 10pm'      # human-readable, shown as-is
+location: 'Big Hill Springs, weather permitting'
+rsvpLink: 'https://buy.stripe.com/…' # optional; falls back to /contact?topic=starparty
+---
 
-   A line or two about the event.
-   ```
+A line or two about the event.
+```
 
-2. `npm run dev` — it's on the calendar. Done.
+While there's at least one upcoming hosted event, the "no public star
+parties" notice gives way to the list. (In `npm run dev`, restart after adding
+the first file to an empty folder.)
 
-For an `astronomical` entry, use `infoUrl` instead of `rsvpLink` if you want a
-"Learn more" link (omit it to show no button, just the write-up).
+**The sky calendar** is `src/data/sky-events.ts`, one row per event in
+Mountain Time, with its source. New Moon rows carry the dark weekend
+("Nearest weekend (derived): Fri … / Sat …"), which `/events` and
+`/star-parties` show. Add the next year's rows before the last ones pass.
+A real hosted star party can also go there as `type: 'Star party'` with
+`startDate`, `location` and `url`; only those rows get Event structured data.
+
+## Star parties, FAQ and the other data files
+
+- `src/data/star-parties.ts`: the star-party price ($150 booking fee + $25
+  per guest), terms, and the observing lesson + rental night ($140). Read by
+  `/star-parties`, `/services`, `/rentals` and the FAQ.
+- `src/data/faq.ts`: every question and answer. `/faq` shows them all;
+  `/rentals`, `/prints` and `/star-parties` show their own group. Prices in
+  answers come from the rental, print and star-party data.
+- `src/config/offers.ts`: phase 2 placeholders (welcome offer, star-party and
+  gift Payment Links). Nothing on the site reads it yet.
+- Breadcrumbs: pages pass their trail to `components/Breadcrumbs.astro` and
+  `breadcrumbJsonLd` (`src/lib/breadcrumbs.ts`), so the visible trail and the
+  structured data match.
+- `npm run check:jsonld` (after a build) parses every JSON-LD block and
+  counts them by type; it fails on invalid JSON or a duplicated FAQPage,
+  BreadcrumbList or LocalBusiness on one page.
+- `public/_redirects` sends `/sitemap.xml` to `/sitemap-index.xml` with a 301.
+  Cloudflare's static assets read it before serving files; Astro's own
+  `redirects` would only write a meta-refresh page.
 
 ## Adding a new testimonial (under a minute)
 
@@ -410,6 +438,20 @@ All six real Appointment Schedule URLs (intro + 1 through 5 hours, on the
 (`CONSULTING_INTRO_CALENDAR_LINK`, `CONSULTING_HOUR_CALENDAR_LINKS`). To
 create more (a different service, a schedule change), Google Calendar →
 Create → Appointment schedule, then pass the resulting URL in as a prop.
+
+## Phase 2 (not done)
+
+Waiting on decisions and new Stripe setup; `src/config/offers.ts` holds the
+empty slots.
+
+- [ ] 10% welcome offer for email sign-ups, with its banner
+      (`WELCOME_OFFER`).
+- [ ] `/gifts` page and gift vouchers, including a gift lesson + rental night.
+- [ ] Online checkout for star parties (booking fee, then guest fee) and for
+      the observing lesson + rental night. Until then both are booked through
+      the contact form and Abdur replies with payment details.
+- [ ] Print returns policy page (`/returns`), then shipping and return
+      details in the print structured data and Merchant Center.
 
 ## Replace before launch
 

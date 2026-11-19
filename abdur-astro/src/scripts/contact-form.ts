@@ -1,5 +1,7 @@
 // Contact form enhancements:
-// 1. Preselect the topic from ?topic= (the Services "Inquire" buttons link here).
+// 1. Preselect the topic from ?topic=, by key (?topic=starparty, what the
+//    site's own links use) or by the label shown (?topic=Private%20star%20party),
+//    ignoring case. Anything else leaves the default.
 // 2. Submit via fetch with inline status instead of leaving the site.
 // Without JS the form still works as a plain POST to Web3Forms.
 import { logToLeadSheet } from '../lib/leadSheet';
@@ -8,11 +10,13 @@ import { lead } from '../lib/track';
 const form = document.getElementById('contact-form') as HTMLFormElement | null;
 
 if (form) {
-  const topic = new URLSearchParams(window.location.search).get('topic');
+  const topic = (new URLSearchParams(window.location.search).get('topic') ?? '').trim().toLowerCase();
   const select = form.querySelector<HTMLSelectElement>('#topic');
-  if (topic && select && [...select.options].some((o) => o.value === topic)) {
-    select.value = topic;
-  }
+  const match =
+    topic && select
+      ? [...select.options].find((o) => o.value.toLowerCase() === topic || o.text.trim().toLowerCase() === topic)
+      : undefined;
+  if (select && match) select.value = match.value;
 
   const status = document.getElementById('form-status');
   const subject = form.querySelector<HTMLInputElement>('input[name="subject"]');

@@ -5,6 +5,9 @@ import Base from '../../layouts/Base.astro';
 import { cleanPathname } from '../../lib/urls';
 import { DUTIES_NOTE } from '../../config';
 import PrintOptions from '../../components/PrintOptions.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import CrossSell from '../../components/CrossSell.astro';
+import { breadcrumbJsonLd, type Crumb } from '../../lib/breadcrumbs';
 import { printVariants, sizeInInches } from '../../lib/prints';
 import { PRINT_SLIDE_IMAGE, photoCredit } from '../../lib/imageMeta';
 
@@ -39,6 +42,7 @@ const slides = [
 
 
 const canonical = new URL(cleanPathname(Astro.url.pathname), Astro.site).href;
+const crumbs: Crumb[] = [{ label: 'Prints', href: '/prints' }, { label: data.title }];
 const description = `${data.title} fine art print: archival giclée astrophotography from Alberta on archival matte or Hahnemühle FineArt Pearl gloss paper, ${data.options[0].size} to ${data.options[data.options.length - 1].size}, from $${from} CAD. Ships across North America.`;
 
 // Google's merchant listings ask for the product image at 1:1, 4:3 and 16:9.
@@ -96,9 +100,10 @@ const credits = await Promise.all(slides.map((slide) => photoCredit(slide.src, P
   description={description}
   ogImage={data.image}
   ogImageAlt={data.alt}
-  schema={[productGroup, ...credits]}
+  schema={[productGroup, ...credits, breadcrumbJsonLd(crumbs, Astro.site, canonical)]}
 >
   <article class="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20">
+    <Breadcrumbs crumbs={crumbs} class="mb-6" />
     <div class="grid gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(22rem,5fr)] lg:gap-16">
       {/* One image at a time, swiped. Native CSS scroll-snap does the swiping,
           so it works on a phone with no JavaScript at all; the dots and the
@@ -202,6 +207,8 @@ const credits = await Promise.all(slides.map((slide) => photoCredit(slide.src, P
             <a href="/contact?topic=prints" class="link-quiet">Questions?</a>
           </p>
         </div>
+
+        <CrossSell variant="print" class="mt-10" />
       </div>
     </div>
   </article>

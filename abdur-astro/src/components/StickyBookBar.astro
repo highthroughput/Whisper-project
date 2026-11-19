@@ -1,0 +1,64 @@
+---
+/**
+ * Phones and tablets only: on a rental page the booking box stacks under the
+ * description, a long scroll below the fold. This slim bar sits at the bottom
+ * of the screen until the box itself comes into view, and jumps to it.
+ *
+ * It's fixed, so it overlays content and never shifts it, and it stays out of
+ * the way of the consent notice, which uses the same strip of screen. Without
+ * JS it never appears: the box is still on the page, just further down.
+ */
+interface Props {
+  /** e.g. "Book the Orion 8″ · from $15" */
+  label: string;
+  /** id of the booking box to scroll to. */
+  target: string;
+}
+
+const { label, target } = Astro.props;
+---
+
+<div
+  class="sticky-book-bar fixed inset-x-0 bottom-0 z-40 border-t hairline bg-surface/95 px-4 py-3 backdrop-blur lg:hidden"
+  data-target={target}
+  hidden
+>
+  <div class="mx-auto flex max-w-xl items-center justify-between gap-4">
+    <p class="font-mono text-[0.75rem] text-star">{label}</p>
+    <a href={`#${target}`} class="btn btn-solid btn-sm min-h-11 shrink-0">Book →</a>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.sticky-book-bar').forEach((bar) => {
+    const target = document.getElementById(bar.dataset.target ?? '');
+    if (!target || !('IntersectionObserver' in window)) return;
+    const banner = document.getElementById('consent-banner');
+    const narrow = window.matchMedia('(max-width: 1023.98px)');
+
+    // Shown only while the booking box is still below the screen: once it's
+    // in view, or scrolled past, the bar has nothing to offer.
+    let below = false;
+    const sync = () => {
+      bar.hidden = !(narrow.matches && below && (!banner || banner.hidden));
+    };
+
+    new IntersectionObserver(([entry]) => {
+      below = !entry.isIntersecting && entry.boundingClientRect.top > 0;
+      sync();
+    }).observe(target);
+
+    if (banner) new MutationObserver(sync).observe(banner, { attributes: true, attributeFilter: ['hidden'] });
+    narrow.addEventListener('change', sync);
+
+    bar.querySelector('a')?.addEventListener('click', (event) => {
+      event.preventDefault();
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      // Focus follows, for keyboard and screen reader users, without opening
+      // a date picker the way focusing the first field would.
+      if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+      target.focus({ preventScroll: true });
+    });
+  });
+</script>

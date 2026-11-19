@@ -1,3 +1,5 @@
+import { existsSync, readdirSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
@@ -86,13 +88,30 @@ const prints = defineCollection({
 });
 
 /**
- * Calendar entries: star parties and other events being hosted, plus
- * astronomical events happening regardless (meteor showers, solstices, etc).
- * Adding an event = one markdown file in src/content/events/. See
- * "Adding a new event" in README.md.
+ * Events Abdur hosts: public star parties and talks, one markdown file each
+ * in src/content/events/ (see "Adding a new event" in README.md). The sky
+ * calendar (Moon phases, meteor showers, eclipses) is src/data/sky-events.ts;
+ * /events shows only `kind: 'hosted'` entries from here.
  */
+const eventFiles = glob({ pattern: '**/*.md', base: './src/content/events' });
 const events = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/events' }),
+  // No hosted event on the calendar is the usual state, and the plain glob
+  // loader warns on every build when its folder is empty, so it only runs
+  // when there is a file to load. (In `astro dev`, restart after adding the
+  // first one.)
+  loader: {
+    name: 'hosted-events',
+    load: async (context) => {
+      const dir = resolve('src/content/events');
+      const hasEvents =
+        existsSync(dir) && readdirSync(dir, { recursive: true }).some((f) => String(f).endsWith('.md'));
+      if (!hasEvents) {
+        context.store.clear();
+        return;
+      }
+      return eventFiles.load(context);
+    },
+  },
   schema: z.object({
     title: z.string(),
     /** 'hosted' = a star party or talk being run personally; 'astronomical' = a sky event happening regardless. */
