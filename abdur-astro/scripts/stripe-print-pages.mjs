@@ -21,7 +21,9 @@
  *   STRIPE_SECRET_KEY=rk_live_... node scripts/stripe-print-pages.mjs --apply  # makes the changes
  *
  * A restricted key needs "Payment Links: Write", "Products: Write" and
- * "Prices: Read". Re-running is safe: anything already right is skipped.
+ * "Prices: Read". Re-running is safe: anything already right is skipped, and
+ * after DUTIES_NOTE changes, the note this script placed is replaced rather
+ * than a second one added (it records the note in the link's metadata).
  * Before changing anything, --apply saves the current name, description and
  * checkout text of everything it will touch to
  * stripe-print-pages-backup-<timestamp>.json.
@@ -41,6 +43,8 @@ if (!KEY) {
 
 /** Stripe allows 1,200 characters of custom text per field. */
 const MAX_CUSTOM_TEXT = 1200;
+/** Payment Link metadata key holding the note this script last placed. */
+const NOTE_METADATA_KEY = 'duties_note';
 const CUSTOM_TEXT_FIELDS = ['shipping_address', 'submit', 'terms_of_service_acceptance', 'after_submit'];
 
 const linkIdOf = (url) => new URL(url).pathname.replace(/^\/+/, '');
@@ -115,17 +119,55 @@ async function allPaymentLinks() {
   return links;
 }
 
-/** "Open edition · signed" and the ways it might have been typed, with the separator before it. */
-const EDITION = /\s*[·,|•–—-]?\s*\bopen[\s-]edition\b(?:\s*[·,|•–—-]?\s*\b(?:hand[\s-])?signed\b)?\s*[.·,|•–—-]?/gi;
+/**
+ * The edition label as a whole: "Open edition · signed", "Open edition,
+ * signed", "Open edition", "Signed", "Hand-signed". It is only ever removed
+ * where it stands alone, as a bracketed aside, a sentence, or a segment
+ * between separators. Inside running prose ("an open edition print",
+ * "signed by the artist") it is left in place and flagged for a hand edit,
+ * since cutting it out of a sentence leaves the sentence broken.
+ */
+const LABEL_CORE = String.raw`(?:open[\s-]edition(?:\s*[·,|•–—-]\s*(?:hand[\s-])?signed)?|(?:hand[\s-])?signed)`;
+const LABEL = new RegExp(`^${LABEL_CORE}$`, 'i');
+const BRACKETED = new RegExp(String.raw`\s*\(\s*${LABEL_CORE}\s*\)`, 'gi');
+const SEPARATOR = /(\s+[·|•–—-]\s+)/;
 const BARYTA = /\bbaryta(?:[\s-]+fib(?:re|er))?\b/gi;
 const LEFTOVER = /baryta|open[\s-]edition|\bsigned\b/i;
+
+/** One sentence with any segment that is only the label dropped, keeping the separators between the rest. */
+function dropLabelSegments(sentence) {
+  const [, body, end] = sentence.match(/^([\s\S]*?)([.!?]?)$/);
+  const parts = body.split(SEPARATOR); // segment, separator, segment, …
+  const segments = parts.filter((_, i) => i % 2 === 0);
+  const separators = parts.filter((_, i) => i % 2 === 1);
+  const keep = segments.map((s) => !LABEL.test(s.trim()));
+  if (keep.every(Boolean)) return sentence;
+  // A dropped segment takes one separator with it: the one before the next
+  // kept segment is the one that was before the dropped one.
+  let out = '';
+  let separator = '';
+  segments.forEach((segment, i) => {
+    if (i > 0 && !separator) separator = separators[i - 1];
+    if (!keep[i]) return;
+    out = out ? out + separator + segment : segment;
+    separator = '';
+  });
+  return out ? out + end : '';
+}
 
 /** The text with the retired paper and edition wording taken out, or flagged if that isn't enough. */
 function cleanText(original, paper) {
   if (!original) return { text: original, flagged: false };
-  let text = original.replace(EDITION, ' ');
+  let text = original.replace(BRACKETED, '');
+  // Sentences keep the whitespace that followed them, so line breaks survive.
+  const pieces = text.split(/(?<=[.!?])(\s+)/);
+  let rebuilt = '';
+  for (let i = 0; i < pieces.length; i += 2) {
+    const sentence = dropLabelSegments(pieces[i]);
+    if (sentence) rebuilt += (rebuilt ? pieces[i - 1] ?? ' ' : '') + sentence;
+  }
+  text = rebuilt.trim();
   if (/pearl/i.test(paper)) text = text.replace(BARYTA, paper);
-  text = text.replace(/\s{2,}/g, ' ').replace(/^\s*[·,|•–—-]\s*/, '').trim();
   if (LEFTOVER.test(text)) return { text: original, flagged: true };
   return { text, flagged: false };
 }
@@ -185,12 +227,16 @@ for (const [id, entry] of prints) {
   // Checkout text: the field a buyer reads at the point duties matter.
   const field = link.shipping_address_collection ? 'shipping_address' : 'submit';
   const current = link.custom_text?.[field]?.message ?? '';
+  // The note this script last put there is kept in the link's metadata, so a
+  // changed DUTIES_NOTE replaces it instead of stacking a second one below.
+  const previous = link.metadata?.[NOTE_METADATA_KEY] ?? '';
   if (!current.includes(NOTE)) {
-    const next = current ? `${current}\n\n${NOTE}` : NOTE;
+    const replacing = previous && current.includes(previous);
+    const next = replacing ? current.replace(previous, NOTE) : current ? `${current}\n\n${NOTE}` : NOTE;
     if (next.length > MAX_CUSTOM_TEXT) {
       problems.push(`${link.url}: its ${field} text plus the note would pass Stripe's ${MAX_CUSTOM_TEXT} characters; left alone`);
     } else {
-      linkPlans.push({ link, field, current, next });
+      linkPlans.push({ link, field, current, next, replacing });
     }
   }
 }
@@ -220,7 +266,7 @@ for (const p of productUpdates) {
     console.log(`  description: "${p.product.description}"\n           →  "${p.wantDescription}"`);
 }
 for (const l of linkPlans) {
-  console.log(`\n${l.link.url}\n  ${l.field === 'shipping_address' ? 'under the shipping address' : 'above the Pay button'}: ${l.current ? 'note added after the existing text' : 'note added'}`);
+  console.log(`\n${l.link.url}\n  ${l.field === 'shipping_address' ? 'under the shipping address' : 'above the Pay button'}: ${l.replacing ? 'earlier duties note replaced' : l.current ? 'note added after the existing text' : 'note added'}`);
 }
 if (handEdits.length) {
   console.log(`\n${handEdits.length} product(s) still mention baryta, an edition or signing in a way this script won't guess at. Edit these by hand in the Stripe Dashboard:`);
@@ -247,7 +293,12 @@ await writeFile(
   JSON.stringify(
     {
       products: productUpdates.map((p) => ({ id: p.product.id, name: p.product.name, description: p.product.description })),
-      payment_links: linkPlans.map((l) => ({ id: l.link.id, url: l.link.url, custom_text: l.link.custom_text })),
+      payment_links: linkPlans.map((l) => ({
+        id: l.link.id,
+        url: l.link.url,
+        custom_text: l.link.custom_text,
+        metadata: l.link.metadata ?? {},
+      })),
     },
     null,
     2,
@@ -276,6 +327,7 @@ for (const l of linkPlans) {
     const message = f === l.field ? l.next : l.link.custom_text?.[f]?.message;
     if (message) params[`custom_text[${f}][message]`] = message;
   }
+  params[`metadata[${NOTE_METADATA_KEY}]`] = NOTE;
   try {
     await post(`/v1/payment_links/${l.link.id}`, params);
     ok += 1;

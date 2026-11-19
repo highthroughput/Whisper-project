@@ -20,6 +20,9 @@ const { options, title, id, class: className } = Astro.props;
 const sizes = [...new Set(options.map((o) => o.size))];
 const papers = [...new Set(options.map((o) => o.paper))];
 const initial = options[0];
+// On a 360 px phone "Hahnemühle FineArt Pearl (gloss)" only fits the select
+// with a slightly smaller face and less padding; from sm up it has room.
+const narrowSelect = 'max-sm:pl-2.5 max-sm:pr-8 max-sm:text-xs';
 ---
 
 <section
@@ -36,17 +39,17 @@ const initial = options[0];
     <span class="text-dust">CAD</span>
   </header>
 
-  <div class="js-only space-y-4 px-5 py-5">
+  <div class="js-only space-y-4 px-4 py-5 sm:px-5">
     <div class="flex flex-col gap-1.5">
       <label for="print-size" class="eyebrow text-faint">Size</label>
-      <select id="print-size" data-size class="select-log w-full">
+      <select id="print-size" data-size class:list={["select-log w-full", narrowSelect]}>
         {sizes.map((size) => <option value={size}>{size}</option>)}
       </select>
     </div>
 
     <div class="flex flex-col gap-1.5">
       <label for="print-paper" class="eyebrow text-faint">Paper</label>
-      <select id="print-paper" data-paper class="select-log w-full">
+      <select id="print-paper" data-paper class:list={["select-log w-full", narrowSelect]}>
         {papers.map((paper) => <option value={paper}>{paper}</option>)}
       </select>
     </div>
