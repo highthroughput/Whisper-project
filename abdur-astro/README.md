@@ -459,12 +459,10 @@ of them in place — but do not launch until each box is checked.
       ("Buymeacoffee"). 36 links total, no shared URLs.
 - [x] Sky-Watcher 10″ rental rates (one night $20, weekend $35, weekly $70)
       have real live Payment Links in `src/data/rentals.ts`.
-- [ ] Orion 8″ rental rates (one night $15, weekend $30, weekly $60) need
-      three Payment Links, set up like the 10″ ones. Paste each into its
-      empty `stripeLink` in `src/data/rentals.ts`, deploy, then rerun
-      `scripts/stripe-redirects.mjs --apply` so they return to `/thank-you`.
-      Until then the 8″ books by email: the form sends Abdur the dates and
-      reference, and he replies with a way to pay.
+- [x] Orion 8″ rental rates (one night $15, weekend $30, weekly $60) have
+      real live Payment Links in `src/data/rentals.ts` (created 2026-11-19).
+      Rerun `scripts/stripe-redirects.mjs --apply` so they return to
+      `/thank-you`.
 - [x] Orion 8″ photo is in `src/assets/rentals/orion-8-dobsonian.jpg`
       (a stand-in until a better one is taken). A scope with no `image`
       skips the photo and its card on `/rentals` shows the aperture.

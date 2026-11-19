@@ -125,12 +125,28 @@ export const RENTAL_SCOPES: RentalScope[] = [
     ],
     eyepieces: '25 mm Plössl and 7 mm X-Cel',
     extras: 'Setup video',
-    // Payment Links not created yet: until they are, bookings go through as
-    // emailed requests and Abdur replies with a link. See README, Rentals.
     rates: [
-      { term: 'One night', nights: 1, detail: 'Up to 1 night', price: 15, stripeLink: '' },
-      { term: 'Weekend', nights: 3, detail: 'Up to 3 nights', price: 30, stripeLink: '' },
-      { term: 'Weekly', nights: 7, detail: 'Up to 7 nights', price: 60, stripeLink: '' },
+      {
+        term: 'One night',
+        nights: 1,
+        detail: 'Up to 1 night',
+        price: 15,
+        stripeLink: 'https://buy.stripe.com/dRmdRbage7sVfbzbjC3Nm0O',
+      },
+      {
+        term: 'Weekend',
+        nights: 3,
+        detail: 'Up to 3 nights',
+        price: 30,
+        stripeLink: 'https://buy.stripe.com/14A00ldsq6oRfbz0EY3Nm0P',
+      },
+      {
+        term: 'Weekly',
+        nights: 7,
+        detail: 'Up to 7 nights',
+        price: 60,
+        stripeLink: 'https://buy.stripe.com/4gM6oJ886aF75AZ9bu3Nm0Q',
+      },
     ],
   },
 ];
