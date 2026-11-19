@@ -187,6 +187,8 @@ const productPlans = new Map(); // product id → { product, paper, wantName, wa
 const linkPlans = [];
 const handEdits = [];
 const problems = [];
+const noAddress = [];
+const noShippingRate = [];
 
 for (const [id, entry] of prints) {
   const link = byId.get(id);
@@ -223,6 +225,11 @@ for (const [id, entry] of prints) {
       plan.links.push(link.url);
     }
   }
+
+  // Read-only shipping check: a print link that doesn't ask for an address
+  // takes payment for something there's nowhere to send.
+  if (!link.shipping_address_collection) noAddress.push(`${link.url} (${option})`);
+  else if (!(link.shipping_options ?? []).length) noShippingRate.push(`${link.url} (${option})`);
 
   // Checkout text: the field a buyer reads at the point duties matter.
   const field = link.shipping_address_collection ? 'shipping_address' : 'submit';
@@ -275,6 +282,19 @@ if (handEdits.length) {
 if (problems.length) {
   console.log('\nLeft alone:');
   for (const p of problems) console.log(`  ${p}`);
+}
+// Reported, never changed: these are settings to fix in the Dashboard.
+if (noAddress.length) {
+  console.log(`\nSHIPPING: ${noAddress.length} print link(s) don't collect a shipping address, so a buyer can pay without giving one.`);
+  console.log('Fix in the Dashboard: Payment Links → the link → Edit → collect customers\' shipping addresses (Canada and the US):');
+  for (const l of noAddress) console.log(`  ${l}`);
+}
+if (noShippingRate.length) {
+  console.log(`\nSHIPPING: ${noShippingRate.length} print link(s) collect an address but have no shipping rate, so buyers aren't charged for shipping:`);
+  for (const l of noShippingRate) console.log(`  ${l}`);
+}
+if (prints.size - missing.length && !noAddress.length && !noShippingRate.length) {
+  console.log('\nShipping: every print link found collects a shipping address and has a shipping rate.');
 }
 
 const work = productUpdates.length + linkPlans.length;
