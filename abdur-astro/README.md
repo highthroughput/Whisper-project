@@ -165,7 +165,8 @@ parties" notice gives way to the list. (In `npm run dev`, restart after adding
 the first file to an empty folder.)
 
 **The sky calendar** is `src/data/sky-events.ts`, one row per event in
-Mountain Time, with its source. New Moon rows carry the dark weekend
+Alberta Time (ABT, UTC-6 all year since Nov 2026), with its source and the
+Alberta date. New Moon rows carry the dark weekend
 ("Nearest weekend (derived): Fri … / Sat …"), which `/events` and
 `/star-parties` show. Add the next year's rows before the last ones pass.
 A real hosted star party can also go there as `type: 'Star party'` with

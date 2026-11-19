@@ -6,7 +6,7 @@ import { cleanPathname } from '../lib/urls';
 import { breadcrumbJsonLd, type Crumb } from '../lib/breadcrumbs';
 import {
   darkWeekendLabel,
-  mountainToday,
+  albertaToday,
   starPartyEventJsonLd,
   upcomingSkyEvents,
   type SkyEvent,
@@ -16,7 +16,7 @@ import {
 // markdown file each); the sky calendar comes from src/data/sky-events.ts.
 // Both show only what's still to come on the day the site was built, so the
 // site has to be rebuilt at least monthly for past dates to drop off.
-const today = mountainToday();
+const today = albertaToday();
 // Asking an empty collection for its entries logs a warning on every build,
 // and no hosted event on the calendar is the usual state.
 const hasEventFiles = Object.keys(import.meta.glob('../content/events/**/*.md')).length > 0;
@@ -87,7 +87,7 @@ const legacyMonthDay = (date: Date) =>
     <h1 class="mt-3 font-display text-4xl sm:text-5xl">Events</h1>
     <p class="mt-6 max-w-2xl text-faint">
       New moons, meteor showers, eclipses and planet nights for Calgary and Southern Alberta, with
-      the best weekends for a star party or a rental. Times are Mountain Time.
+      the best weekends for a star party or a rental. Times are Alberta Time (UTC−6).
     </p>
 
     {

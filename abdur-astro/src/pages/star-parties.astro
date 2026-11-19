@@ -8,7 +8,7 @@ import { cleanPathname } from '../lib/urls';
 import { breadcrumbJsonLd, type Crumb } from '../lib/breadcrumbs';
 import { faqPageJsonLd, getFaqGroups } from '../data/faq';
 import { LESSON_RENTAL_NIGHT, STAR_PARTY, starPartyTotal } from '../data/star-parties';
-import { darkWeekend, darkWeekendLabel, mountainToday, upcomingSkyEvents } from '../data/sky-events';
+import { darkWeekend, darkWeekendLabel, albertaToday, upcomingSkyEvents } from '../data/sky-events';
 
 const sp = STAR_PARTY;
 const [small, large] = sp.examples;
@@ -20,7 +20,7 @@ const faq = (await getFaqGroups()).find((group) => group.id === 'star-parties')!
 
 // The next four dark weekends: New Moon rows whose derived Saturday hasn't
 // passed yet on the day the site was built.
-const today = mountainToday();
+const today = albertaToday();
 const darkWeekends = upcomingSkyEvents()
   .filter((e) => e.type === 'Moon' && e.title === 'New Moon')
   .filter((e) => (darkWeekend(e)?.sat ?? '') >= today)
