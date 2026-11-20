@@ -5,7 +5,7 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 import CrossSell from '../components/CrossSell.astro';
 import FaqList from '../components/FaqList.astro';
 import { PICKUP_TERMS, RENTAL_SCOPES, lowestRentalRate } from '../data/rentals';
-import { LESSON_RENTAL_NIGHT } from '../data/star-parties';
+import { LESSON_RENTAL_NIGHT, hoursInWords } from '../data/star-parties';
 import { faqPageJsonLd, getFaqGroups } from '../data/faq';
 import { cleanPathname } from '../lib/urls';
 import { breadcrumbJsonLd, type Crumb } from '../lib/breadcrumbs';
@@ -13,7 +13,7 @@ import { breadcrumbJsonLd, type Crumb } from '../lib/breadcrumbs';
 const canonical = new URL(cleanPathname(Astro.url.pathname), Astro.site).href;
 const crumbs: Crumb[] = [{ label: 'Rentals' }];
 const faq = (await getFaqGroups()).find((group) => group.id === 'rentals')!;
-const lessonCard = `New to telescopes? Book an observing lesson + rental night ($${LESSON_RENTAL_NIGHT.price}): an evening with me and the scope, at least two hours of observing, rental included.`;
+const lessonCard = `New to telescopes? Book an observing lesson + rental night ($${LESSON_RENTAL_NIGHT.price}): an evening with me and the scope, at least ${hoursInWords(LESSON_RENTAL_NIGHT.minHours)} of observing, rental included.`;
 
 // Every scope, with its own page under /rentals/<slug>. The rates and what's
 // in the case come from src/data/rentals.ts, so this page can't disagree

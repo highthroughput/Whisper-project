@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 /**
- * Parse every JSON-LD block in the built site and count them by @type.
+ * Parse every JSON-LD block in the built site and count them by @type, and
+ * check each page's meta description fits a search result.
  *
  *   npm run build && npm run check:jsonld
  *
  * Fails (exit 1) if any block isn't valid JSON, has no @type, or a page carries
- * more than one FAQPage, BreadcrumbList or LocalBusiness block. Prints a count
- * per @type, and per page with --pages.
+ * more than one FAQPage, BreadcrumbList or LocalBusiness block, or if an
+ * indexable page's meta description is longer than 160 characters. Prints a
+ * count per @type, and per page with --pages.
  */
 import { readdir, readFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
@@ -14,6 +16,8 @@ import { fileURLToPath } from 'node:url';
 
 const DIST = fileURLToPath(new URL('../dist/', import.meta.url));
 const SHOW_PAGES = process.argv.includes('--pages');
+/** Longest meta description before search results start cutting it off. */
+const MAX_DESCRIPTION = 160;
 /** Types a page should never carry twice. */
 const ONCE_PER_PAGE = ['FAQPage', 'BreadcrumbList', 'LocalBusiness'];
 
@@ -48,6 +52,13 @@ for (const file of files) {
   const page = '/' + relative(DIST, file).replace(/\.html$/, '').replace(/(^|\/)index$/, '');
   const html = await readFile(file, 'utf8');
   const perPage = new Map();
+  const description = html.match(/<meta name="description" content="([^"]*)"/)?.[1];
+  const noindex = /<meta name="robots" content="noindex"/.test(html);
+  if (description && !noindex) {
+    const text = description.replace(/&amp;/g, '&').replace(/&#39;/g, "'").replace(/&quot;/g, '"');
+    const length = [...text].length;
+    if (length > MAX_DESCRIPTION) problems.push(`${page}: meta description is ${length} characters (max ${MAX_DESCRIPTION})`);
+  }
   for (const match of html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)) {
     blocks += 1;
     let data;

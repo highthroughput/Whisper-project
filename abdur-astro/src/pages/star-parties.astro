@@ -7,8 +7,14 @@ import eventPhoto from '../assets/photos/event-photo.jpg';
 import { cleanPathname } from '../lib/urls';
 import { breadcrumbJsonLd, type Crumb } from '../lib/breadcrumbs';
 import { faqPageJsonLd, getFaqGroups } from '../data/faq';
-import { LESSON_RENTAL_NIGHT, STAR_PARTY, starPartyTotal } from '../data/star-parties';
-import { darkWeekend, darkWeekendLabel, albertaToday, upcomingSkyEvents } from '../data/sky-events';
+import {
+  LESSON_RENTAL_NIGHT,
+  STAR_PARTY,
+  darkSiteDistance,
+  hoursInWords,
+  starPartyTotal,
+} from '../data/star-parties';
+import { darkWeekendLabel, upcomingDarkWeekends } from '../data/sky-events';
 
 const sp = STAR_PARTY;
 const [small, large] = sp.examples;
@@ -18,22 +24,17 @@ const canonical = new URL(cleanPathname(Astro.url.pathname), Astro.site).href;
 const crumbs: Crumb[] = [{ label: 'Star parties' }];
 const faq = (await getFaqGroups()).find((group) => group.id === 'star-parties')!;
 
-// The next four dark weekends: New Moon rows whose derived Saturday hasn't
-// passed yet on the day the site was built.
-const today = albertaToday();
-const darkWeekends = upcomingSkyEvents()
-  .filter((e) => e.type === 'Moon' && e.title === 'New Moon')
-  .filter((e) => (darkWeekend(e)?.sat ?? '') >= today)
-  .slice(0, 4)
-  .map((e) => darkWeekendLabel(e)!);
+// The next four dark weekends whose Saturday hasn't passed on the day the
+// site was built.
+const darkWeekends = upcomingDarkWeekends(4).map((e) => darkWeekendLabel(e)!);
 
 const eventAlt =
   'Abdur in a red jacket talking with his hands at an outdoor public astronomy event on a sunny day, beside a solar telescope on a tracking mount, with a white refractor and a small crowd of families on the grass behind him.';
 
 const night: [string, string][] = [
-  ['Where', 'Your acreage, campground, lodge or venue, or a dark site near Big Hill Springs, about 40 minutes from downtown Calgary'],
+  ['Where', `Your acreage, campground, lodge or venue, or a dark site near ${sp.darkSite.near}, ${darkSiteDistance()}`],
   ['Good for', 'Birthdays, family gatherings, camps, team retreats and weddings'],
-  ['I bring', 'My largest telescopes, eyepieces, and a guided tour of at least two hours'],
+  ['I bring', `My largest telescopes, eyepieces, and a guided tour of at least ${hoursInWords(sp.minHours)}`],
   ['Weather', "If it's cloudy, we move to the next clear night or you get a full refund"],
 ];
 
@@ -44,7 +45,7 @@ const service = {
   name: 'Private star party',
   serviceType: 'Private stargazing event',
   description:
-    'A private star party at your acreage, campground, lodge or venue near Calgary and Cochrane: telescopes, eyepieces and a guided tour of the night sky of at least two hours, with a clear-night guarantee.',
+    `A private star party at your acreage, campground, lodge or venue near Calgary and Cochrane: telescopes, eyepieces and a guided tour of the night sky of at least ${hoursInWords(sp.minHours)}, with a clear-night guarantee.`,
   provider: { '@id': 'https://abdurastro.com/#business' },
   areaServed: [
     { '@type': 'City', name: 'Calgary' },
@@ -74,7 +75,7 @@ const cards = [
   },
   {
     title: 'Learn to find things yourself',
-    text: `An observing lesson + rental night is $${LESSON_RENTAL_NIGHT.price}: an evening with me and a rental Dobsonian, at least two hours of observing, rental included. Online and in-person astrophotography tutorials are on the services page.`,
+    text: `An observing lesson + rental night is $${LESSON_RENTAL_NIGHT.price}: an evening with me and a rental Dobsonian, at least ${hoursInWords(LESSON_RENTAL_NIGHT.minHours)} of observing, rental included. Online and in-person astrophotography tutorials are on the services page.`,
     links: [
       { label: 'Ask about a lesson →', href: '/contact?topic=tutorials' },
       { label: 'Services →', href: '/services' },
@@ -87,6 +88,7 @@ const sectionHead = 'font-display text-3xl';
 // Built here as whole sentences: prices and numbers mid-sentence in markup are
 // one stray line break away from "up to20".
 const priceLine = `$${sp.bookingFee} booking fee + $${sp.perGuest} per guest (CAD). ${small} guests is $${starPartyTotal(small)}; ${large} guests is $${starPartyTotal(large)}. Groups of up to ${sp.maxGuests}; ask about larger groups.`;
+const nightIntro = `I arrive early and set up my largest telescopes. Once your group is there, we observe for at least ${hoursInWords(sp.minHours)}, and the best dates are the weeks around the new moon.`;
 const termsLine = `The $${sp.bookingFee} booking fee holds your date and is fully refundable if you cancel at least ${sp.refundWindowHours} hours before. The guest fee is due ${sp.guestFeeDueHours} hours before the party.`;
 ---
 
@@ -155,10 +157,7 @@ const termsLine = `The $${sp.bookingFee} booking fee holds your date and is full
           <span class="font-mono text-[0.6875rem] text-dust" aria-hidden="true">02</span>
           <div class="max-w-prose">
             <h2 id="night-heading" class={sectionHead}>What a night looks like</h2>
-            <p class="mt-5 leading-relaxed text-star/85">
-              I arrive early and set up my largest telescopes. Once your group is there, we observe
-              for at least two hours, and the best dates are the weeks around the new moon.
-            </p>
+            <p class="mt-5 leading-relaxed text-star/85">{nightIntro}</p>
           </div>
           {/* The same spec panel as the star-party block on /services. */}
           <section class="border hairline bg-surface lg:col-start-3" aria-label="What a star party includes">

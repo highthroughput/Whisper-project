@@ -9,7 +9,7 @@
 import { getCollection } from 'astro:content';
 import { SITE } from '../config';
 import { RENTAL_SCOPES } from './rentals';
-import { LESSON_RENTAL_NIGHT, STAR_PARTY, starPartyTotal } from './star-parties';
+import { LESSON_RENTAL_NIGHT, STAR_PARTY, darkSiteDistance, hoursInWords, starPartyTotal } from './star-parties';
 
 export type AnswerPart = string | { text: string; href: string };
 
@@ -86,7 +86,7 @@ export async function getFaqGroups(): Promise<FaqGroup[]> {
         {
           q: 'Can you show me how to use it?',
           a: [
-            `Yes. An observing lesson + rental night is $${LESSON_RENTAL_NIGHT.price}: an evening with Abdur and the rental scope, at least two hours of observing, with that night's rental included. `,
+            `Yes. An observing lesson + rental night is $${LESSON_RENTAL_NIGHT.price}: an evening with Abdur and the rental scope, at least ${hoursInWords(LESSON_RENTAL_NIGHT.minHours)} of observing, with that night's rental included. `,
             { text: 'Ask through the contact form', href: '/contact?topic=tutorials' },
             '.',
           ],
@@ -113,12 +113,12 @@ export async function getFaqGroups(): Promise<FaqGroup[]> {
         {
           q: 'Where can it be held?',
           a: [
-            'Your acreage, campground, lodge or venue, or any fairly dark spot. Otherwise, a dark site about 40 minutes from downtown Calgary near Big Hill Springs in Rocky View County.',
+            `Your acreage, campground, lodge or venue, or any fairly dark spot. Otherwise, a dark site ${darkSiteDistance()} near ${sp.darkSite.near} in ${sp.darkSite.area}.`,
           ],
         },
         {
           q: 'How long is it?',
-          a: ['At least two hours of guided observing. Abdur arrives early to set up his largest telescopes.'],
+          a: [`At least ${hoursInWords(sp.minHours)} of guided observing. Abdur arrives early to set up his largest telescopes.`],
         },
         {
           q: "What if it's cloudy?",

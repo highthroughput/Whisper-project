@@ -14,7 +14,9 @@ documented in [DESIGN.md](./DESIGN.md).
 - Astro's built-in image service — responsive `srcset`, WebP, lazy loading below
   the fold; full-resolution files never ship to mobile
 - Content collections (`src/content.config.ts`) for photos and prints
-- `@astrojs/sitemap`, JSON-LD (LocalBusiness site-wide, Product on print pages)
+- `@astrojs/sitemap`, JSON-LD (LocalBusiness site-wide; ProductGroup on print
+  pages, Product on rental pages, Service on /services and /star-parties,
+  FAQPage, BreadcrumbList)
 - Fonts self-hosted via Fontsource: Marcellus / Archivo / IBM Plex Mono
 
 ## Local development
@@ -186,8 +188,9 @@ A real hosted star party can also go there as `type: 'Star party'` with
   `breadcrumbJsonLd` (`src/lib/breadcrumbs.ts`), so the visible trail and the
   structured data match.
 - `npm run check:jsonld` (after a build) parses every JSON-LD block and
-  counts them by type; it fails on invalid JSON or a duplicated FAQPage,
-  BreadcrumbList or LocalBusiness on one page.
+  counts them by type; it fails on invalid JSON, a duplicated FAQPage,
+  BreadcrumbList or LocalBusiness on one page, or a meta description over
+  160 characters on an indexable page.
 - `public/_redirects` sends `/sitemap.xml` to `/sitemap-index.xml` with a 301.
   Cloudflare's static assets read it before serving files; Astro's own
   `redirects` would only write a meta-refresh page.
@@ -488,11 +491,10 @@ of them in place — but do not launch until each box is checked.
       and `src/pages/prints/[slug].astro` — the number itself is still an
       estimate, confirm before launch
 - [ ] Coordinates in `src/config.ts` (`coordinates`) if 51.0° N · 114.1° W isn't right
-- [ ] No real hosted events (star parties, talks) are on the calendar yet.
-      `src/content/events/` currently has only `kind: 'astronomical'` entries
-      (meteor showers, the winter solstice — real, well-known annual dates).
-      Add `kind: 'hosted'` markdown files as real dates are confirmed; see
-      "Adding a new event" above.
+- [ ] No real hosted events (star parties, talks) are on the calendar yet:
+      `src/content/events/` is empty, and the sky calendar lives in
+      `src/data/sky-events.ts`. Add `kind: 'hosted'` markdown files as real
+      dates are confirmed; see "Adding a new event" above.
 
 ### 3. Stripe Payment Links
 

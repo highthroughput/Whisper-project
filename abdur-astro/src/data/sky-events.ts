@@ -76,7 +76,7 @@ export const SKY_EVENTS: SkyEvent[] = [
   { date: '2027-07-03', time: '21:02 ABT', title: 'New Moon', type: 'Moon', note: NEW('2027-07-02', '2027-07-03'), source: USNO },
   { date: '2027-07-18', time: '09:45 ABT', title: 'Full Moon', type: 'Moon', note: FULL, source: USNO },
   { date: '2027-07-30', time: '', title: 'Southern Delta Aquariids + Alpha Capricornids (Jul 30–31)', type: 'Meteor shower', note: '~7% waning crescent Moon that rises at dawn, favourable; Alpha Capricornids known for fireballs', source: AMS },
-  { date: '2027-08-02', time: '', title: 'Total solar eclipse (NOT visible from Alberta)', type: 'Eclipse', note: 'Path over N Africa/Spain/Middle East; content hook only', source: TAD },
+  { date: '2027-08-02', time: '', title: 'Total solar eclipse (not visible from Alberta)', type: 'Eclipse', note: 'The path of totality crosses Spain, North Africa and the Middle East', source: TAD },
   { date: '2027-08-02', time: '04:05 ABT', title: 'New Moon', type: 'Moon', note: NEW('2027-07-30', '2027-07-31'), source: USNO },
   { date: '2027-08-12', time: '', title: 'Perseids peak night (Aug 12–13)', type: 'Meteor shower', note: '~86% waxing gibbous Moon sets about 2 am, leaving dark sky before dawn; 30–50/hr from rural sites', source: AMS },
   { date: '2027-08-16', time: '23:24 ABT – 03:03 ABT Aug 17', title: 'Penumbral lunar eclipse', type: 'Eclipse', note: 'Calgary: max ~1:13 am Aug 17; subtle shading', source: TAD },
@@ -93,7 +93,7 @@ export const SKY_EVENTS: SkyEvent[] = [
   { date: '2027-11-17', time: '', title: 'Leonids peak night (Nov 17–18)', type: 'Meteor shower', note: '~80% waning gibbous Moon; best before dawn on Nov 18', source: AMS },
   { date: '2027-11-27', time: '21:24 ABT', title: 'New Moon', type: 'Moon', note: NEW('2027-11-26', '2027-11-27'), source: USNO },
   { date: '2027-12-13', time: '10:09 ABT', title: 'Full Moon', type: 'Moon', note: FULL, source: USNO },
-  { date: '2027-12-14', time: '', title: 'Geminids peak (Dec 14, UTC)', type: 'Meteor shower', note: '~98% full Moon on peak: poor year', source: AMS },
+  { date: '2027-12-14', time: '', title: 'Geminids peak night (Dec 14–15)', type: 'Meteor shower', note: 'Nearly full Moon (about 98%) up all night: a poor year', source: AMS },
   { date: '2027-12-21', time: '20:42 ABT', title: 'December solstice', type: 'Season', note: 'Longest night', source: USNO },
   { date: '2027-12-22', time: '', title: 'Ursids peak night (Dec 22–23)', type: 'Meteor shower', note: '~21% waning crescent Moon; the short peak is late in the evening of Dec 22', source: AMS },
   { date: '2027-12-27', time: '14:12 ABT', title: 'New Moon', type: 'Moon', note: NEW('2027-12-24', '2027-12-25'), source: USNO },
@@ -136,6 +136,19 @@ export function shortDate(iso: string): string {
 export function darkWeekendLabel(event: SkyEvent): string | null {
   const w = darkWeekend(event);
   return w ? `Dark weekend: Fri ${shortDate(w.fri)} / Sat ${shortDate(w.sat)}` : null;
+}
+
+/**
+ * The next `count` dark weekends whose Saturday hasn't passed. Judged on the
+ * weekend, not the New Moon: a weekend can fall a few days either side of
+ * its New Moon, so filtering on the New Moon's date would drop a weekend
+ * still to come or keep one already gone.
+ */
+export function upcomingDarkWeekends(count: number, events = SKY_EVENTS, today = albertaToday()): SkyEvent[] {
+  return events
+    .filter((e) => e.type === 'Moon' && e.title === 'New Moon' && (darkWeekend(e)?.sat ?? '') >= today)
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .slice(0, count);
 }
 
 /**

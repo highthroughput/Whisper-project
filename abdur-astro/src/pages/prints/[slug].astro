@@ -43,7 +43,9 @@ const slides = [
 
 const canonical = new URL(cleanPathname(Astro.url.pathname), Astro.site).href;
 const crumbs: Crumb[] = [{ label: 'Prints', href: '/prints' }, { label: data.title }];
-const description = `${data.title} fine art print: archival giclée astrophotography from Alberta on archival matte or Hahnemühle FineArt Pearl gloss paper, ${data.options[0].size} to ${data.options[data.options.length - 1].size}, from $${from} CAD. Ships across North America.`;
+// Kept under 160 characters for the longest title (North America & Pelican
+// Nebulae); `npm run check:jsonld` fails the build output if one isn't.
+const description = `${data.title} fine art print from Alberta: archival giclée on matte or Hahnemühle FineArt Pearl paper, ${data.options[0].size} to ${data.options[data.options.length - 1].size}, from $${from} CAD.`;
 
 // Google's merchant listings ask for the product image at 1:1, 4:3 and 16:9.
 // The master is 3:2, so each is a centred crop of the full-resolution file.

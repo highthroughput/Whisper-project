@@ -48,7 +48,7 @@ const integrationPart =
   total > 0
     ? `${hours} hours of ${filterPart ? `${filterPart.replaceAll(' · ', '/')} ` : ''}integration. `
     : '';
-const description = `${data.title} (${data.target}) photographed from ${locationPart}. ${integrationPart}Full acquisition log: telescope, camera, mount, filters and capture dates.`;
+const description = `${data.title} (${data.target}) photographed from ${locationPart}. ${integrationPart}Full acquisition log: telescope, camera, mount, filters and dates.`;
 
 const credit = await photoCredit(data.image, GALLERY_PHOTO_IMAGE, Astro.site);
 const canonical = new URL(cleanPathname(Astro.url.pathname), Astro.site).href;

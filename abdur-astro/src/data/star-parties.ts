@@ -23,7 +23,7 @@ export const STAR_PARTY = {
   /** Minimum guided observing once the group arrives. */
   minHours: 2,
   /** The fallback site when the client has no dark spot of their own. */
-  darkSite: 'a dark site near Big Hill Springs in Rocky View County, about 40 minutes from downtown Calgary',
+  darkSite: { near: 'Big Hill Springs', area: 'Rocky View County', minutesFromCalgary: 40 },
   /** Contact form topic key (see INQUIRY_TOPICS in src/config.ts). */
   topic: 'starparty',
 } as const;
@@ -37,3 +37,11 @@ export const LESSON_RENTAL_NIGHT = {
   /** Minimum observing. */
   minHours: 2,
 } as const;
+
+const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+
+/** 2 → "two hours", as the copy spells small numbers. */
+export const hoursInWords = (n: number) => `${WORDS[n] ?? n} hour${n === 1 ? '' : 's'}`;
+
+/** "about 40 minutes from downtown Calgary". */
+export const darkSiteDistance = () => `about ${STAR_PARTY.darkSite.minutesFromCalgary} minutes from downtown Calgary`;

@@ -10,7 +10,7 @@ import ConsultBooking from '../components/ConsultBooking.astro';
 import eventPhoto from '../assets/photos/event-photo.jpg';
 import { byDateDesc } from '../lib/photos';
 import { HOURLY_RATE, TUTORIAL_HOUR_LINKS, CONSULTING_HOUR_LINKS } from '../data/checkout';
-import { LESSON_RENTAL_NIGHT, STAR_PARTY } from '../data/star-parties';
+import { LESSON_RENTAL_NIGHT, STAR_PARTY, hoursInWords } from '../data/star-parties';
 
 // Stripe links and the hourly rate live in src/data/checkout.ts, shared with
 // the thank-you page that values a paid session after checkout.
@@ -80,8 +80,7 @@ const crumbs: Crumb[] = [{ label: 'Services' }];
 const breadcrumbLd = breadcrumbJsonLd(crumbs, Astro.site, new URL(cleanPathname(Astro.url.pathname), Astro.site).href);
 
 const lessonHeading = `Observing lesson + rental night: $${LESSON_RENTAL_NIGHT.price}.`;
-const lessonText =
-  'An evening with me and a rental Dobsonian at your place or a semi-dark site: at least two hours of observing, a curated list, and how to find things yourself. The rental for that night is included.';
+const lessonText = `An evening with me and a rental Dobsonian at your place or a semi-dark site: at least ${hoursInWords(LESSON_RENTAL_NIGHT.minHours)} of observing, a curated list, and how to find things yourself. The rental for that night is included.`;
 const starPartyPrice = `$${STAR_PARTY.bookingFee} booking fee + $${STAR_PARTY.perGuest} per guest.`;
 
 // Tutorials and consulting as Services, each at the hourly rate the booking
@@ -132,7 +131,7 @@ const serviceLd = [
     <h1 class="mt-3 font-display text-4xl sm:text-5xl">Services</h1>
     <p class="mt-6 max-w-2xl text-faint">
       The photographs are one output of years spent learning this sky. The rest is teaching it,
-      speccing gear for it, and sharing it in person: astronomy tutorials Canada-wide, and
+      speccing gear for it, and sharing it in person: astronomy tutorials Canada-wide, and{' '}
       <a href="/star-parties" class="link-quiet">dark-sky experiences</a> rooted in Southern Alberta.
       Looking to try a telescope before you buy one? See <a href="/rentals" class="link-quiet">scope rentals</a>.
     </p>

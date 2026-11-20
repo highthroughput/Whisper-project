@@ -4,9 +4,11 @@
  * description, a long scroll below the fold. This slim bar sits at the bottom
  * of the screen until the box itself comes into view, and jumps to it.
  *
- * It's fixed, so it overlays content and never shifts it, and it stays out of
- * the way of the consent notice, which uses the same strip of screen. Without
- * JS it never appears: the box is still on the page, just further down.
+ * It's fixed, so it overlays content and never shifts it. It sits under the
+ * header (z-30 against the header's z-40), so the open mobile menu covers it,
+ * and it stays out of the way of the consent notice, which uses the same
+ * strip of screen. Without JS it never appears: the box is still on the page,
+ * just further down.
  */
 interface Props {
   /** e.g. "Book the Orion 8″ · from $15" */
@@ -19,7 +21,7 @@ const { label, target } = Astro.props;
 ---
 
 <div
-  class="sticky-book-bar fixed inset-x-0 bottom-0 z-40 border-t hairline bg-surface/95 px-4 py-3 backdrop-blur lg:hidden"
+  class="sticky-book-bar fixed inset-x-0 bottom-0 z-30 border-t hairline bg-surface/95 px-4 py-3 backdrop-blur lg:hidden"
   data-target={target}
   hidden
 >

@@ -158,6 +158,11 @@
       min-height: 2.75rem;
       padding-inline: 1.1rem;
     }
+
+    /* The small button is a touch target on phones too. */
+    .btn-sm {
+      min-height: 2.75rem;
+    }
   }
 
   /* A <select> drawn in the log register. The chevron is painted here because

@@ -1,5 +1,5 @@
 import { existsSync, readdirSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
@@ -102,7 +102,9 @@ const events = defineCollection({
   loader: {
     name: 'hosted-events',
     load: async (context) => {
-      const dir = resolve('src/content/events');
+      // Against the project root, as the glob loader resolves its base, not
+      // the shell's working directory.
+      const dir = fileURLToPath(new URL('./src/content/events/', context.config.root));
       const hasEvents =
         existsSync(dir) && readdirSync(dir, { recursive: true }).some((f) => String(f).endsWith('.md'));
       if (!hasEvents) {
@@ -114,8 +116,12 @@ const events = defineCollection({
   },
   schema: z.object({
     title: z.string(),
-    /** 'hosted' = a star party or talk being run personally; 'astronomical' = a sky event happening regardless. */
-    kind: z.enum(['hosted', 'astronomical']),
+    /**
+     * Always 'hosted': a star party or talk Abdur runs. Sky events (meteor
+     * showers, Moon phases) live in src/data/sky-events.ts, so an
+     * 'astronomical' entry here would fail the build rather than vanish.
+     */
+    kind: z.enum(['hosted']),
     /** Machine date used for sorting; past events drop off the calendar. */
     date: z.coerce.date(),
     /** Human-readable date/time shown in the log, e.g. "Peak night, Oct 8" or "Sat Nov 14 · 7–10pm". */
@@ -123,8 +129,6 @@ const events = defineCollection({
     location: z.string().optional(),
     /** Hosted events: where to book or RSVP. */
     rsvpLink: z.string().optional(),
-    /** Astronomical events: link to more detail. */
-    infoUrl: z.string().optional(),
   }),
 });
 
